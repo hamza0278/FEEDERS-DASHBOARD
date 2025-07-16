@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ACTIVATION KEYS</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
+      color: white;
+      margin: 0;
+    }
+
+    @keyframes gradientBG {
+      0% {background-position: 0% 50%;}
+      50% {background-position: 100% 50%;}
+      100% {background-position: 0% 50%;}
+    }
+
+    header {
+      background: rgba(0, 0, 0, 0.6);
+      color: #00f7ff;
+      padding: 1rem 2rem;
+      text-align: center;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    .header-title {
+      margin: 0;
+      font-size: 1.8rem;
+      font-weight: bold;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 2rem auto;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
+      padding: 2rem;
+      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      font-weight: 700;
+      font-size: 1.6rem;
+      color: #00f7ff;
+    }
+
+    .top-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .btn-group-right {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .btn {
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 0.95rem;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-shadow: 0 0 5px rgba(0,0,0,0.2);
+    }
+
+    .btn.yellow {
+      background: linear-gradient(135deg, #f7ff00, #db36a4);
+      color: white;
+    }
+
+    .btn.yellow:hover {
+      filter: brightness(1.2);
+    }
+
+    .btn.blue {
+      background: linear-gradient(135deg, #00f7ff, #007bff);
+      color: white;
+    }
+
+    .btn.blue:hover {
+      filter: brightness(1.2);
+    }
+
+    .btn.red {
+      background: linear-gradient(135deg, #ff416c, #ff4b2b);
+      color: white;
+    }
+
+    .btn.red:hover {
+      filter: brightness(1.2);
+    }
+
+    .form-control {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 8px;
+      height: 38px;
+    }
+
+    .form-control::placeholder {
+      color: #ccc;
+    }
+
+    .key-box {
+      display: flex;
+      flex-direction: column;
+      background: rgba(255, 255, 255, 0.06);
+      padding: 12px 16px;
+      border-radius: 12px;
+      height: 100%;
+      justify-content: space-between;
+      border-left: 4px solid #00f7ff;
+      backdrop-filter: blur(6px);
+      box-shadow: 0 2px 10px rgba(0, 255, 255, 0.2);
+    }
+
+    .key-text {
+      word-break: break-word;
+      font-weight: 600;
+      font-size: 1rem;
+      color: #e3f6ff;
+    }
+
+    .key-actions {
+      margin-top: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .key-actions button {
+      background: #00f7ff;
+      border: none;
+      color: #000;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: bold;
+      transition: background 0.2s ease;
+    }
+
+    .key-actions button:hover {
+      background: #00c9d8;
+    }
+
+    .status-label {
+      font-size: 0.8rem;
+      font-weight: bold;
+      padding: 4px 10px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(4px);
+      color: #fff;
+    }
+
+    .status-label.used {
+      background: rgba(220, 53, 69, 0.8);
+    }
+
+    .status-label.unused {
+      background: rgba(40, 167, 69, 0.8);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-title">FEEDER MONITORING DASHBOARD</div>
+  </header>
+
+  <div class="container">
+    <h2>Generated Activation Keys</h2>
+
+    <div class="top-actions">
+      <a href="dashboard.html" class="btn yellow">← Back</a>
+
+      <div class="btn-group-right">
+        <input type="number" min="1" id="search-input" class="form-control" placeholder="Search by Serial No." style="max-width: 220px;">
+        <button class="btn blue" onclick="generateKey()">+ Generate</button>
+        <button class="btn red" onclick="deleteUsed()">Delete Used</button>
+      </div>
+    </div>
+
+    <div id="key-list" class="row gx-3 gy-3"></div>
+  </div>
+
+  <script>
+    const API_BASE = location.hostname === 'localhost' ? 'http://localhost:3000/api/keys' : `http://${location.hostname}:3000/api/keys`;
+    let allKeys = [];
+
+    async function loadKeys() {
+      try {
+        const res = await fetch(API_BASE);
+        const data = await res.json();
+        allKeys = data.keys || [];
+        displayKeys();
+      } catch {
+        Swal.fire("Error", "Could not fetch keys from the server.", "error");
+      }
+    }
+
+    function displayKeys() {
+      const searchValue = document.getElementById('search-input').value.trim();
+      const searchNumber = parseInt(searchValue);
+      const keysWithSerial = allKeys.map((item, idx) => ({ ...item, serial: idx + 1 }));
+
+      let filtered = keysWithSerial.filter(item => isNaN(searchNumber) || item.serial === searchNumber);
+
+      const list = document.getElementById('key-list');
+      list.innerHTML = '';
+
+      if (filtered.length === 0) {
+        list.innerHTML = '<p class="text-center text-light">No keys found.</p>';
+        return;
+      }
+
+      filtered.forEach(item => {
+        const key = item.key || item;
+        const used = item.used || false;
+        const serial = item.serial;
+
+        const col = document.createElement('div');
+        col.className = 'col-md-6 col-lg-4';
+
+        const keyBox = document.createElement('div');
+        keyBox.className = 'key-box';
+
+        const keyText = document.createElement('div');
+        keyText.className = 'key-text';
+        keyText.textContent = `${serial} - ${key}`;
+
+        const actions = document.createElement('div');
+        actions.className = 'key-actions';
+
+        if (!used) {
+          const copyBtn = document.createElement('button');
+          copyBtn.textContent = 'Copy';
+          copyBtn.onclick = () => {
+            navigator.clipboard.writeText(key).then(() => {
+              Swal.fire({
+                icon: 'success',
+                title: 'Copied!',
+                text: 'Key copied to clipboard.',
+                timer: 1000,
+                showConfirmButton: false
+              });
+            });
+          };
+          actions.appendChild(copyBtn);
+        }
+
+        const status = document.createElement('div');
+        status.className = 'status-label ' + (used ? 'used' : 'unused');
+        status.textContent = used ? 'Used' : 'Unused';
+
+        actions.appendChild(status);
+        keyBox.appendChild(keyText);
+        keyBox.appendChild(actions);
+        col.appendChild(keyBox);
+        list.appendChild(col);
+      });
+    }
+
+    async function generateKey() {
+      try {
+        const res = await fetch(`${API_BASE}/generate`, { method: 'POST' });
+        const result = await res.json();
+        if (result.success) {
+          Swal.fire({ icon: 'success', title: 'Key generated!', timer: 1000, showConfirmButton: false });
+          loadKeys();
+        } else {
+          Swal.fire("Error", result.message || 'Failed to generate key.', "error");
+        }
+      } catch {
+        Swal.fire("Error", "Server not reachable.", "error");
+      }
+    }
+
+    async function deleteUsed() {
+      const confirmed = await Swal.fire({
+        title: 'Delete All Used Keys?',
+        text: 'This will permanently remove all used activation keys.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, delete',
+        cancelButtonText: 'Cancel',
+        confirmButtonColor: '#dc3545'
+      });
+
+      if (confirmed.isConfirmed) {
+        try {
+          const res = await fetch(`${API_BASE}/delete-used`, { method: 'POST' });
+          const data = await res.json();
+          if (data.success) {
+            Swal.fire("Deleted", "Used keys removed.", "success");
+            loadKeys();
+          } else {
+            Swal.fire("Error", "Failed to delete used keys.", "error");
+          }
+        } catch {
+          Swal.fire("Error", "Server error while deleting keys.", "error");
+        }
+      }
+    }
+
+    document.getElementById('search-input').addEventListener('input', () => displayKeys());
+
+    loadKeys();
+  </script>
+</body>
+</html>

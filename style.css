@@ -1,0 +1,29 @@
+.btn.yellow {
+  background: #f1c40f;
+  color: #000;
+}
+.btn.yellow:hover {
+  background: #d4ac0d;
+}
+
+header {
+  background-color: #004085;
+  padding: 1rem 2rem;
+  text-align: left;
+}
+
+.header-title {
+  margin: 0;
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: white !important;
+  text-align: left;
+}
+
+header h1, 
+header h2 {
+  font-size: 1.4rem;
+  margin: 0;
+  color: white !important;
+  text-align: left;
+}

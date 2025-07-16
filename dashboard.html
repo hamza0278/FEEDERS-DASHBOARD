@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>FEEDER MONITORING DASHBOARD</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f4f6f9;
+    }
+    header {
+      background-color: #004085;
+      color: white;
+      padding: 1rem 2rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .header-title {
+      font-size: 1.75rem;
+      font-weight: bold;
+    }
+    .header-right {
+      margin-left: auto;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+    .logout-btn, .save-all-btn, .search-btn, .generate-btn, .add-btn, .users-btn {
+      border: none;
+      padding: 6px 12px;
+      border-radius: 5px;
+      font-size: 14px;
+      cursor: pointer;
+      color: white;
+    }
+    .logout-btn { background-color: #dc3545; }
+    .save-all-btn { background-color: #198754; }
+    .search-btn { background-color: #0069d9; }
+    .generate-btn { background-color: #ffc107; color: black; }
+    .add-btn { background-color: #0d6efd; }
+    .users-btn { background-color: #343a40; }
+    .search-wrapper {
+      display: flex;
+      gap: 5px;
+    }
+    .search-input {
+      padding: 6px 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+    .feeder-box {
+      background: #fff;
+      padding: 1.2rem;
+      border-radius: 10px;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .form-label {
+      font-weight: 500;
+    }
+    footer {
+      background-color: #004085;
+      color: white;
+      text-align: center;
+      padding: 10px;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+    }
+    .feeder-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    @media (max-width: 768px) {
+      .header-title {
+        flex: 1 0 100%;
+        margin-bottom: 0.5rem;
+        font-size: 1.4rem;
+      }
+      .header-right {
+        justify-content: flex-start;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+      .search-wrapper {
+        flex: 1 0 100%;
+        margin-top: 8px;
+      }
+      .search-input {
+        flex: 1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h2 class="header-title m-0">FEEDER MONITORING DASHBOARD</h2>
+    <div class="header-right">
+      <button id="users-btn" class="users-btn" onclick="location.href='users.html'">Users</button>
+      <button id="add-btn" class="add-btn" onclick="showAddDeleteOptions()">Add/Delete</button>
+      <button id="generate-btn" class="generate-btn" onclick="location.href='keys.html'">Generate Keys</button>
+      <div class="search-wrapper">
+        <input type="text" class="search-input" id="search-input" placeholder="Search feeder...">
+        <button class="search-btn" onclick="performSearch()">Search</button>
+      </div>
+      <button id="save-btn" class="save-all-btn" onclick="saveAll()">Save</button>
+      <button class="logout-btn" onclick="confirmLogout()">Logout</button>
+    </div>
+  </header>
+
+  <div class="container py-4">
+    <div class="row" id="feeder-container"></div>
+  </div>
+
+  <footer>
+    &copy; 2025 132KV GRID STATION MURIDKE FEEDER MONITORING SYSTEM
+  </footer>
+
+  <script>
+    function confirmLogout() {
+      Swal.fire({
+        title: 'Are you sure?',
+        text: "You will be logged out.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, Logout',
+        cancelButtonText: 'Cancel',
+        confirmButtonColor: '#dc3545'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          localStorage.removeItem('role');
+          localStorage.removeItem('username');
+          window.location.href = 'index.html';
+        }
+      });
+    }
+
+    const feederContainer = document.getElementById("feeder-container");
+
+    function createFeederBox(feeder = {}, scrollIntoView = false) {
+      const isAdmin = localStorage.getItem("role") === "admin";
+      const column = document.createElement("div");
+      column.className = "col-12 col-md-6 col-lg-4 feeder-column";
+
+      const feederBox = document.createElement("div");
+      feederBox.className = "feeder-box";
+
+      const selectedReason = feeder.reason || "";
+
+      feederBox.innerHTML = `
+        <div class="feeder-header">
+          <h5 class="feeder-title">${feeder.name || 'New Feeder'}</h5>
+        </div>
+
+        <div class="mb-2 mt-2">
+          <label class="form-label">Status</label>
+          <select class="form-select status-select" ${!isAdmin ? 'disabled' : ''}>
+            <option value="on" ${feeder.status === 'on' ? 'selected' : ''}>On</option>
+            <option value="off" ${feeder.status === 'off' ? 'selected' : ''}>Off</option>
+          </select>
+        </div>
+
+        <div class="mb-2">
+          <label class="form-label">Reason</label>
+          <select class="form-select reason-select" ${!isAdmin ? 'disabled' : ''}>
+            <option value="">Select Reason</option>
+            <option value="Shutdown" ${selectedReason === "Shutdown" ? 'selected' : ''}>Shutdown</option>
+            <option value="Load Shedding" ${selectedReason === "Load Shedding" ? 'selected' : ''}>Load Shedding</option>
+            <option value="Maintenance" ${selectedReason === "Maintenance" ? 'selected' : ''}>Maintenance</option>
+            <option value="Dead Short" ${selectedReason === "Dead Short" ? 'selected' : ''}>Dead Short</option>
+            <option value="Main Fail" ${selectedReason === "Main Fail" ? 'selected' : ''}>Main Fail</option>
+            <option value="Unknown" ${selectedReason === "Unknown" ? 'selected' : ''}>Unknown</option>
+          </select>
+        </div>
+
+        <div class="mb-2">
+          <label class="form-label">Shutdown Time</label>
+          <input type="time" class="form-control shutdown-time" value="${feeder.shutdownTime || ''}" ${!isAdmin ? 'disabled' : ''}>
+        </div>
+
+        <div class="mb-2">
+          <label class="form-label">Expected Restoration</label>
+          <input type="time" class="form-control restoration-time" value="${feeder.restorationTime || ''}" ${!isAdmin ? 'disabled' : ''}>
+        </div>
+      `;
+
+      column.appendChild(feederBox);
+      feederContainer.appendChild(column);
+
+      const statusSelect = feederBox.querySelector(".status-select");
+      const reasonSelect = feederBox.querySelector(".reason-select");
+      const shutdownInput = feederBox.querySelector(".shutdown-time");
+      const restorationInput = feederBox.querySelector(".restoration-time");
+
+      function toggleDependentFields() {
+        const isOff = statusSelect.value === "off";
+        if (isAdmin) {
+          reasonSelect.disabled = !isOff;
+          shutdownInput.disabled = !isOff;
+          restorationInput.disabled = !isOff;
+        }
+      }
+
+      statusSelect.addEventListener("change", toggleDependentFields);
+      toggleDependentFields();
+
+      if (scrollIntoView) {
+        setTimeout(() => column.scrollIntoView({ behavior: "smooth" }), 100);
+      }
+    }
+
+    function showAddDeleteOptions() {
+      Swal.fire({
+        title: 'Choose Action',
+        icon: 'question',
+        showDenyButton: true,
+        confirmButtonText: 'Add Feeder',
+        denyButtonText: 'Delete Feeder'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          addFeeder();
+        } else if (result.isDenied) {
+          showDeleteFeederPopup();
+        }
+      });
+    }
+
+    function addFeeder() {
+      Swal.fire({
+        title: 'Enter Feeder Name',
+        input: 'text',
+        inputPlaceholder: 'e.g. HASSAN PARK (110801)',
+        showCancelButton: true,
+        confirmButtonText: 'Add Feeder',
+        cancelButtonText: 'Cancel',
+        inputValidator: (value) => {
+          if (!value.trim()) return 'Feeder name is required!';
+        }
+      }).then(result => {
+        if (result.isConfirmed) {
+          createFeederBox({ name: result.value.trim(), status: 'on' }, true);
+        }
+      });
+    }
+
+    function showDeleteFeederPopup() {
+      const feeders = document.querySelectorAll(".feeder-column");
+      if (feeders.length === 0) {
+        Swal.fire('No feeders to delete.', '', 'info');
+        return;
+      }
+
+      let tableHtml = `
+        <table class="table table-bordered">
+          <thead><tr><th>Feeder Name</th><th>Action</th></tr></thead>
+          <tbody>
+      `;
+
+      feeders.forEach((feeder, index) => {
+        const name = feeder.querySelector(".feeder-title").textContent;
+        tableHtml += `
+          <tr>
+            <td>${name}</td>
+            <td><button class="btn btn-danger btn-sm" onclick="deleteFeederByIndex(${index})">Delete</button></td>
+          </tr>
+        `;
+      });
+
+      tableHtml += '</tbody></table>';
+
+      Swal.fire({
+        title: 'Delete Feeders',
+        html: tableHtml,
+        showConfirmButton: false,
+        width: '600px'
+      });
+    }
+
+    function deleteFeederByIndex(index) {
+      const feeders = document.querySelectorAll(".feeder-column");
+      if (feeders[index]) {
+        feeders[index].remove();
+        Swal.fire('Deleted!', 'Feeder removed from page. Click Save to confirm.', 'success');
+      }
+    }
+
+    function saveAll() {
+      const allBoxes = document.querySelectorAll(".feeder-box");
+      const data = [];
+
+      allBoxes.forEach((box, index) => {
+        const name = box.querySelector(".feeder-title").textContent;
+        const status = box.querySelector(".status-select").value;
+        const reason = box.querySelector(".reason-select").value;
+        const shutdown = box.querySelector(".shutdown-time").value;
+        const restoration = box.querySelector(".restoration-time").value;
+
+        data.push({
+          id: index + 1,
+          name,
+          status,
+          reason,
+          shutdownTime: shutdown,
+          restorationTime: restoration
+        });
+      });
+
+      fetch('/api/feeders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: localStorage.getItem('username'), feeders: data })
+      })
+      .then(res => res.json())
+      .then(result => {
+        Swal.fire({
+          icon: 'success',
+          title: 'Saved!',
+          text: 'All feeder data has been saved.',
+          confirmButtonColor: '#198754'
+        });
+      })
+      .catch(error => {
+        console.error('Error saving data:', error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Save failed!',
+          text: 'Could not save feeder data.',
+          confirmButtonColor: '#dc3545'
+        });
+      });
+    }
+
+    function performSearch() {
+      const keyword = document.getElementById("search-input").value.toLowerCase();
+      const feeders = document.querySelectorAll(".feeder-column");
+      let found = false;
+
+      feeders.forEach(feeder => {
+        const name = feeder.querySelector(".feeder-title").textContent.toLowerCase();
+        const match = name.includes(keyword);
+        feeder.style.display = match ? "block" : "none";
+        if (match) found = true;
+      });
+
+      if (!found) {
+        Swal.fire({
+          icon: 'info',
+          title: 'No match found',
+          text: 'No feeders match your search.',
+          confirmButtonColor: '#0069d9'
+        });
+      }
+    }
+
+    fetch('/api/feeders')
+      .then(res => res.json())
+      .then(data => data.forEach(feeder => createFeederBox(feeder)));
+
+    window.addEventListener("DOMContentLoaded", () => {
+      const role = localStorage.getItem("role");
+      if (role !== "admin") {
+        document.getElementById("save-btn").style.display = "none";
+        document.getElementById("generate-btn").style.display = "none";
+        document.getElementById("add-btn").style.display = "none";
+        document.getElementById("users-btn").style.display = "none";
+      }
+    });
+  </script>
+</body>
+</html>

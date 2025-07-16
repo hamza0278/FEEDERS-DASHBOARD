@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>REGISTERED USERS</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 2rem;
+      background: linear-gradient(135deg, #0f172a, #1e293b);
+      font-family: 'Poppins', sans-serif;
+      color: #f8fafc;
+    }
+    .top-bar {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+    .back-link, .print-btn, .download-btn {
+      padding: 10px 16px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s ease;
+    }
+    .back-link {
+      background: linear-gradient(to right, #2563eb, #3b82f6);
+      color: white;
+    }
+    .back-link:hover {
+      background: linear-gradient(to right, #1e40af, #2563eb);
+    }
+    .print-btn {
+      background: linear-gradient(to right, #10b981, #34d399);
+      color: white;
+    }
+    .print-btn:hover {
+      background: linear-gradient(to right, #047857, #10b981);
+    }
+    .download-btn {
+      background: linear-gradient(to right, #facc15, #fbbf24);
+      color: #1f2937;
+    }
+    .download-btn:hover {
+      background: linear-gradient(to right, #eab308, #facc15);
+    }
+    h1 {
+      text-align: center;
+      font-size: 32px;
+      color: #facc15;
+      margin-bottom: 1rem;
+      text-shadow: 0 2px 8px rgba(255,255,255,0.1);
+    }
+    .section-title {
+      font-size: 20px;
+      font-weight: bold;
+      margin: 2rem 0 1rem;
+      color: #e0f2fe;
+    }
+    .container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+    .user-card {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 20px;
+      padding: 1.5rem;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(16px);
+      position: relative;
+      overflow: hidden;
+    }
+    .user-card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: conic-gradient(from 180deg at 50% 50%, #3b82f6, #10b981, #f59e0b, #3b82f6);
+      animation: rotate 6s linear infinite;
+      opacity: 0.2;
+      z-index: 0;
+    }
+    .user-card * {
+      position: relative;
+      z-index: 1;
+    }
+    @keyframes rotate {
+      0% { transform: rotate(0deg);}
+      100% { transform: rotate(360deg);}
+    }
+    .user-card h3 {
+      margin: 0 0 10px;
+      font-size: 20px;
+      color: #f1f5f9;
+    }
+    .badge {
+      display: inline-block;
+      margin-top: 8px;
+      padding: 6px 12px;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: 9999px;
+      background: linear-gradient(to right, #4ade80, #22d3ee);
+      color: #0f172a;
+      margin-right: 6px;
+    }
+    .status-badge.activated {
+      background: linear-gradient(to right, #16a34a, #4ade80);
+      color: #f0fdf4;
+    }
+    .status-badge.not-activated {
+      background: linear-gradient(to right, #dc2626, #f87171);
+      color: #fff1f2;
+    }
+    .delete-btn, .deactivate-btn, .activate-btn {
+      margin-top: 12px;
+      padding: 6px 12px;
+      border: none;
+      border-radius: 10px;
+      font-weight: bold;
+      font-size: 13px;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+      display: inline-block;
+    }
+    .delete-btn {
+      background: linear-gradient(to right, #ef4444, #f87171);
+      color: white;
+      margin-left: 8px;
+    }
+    .deactivate-btn {
+      background: linear-gradient(to right, #f59e0b, #fbbf24);
+      color: #1f2937;
+    }
+    .activate-btn {
+      background: linear-gradient(to right, #22c55e, #4ade80);
+      color: white;
+      margin-right: 8px;
+    }
+    .delete-btn:hover, .deactivate-btn:hover, .activate-btn:hover {
+      transform: scale(1.05);
+    }
+    @media print {
+      .top-bar, .delete-btn, .deactivate-btn, .activate-btn {
+        display: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="top-bar">
+    <a class="back-link" href="dashboard.html">⬅ Dashboard</a>
+    <button class="print-btn" onclick="window.print()">🖨 Print All Users</button>
+    <button class="download-btn" onclick="downloadDatabase()">📥 Download Database</button>
+  </div>
+
+  <h1>Registered Users</h1>
+
+  <div>
+    <div class="section-title">👑 Admin Users</div>
+    <div class="container" id="adminContainer"></div>
+
+    <div class="section-title">👥 Other Users</div>
+    <div class="container" id="userContainer"></div>
+  </div>
+
+  <script>
+    async function loadUsers() {
+      try {
+        const res = await fetch('/api/users');
+        const data = await res.json();
+        const adminContainer = document.getElementById('adminContainer');
+        const userContainer = document.getElementById('userContainer');
+
+        adminContainer.innerHTML = '';
+        userContainer.innerHTML = '';
+
+        if (!data.users || data.users.length === 0) {
+          adminContainer.innerHTML = userContainer.innerHTML = '<p style="text-align:center;width:100%;">No users found.</p>';
+          return;
+        }
+
+        data.users.forEach(user => {
+          const card = document.createElement('div');
+          card.className = 'user-card';
+
+          let innerHTML = `
+            <h3>${user.username}</h3>
+            <span class="badge">Role: ${user.role}</span>
+            <span class="badge status-badge ${user.activated ? 'activated' : 'not-activated'}">
+              ${user.activated ? '✅ Activated' : 'Not Activated'}
+            </span>
+          `;
+
+          if (user.role !== 'admin') {
+            if (user.activated) {
+              innerHTML += `<button class="deactivate-btn" onclick="deactivateUser('${user.username}')">🚫 Deactivate</button>`;
+            } else {
+              innerHTML += `<button class="activate-btn" onclick="activateUser('${user.username}')">🟢 Activate</button>`;
+            }
+            innerHTML += `<button class="delete-btn" onclick="deleteUser('${user.username}')">🗑 Delete</button>`;
+          }
+
+          card.innerHTML = innerHTML;
+
+          if (user.role === 'admin') {
+            adminContainer.appendChild(card);
+          } else {
+            userContainer.appendChild(card);
+          }
+        });
+      } catch (error) {
+        Swal.fire('Error', 'Failed to load users.', 'error');
+      }
+    }
+
+    async function deleteUser(username) {
+      const confirm = await Swal.fire({
+        title: `Delete user "${username}"?`,
+        text: 'This action cannot be undone.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'Cancel'
+      });
+
+      if (!confirm.isConfirmed) return;
+
+      try {
+        const res = await fetch('/api/users/delete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username })
+        });
+
+        const result = await res.json();
+        if (result.success) {
+          Swal.fire('Deleted!', result.message, 'success');
+          loadUsers();
+        } else {
+          Swal.fire('Error', result.message || 'Failed to delete user.', 'error');
+        }
+      } catch (error) {
+        Swal.fire('Error', 'Failed to delete user.', 'error');
+      }
+    }
+
+    async function activateUser(username) {
+      try {
+        const res = await fetch('/api/users/activate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username })
+        });
+        const result = await res.json();
+        if (result.success) {
+          Swal.fire('Activated!', result.message, 'success');
+          loadUsers();
+        } else {
+          Swal.fire('Error', result.message || 'Failed to activate user.', 'error');
+        }
+      } catch (error) {
+        Swal.fire('Error', 'Failed to activate user.', 'error');
+      }
+    }
+
+    async function deactivateUser(username) {
+      try {
+        const res = await fetch('/api/users/deactivate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username })
+        });
+        const result = await res.json();
+        if (result.success) {
+          Swal.fire('Deactivated!', result.message, 'success');
+          loadUsers();
+        } else {
+          Swal.fire('Error', result.message || 'Failed to deactivate user.', 'error');
+        }
+      } catch (error) {
+        Swal.fire('Error', 'Failed to deactivate user.', 'error');
+      }
+    }
+
+    async function downloadDatabase() {
+      try {
+        const response = await fetch('/download-data-folder');
+        if (!response.ok) throw new Error('Network response was not ok');
+
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'data-folder.zip';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+      } catch (error) {
+        Swal.fire('Error', 'Failed to download database.', 'error');
+      }
+    }
+
+    loadUsers();
+  </script>
+</body>
+</html>

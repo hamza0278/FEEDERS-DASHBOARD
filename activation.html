@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>ACTIVATE ACCOUNT</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f7fafc;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .box {
+      background: white;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 340px;
+      box-sizing: border-box;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    input,
+    button {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 1rem;
+      border-radius: 6px;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+
+    input {
+      border: 1px solid #ccc;
+    }
+
+    button {
+      background: #007bff;
+      color: white;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 15px;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    .back-link {
+      text-align: center;
+      margin-top: 1.2rem;
+    }
+
+    .back-link a {
+      color: #28a745;
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+    .contact-info {
+      margin-top: 0.8rem;
+      text-align: center;
+      font-size: 0.9rem;
+    }
+
+    .contact-info a {
+      color: #007bff;
+      font-weight: bold;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h2>Activate Account</h2>
+    <form onsubmit="activate(); return false;">
+      <input type="text" id="username" placeholder="Username" required>
+      <input type="text" id="key" placeholder="Activation Key" required>
+      <button type="submit">Activate</button>
+    </form>
+
+    <div class="back-link">
+      <a href="login.html">← Back to Login</a>
+    </div>
+
+    <p class="contact-info">
+      Need an activation key? <br>
+      <a href="https://wa.me/923000099887" target="_blank">WhatsApp 0311-4085433</a>
+    </p>
+  </div>
+
+  <script>
+    function activate() {
+      const username = document.getElementById('username').value.trim();
+      const key = document.getElementById('key').value.trim();
+
+      if (!username || !key) {
+        Swal.fire("Missing Info", "Please enter both username and activation key.", "warning");
+        return;
+      }
+
+      fetch('/api/activate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, key })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (!data.success) {
+          Swal.fire("Activation Failed", data.message, "error");
+        } else {
+          Swal.fire({
+            icon: 'success',
+            title: "Success",
+            text: data.message,
+            timer: 1500,
+            showConfirmButton: false
+          }).then(() => {
+            window.location.href = 'login.html';
+          });
+        }
+      })
+      .catch(() => {
+        Swal.fire("Error", "Failed to connect to server.", "error");
+      });
+    }
+  </script>
+</body>
+</html>

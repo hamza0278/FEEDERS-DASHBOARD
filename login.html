@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LOGIN</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f0f4f8;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .login-box {
+      background: #fff;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 320px;
+      box-sizing: border-box;
+    }
+
+    .login-box h2 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      color: #333;
+    }
+
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 1rem;
+      border-radius: 6px;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+
+    input {
+      border: 1px solid #ccc;
+    }
+
+    button {
+      background-color: #0056b3;
+      color: white;
+      border: none;
+      font-weight: bold;
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #004494;
+    }
+
+    .forgot-link {
+      text-align: right;
+      margin-top: -0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .forgot-link a {
+      color: #dc3545;
+      font-size: 0.9rem;
+      text-decoration: none;
+    }
+
+    .signup-link, .contact-info {
+      text-align: center;
+      font-size: 0.9rem;
+      margin-top: 10px;
+    }
+
+    .signup-link a {
+      color: #28a745;
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+    .contact-info {
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-box">
+    <h2>Login / Signup</h2>
+    <form id="loginForm">
+      <input type="text" id="email" placeholder="Email" required />
+      <input type="password" id="password" placeholder="Password" required />
+      <div class="forgot-link">
+        <a href="recover.html">Forgot Password?</a>
+      </div>
+      <button type="submit">Login</button>
+    </form>
+
+    <div class="signup-link">
+      Don't have an account? <a href="signup.html">Sign Up</a>
+    </div>
+
+    <p class="contact-info">
+      <strong>In order to complete the signup process, you need an activation key.</strong>
+    </p>
+  </div>
+
+  <script>
+    function isValidEmail(email) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return emailRegex.test(email);
+    }
+
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const emailInput = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value.trim();
+      const isAdmin = emailInput.toLowerCase() === 'admin';
+
+      if (!emailInput || !password) {
+        Swal.fire("Missing Fields", "Please enter both email and password", "warning");
+        return;
+      }
+
+      if (!isAdmin && !isValidEmail(emailInput)) {
+        Swal.fire("Invalid Email", "Please enter a valid email address", "error");
+        return;
+      }
+
+      fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: emailInput, password })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (!data.success) {
+          Swal.fire("Login Failed", data.message || "Invalid credentials", "error");
+        } else {
+          localStorage.setItem('role', data.role);
+          localStorage.setItem('username', emailInput);
+
+          if (data.role === 'admin') {
+            Swal.fire({
+              icon: 'success',
+              title: 'Welcome Admin',
+              text: 'Redirecting to dashboard...',
+              timer: 1500,
+              showConfirmButton: false
+            }).then(() => {
+              window.location.href = 'dashboard.html';
+            });
+          } else if (data.activated === true) {
+            Swal.fire({
+              icon: 'success',
+              title: 'Welcome',
+              text: 'Redirecting to dashboard...',
+              timer: 1500,
+              showConfirmButton: false
+            }).then(() => {
+              window.location.href = 'dashboard.html';
+            });
+          } else {
+            Swal.fire({
+              icon: 'warning',
+              title: 'Activation Required',
+              text: 'Redirecting to activation page...',
+              timer: 2000,
+              showConfirmButton: false
+            }).then(() => {
+              window.location.href = 'activation.html';
+            });
+          }
+        }
+      })
+      .catch(() => {
+        Swal.fire("Error", "Failed to connect to server", "error");
+      });
+    });
+  </script>
+</body>
+</html>
