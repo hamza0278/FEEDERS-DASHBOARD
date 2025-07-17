@@ -125,13 +125,14 @@
 
       const emailInput = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value.trim();
+      const isAdmin = emailInput.toLowerCase() === 'admin';
 
       if (!emailInput || !password) {
         Swal.fire("Missing Fields", "Please enter both email and password", "warning");
         return;
       }
 
-      if (emailInput.toLowerCase() !== 'admin' && !isValidEmail(emailInput)) {
+      if (!isAdmin && !isValidEmail(emailInput)) {
         Swal.fire("Invalid Email", "Please enter a valid email address", "error");
         return;
       }
@@ -139,10 +140,11 @@
       try {
         const data = await Parse.Cloud.run("loginUser", { username: emailInput, password });
 
-        localStorage.setItem('role', data.role || 'user');
+        localStorage.setItem('role', data.role || 'public');
         localStorage.setItem('username', emailInput);
         localStorage.setItem('sessionToken', data.sessionToken);
 
+        // ✅ NEW: Redirect logic based on role
         if (data.role === 'admin') {
           Swal.fire({
             icon: 'success',
