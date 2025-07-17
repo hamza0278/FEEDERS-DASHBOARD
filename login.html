@@ -139,7 +139,7 @@
 
       try {
         const data = await Parse.Cloud.run("loginUser", { username: emailInput, password });
-
+        await Parse.User.become(data.sessionToken); // ← ADD THIS LINE
         localStorage.setItem('role', data.role || 'public');
         localStorage.setItem('username', emailInput);
         localStorage.setItem('sessionToken', data.sessionToken);
