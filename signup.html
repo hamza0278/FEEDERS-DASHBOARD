@@ -6,6 +6,7 @@
   <title>SIGNUP</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://npmcdn.com/parse/dist/parse.min.js"></script>
   <style>
     body {
       font-family: 'Inter', sans-serif;
@@ -86,8 +87,12 @@
   </div>
 
   <script>
+    // ✅ Initialize Parse with your Back4App keys
+    Parse.initialize("2UbcjCCCAXXdMC34Xsq3se5xHv42l9zpncnBO5zk", "Ryed1qJgdnSd6xxrVqFt95aLpxEDz9DDic1aaVGq");
+    Parse.serverURL = "https://parseapi.back4app.com/";
+
     function isValidEmail(email) {
-      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+      return /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email);
     }
 
     document.getElementById('signup-form').addEventListener('submit', async function(e) {
@@ -103,48 +108,26 @@
         return Swal.fire('Invalid Email', 'Please enter a valid email address.', 'error');
       }
 
+      const user = new Parse.User();
+      user.set("username", username);
+      user.set("password", password);
+      user.set("email", username);
+
       try {
-        const res = await fetch('/api/signup', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username, password })
+        await user.signUp();
+        Swal.fire({
+          icon: 'success',
+          title: 'Signup Successful',
+          text: 'You can now log in.',
+          confirmButtonText: 'Go to Login'
+        }).then(() => {
+          window.location.href = 'login.html';
         });
-
-        const data = await res.json();
-
-        if (res.ok) {
-          // ✅ Show success popup instantly
-          Swal.fire({
-            icon: 'success',
-            title: 'Signup Successful',
-            text: 'You can now log in.',
-            confirmButtonText: 'Go to Login'
-          }).then(() => {
-            window.location.href = 'login.html';
-          });
-
-          // 📨 Send welcome email in background
-          fetch('/api/send-welcome', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email: username, username })
-          }).catch(() => {
-            // silently fail if email fails
-          });
-
-        } else {
-          Swal.fire({
-            icon: 'error',
-            title: 'Signup Failed',
-            text: data.message || 'Signup failed.'
-          });
-        }
-
       } catch (error) {
         Swal.fire({
           icon: 'error',
-          title: 'Connection Error',
-          text: 'Unable to connect to server.'
+          title: 'Signup Failed',
+          text: error.message
         });
       }
     });
