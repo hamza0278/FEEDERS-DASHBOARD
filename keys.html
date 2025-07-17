@@ -270,43 +270,49 @@
     }
 
     async function generateKey() {
-      try {
-        const result = await Parse.Cloud.run("generateKey");
-        if (result.success) {
-          Swal.fire({ icon: 'success', title: 'Key generated!', timer: 1000, showConfirmButton: false });
-          loadKeys();
-        } else {
-          Swal.fire("Error", result.message || 'Failed to generate key.', "error");
-        }
-      } catch {
-        Swal.fire("Error", "Server not reachable.", "error");
-      }
+  try {
+    const result = await Parse.Cloud.run("generateKey");
+    if (result.success) {
+      Swal.fire({
+        icon: 'success',
+        title: 'Key generated!',
+        timer: 1000,
+        showConfirmButton: false
+      });
+      loadKeys();
+    } else {
+      Swal.fire("Error", result.message || "Failed to generate key.", "error");
     }
+  } catch (err) {
+    Swal.fire("Error", "Server not reachable.", "error");
+  }
+}
 
     async function deleteUsed() {
-      const confirmed = await Swal.fire({
-        title: 'Delete All Used Keys?',
-        text: 'This will permanently remove all used activation keys.',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Yes, delete',
-        cancelButtonText: 'Cancel',
-        confirmButtonColor: '#dc3545'
-      });
-      if (confirmed.isConfirmed) {
-        try {
-          const res = await Parse.Cloud.run("deleteUsedKeys");
-          if (res.success) {
-            Swal.fire("Deleted", "Used keys removed.", "success");
-            loadKeys();
-          } else {
-            Swal.fire("Error", "Failed to delete used keys.", "error");
-          }
-        } catch {
-          Swal.fire("Error", "Server error while deleting keys.", "error");
-        }
+  const confirmed = await Swal.fire({
+    title: 'Delete All Used Keys?',
+    text: 'This will permanently remove all used activation keys.',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Yes, delete',
+    cancelButtonText: 'Cancel',
+    confirmButtonColor: '#dc3545'
+  });
+
+  if (confirmed.isConfirmed) {
+    try {
+      const result = await Parse.Cloud.run("deleteUsedKeys");
+      if (result.success) {
+        Swal.fire("Deleted", "Used keys removed.", "success");
+        loadKeys();
+      } else {
+        Swal.fire("Error", result.message || "Failed to delete keys.", "error");
       }
+    } catch {
+      Swal.fire("Error", "Server error while deleting keys.", "error");
     }
+  }
+}
 
     document.getElementById('search-input').addEventListener('input', () => displayKeys());
 
