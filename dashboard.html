@@ -1,11 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<script src="https://npmcdn.com/parse/dist/parse.min.js"></script>
-<script>
-  Parse.initialize("2UbcjCCCAXXdMC34Xsq3se5xHv42l9zpncnBO5zk", "Ryed1qJgdnSd6xxrVqFt95aLpxEDz9DDic1aaVGq");
-  Parse.serverURL = "https://parseapi.back4app.com";
-</script>
   <meta charset="UTF-8">
   <title>FEEDER MONITORING DASHBOARD</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -364,7 +359,7 @@
       }
     }
 
-    fetch('/api/feeders')
+    Parse.Cloud.run("getFeeders")
       .then(res => res.json())
       .then(data => data.forEach(feeder => createFeederBox(feeder)));
 
