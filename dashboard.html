@@ -72,6 +72,16 @@
       justify-content: space-between;
       align-items: center;
     }
+    .status-load-row {
+      display: flex;
+      gap: 10px;
+    }
+    .status-select {
+      width: 45%;
+    }
+    .load-input {
+      width: 45%;
+    }
     @media (max-width: 768px) {
       .header-title { flex: 1 0 100%; margin-bottom: 0.5rem; font-size: 1.4rem; }
       .header-right {
@@ -138,17 +148,21 @@
     feederBox.className = "feeder-box";
 
     const selectedReason = feeder.reason || "";
+    const loadValue = feeder.load || "";
 
     feederBox.innerHTML = `
       <div class="feeder-header">
         <h5 class="feeder-title">${feeder.name || 'New Feeder'}</h5>
       </div>
       <div class="mb-2 mt-2">
-        <label class="form-label">Status</label>
-        <select class="form-select status-select" ${!isAdmin ? 'disabled' : ''}>
-          <option value="on" ${feeder.status === 'on' ? 'selected' : ''}>On</option>
-          <option value="off" ${feeder.status === 'off' ? 'selected' : ''}>Off</option>
-        </select>
+        <label class="form-label">Status / Load</label>
+        <div class="status-load-row">
+          <select class="form-select status-select" ${!isAdmin ? 'disabled' : ''}>
+            <option value="on" ${feeder.status === 'on' ? 'selected' : ''}>On</option>
+            <option value="off" ${feeder.status === 'off' ? 'selected' : ''}>Off</option>
+          </select>
+          <input type="text" class="form-control load-input" placeholder="e.g. 120A" value="${loadValue}" ${!isAdmin ? 'disabled' : ''} pattern="\\d{1,3}[A-Za-z]" title="3 digits followed by 1 letter">
+        </div>
       </div>
       <div class="mb-2">
         <label class="form-label">Reason</label>
@@ -179,6 +193,7 @@
     const reasonSelect = feederBox.querySelector(".reason-select");
     const shutdownInput = feederBox.querySelector(".shutdown-time");
     const restorationInput = feederBox.querySelector(".restoration-time");
+    const loadInput = feederBox.querySelector(".load-input");
 
     function toggleDependentFields() {
       const isOff = statusSelect.value === "off";
@@ -202,67 +217,6 @@
       setTimeout(() => column.scrollIntoView({ behavior: "smooth" }), 100);
     }
   }
-
-  function showAddDeleteOptions() {
-    Swal.fire({
-      title: "Add or Delete Feeder?",
-      showDenyButton: true,
-      confirmButtonText: "Add",
-      denyButtonText: `Delete`,
-      confirmButtonColor: "#0d6efd",
-      denyButtonColor: "#dc3545"
-    }).then((result) => {
-      if (result.isConfirmed) {
-        Swal.fire({
-          title: "Enter Feeder Name",
-          input: "text",
-          inputLabel: "Feeder Name",
-          inputPlaceholder: "e.g. Feeder A",
-          showCancelButton: true
-        }).then(inputResult => {
-          if (inputResult.isConfirmed && inputResult.value.trim()) {
-            createFeederBox({ name: inputResult.value.trim() }, true);
-          }
-        });
-      } else if (result.isDenied) {
-        const allFeeders = Array.from(document.querySelectorAll(".feeder-column"));
-        if (allFeeders.length === 0) {
-          Swal.fire("No feeders to delete.");
-          return;
-        }
-
-        let html = '<ul class="list-group">';
-        allFeeders.forEach((column, index) => {
-          const title = column.querySelector(".feeder-title").textContent;
-          html += `<li class="list-group-item d-flex justify-content-between align-items-center">
-            ${title}
-            <button class="btn btn-sm btn-danger feeder-delete-btn" data-index="${index}">Delete</button>
-          </li>`;
-        });
-        html += "</ul>";
-
-        Swal.fire({
-          title: "Delete Feeders",
-          html,
-          showCloseButton: true,
-          showConfirmButton: false,
-          didOpen: () => {
-            document.querySelectorAll(".feeder-delete-btn").forEach(btn => {
-              btn.addEventListener("click", () => {
-                const index = parseInt(btn.getAttribute("data-index"));
-                const columnToRemove = document.querySelectorAll(".feeder-column")[index];
-                if (columnToRemove) {
-                  columnToRemove.remove();
-                  Swal.close();
-                }
-              });
-            });
-          }
-        });
-      }
-    });
-  }
-
   function saveAll() {
     const allBoxes = document.querySelectorAll(".feeder-box");
     const data = [];
@@ -273,6 +227,7 @@
       const reason = box.querySelector(".reason-select").value;
       const shutdown = box.querySelector(".shutdown-time").value;
       const restoration = box.querySelector(".restoration-time").value;
+      const load = box.querySelector(".load-input")?.value || '';
 
       data.push({
         id: index + 1,
@@ -280,7 +235,8 @@
         status,
         reason,
         shutdownTime: shutdown,
-        restorationTime: restoration
+        restorationTime: restoration,
+        load
       });
     });
 
@@ -347,7 +303,6 @@
       document.getElementById("users-btn").style.display = "none";
     }
 
-    // Auto logout admin after 5 minutes of inactivity
     if (role === "admin") {
       let timeout;
       function resetTimer() {
@@ -358,17 +313,16 @@
           Swal.fire("Logged Out", "You were inactive for 5 minutes.", "info").then(() => {
             window.location.href = "index.html";
           });
-        }, 300000); // 5 minutes
+        }, 300000);
       }
 
       ['click', 'mousemove', 'keydown', 'scroll', 'touchstart'].forEach(evt =>
         document.addEventListener(evt, resetTimer, false)
       );
 
-      resetTimer(); // start timer initially
+      resetTimer();
     }
   });
-</script>
-
+  </script>
 </body>
 </html>
