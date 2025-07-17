@@ -6,6 +6,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://npmcdn.com/parse/dist/parse.min.js"></script>
+  <script>
+    Parse.initialize("2UbcjCCCAXXdMC34Xsq3se5xHv42l9zpncnBO5zk", "Ryed1qJgdnSd6xxrVqFt95aLpxEDz9DDic1aaVGq");
+    Parse.serverURL = "https://parseapi.back4app.com";
+  </script>
   <style>
     body {
       font-family: 'Inter', sans-serif;
@@ -103,7 +108,7 @@
   </div>
 
   <script>
-    function activate() {
+    async function activate() {
       const username = document.getElementById('username').value.trim();
       const key = document.getElementById('key').value.trim();
 
@@ -112,30 +117,55 @@
         return;
       }
 
-      fetch('/api/activate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, key })
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (!data.success) {
-          Swal.fire("Activation Failed", data.message, "error");
-        } else {
-          Swal.fire({
-            icon: 'success',
-            title: "Success",
-            text: data.message,
-            timer: 1500,
-            showConfirmButton: false
-          }).then(() => {
-            window.location.href = 'login.html';
-          });
+      try {
+        // Find the user
+        const userQuery = new Parse.Query(Parse.User);
+        userQuery.equalTo("username", username);
+        const user = await userQuery.first({ useMasterKey: true });
+
+        if (!user) {
+          Swal.fire("User Not Found", "No user with that username exists.", "error");
+          return;
         }
-      })
-      .catch(() => {
-        Swal.fire("Error", "Failed to connect to server.", "error");
-      });
+
+        if (user.get("activated")) {
+          Swal.fire("Already Activated", "This account is already activated.", "info");
+          return;
+        }
+
+        // Check activation key
+        const Key = Parse.Object.extend("Keys");
+        const keyQuery = new Parse.Query(Key);
+        keyQuery.equalTo("key", key);
+        keyQuery.equalTo("used", false);
+        const activationKey = await keyQuery.first({ useMasterKey: true });
+
+        if (!activationKey) {
+          Swal.fire("Invalid Key", "That activation key is invalid or already used.", "error");
+          return;
+        }
+
+        // Activate user
+        user.set("activated", true);
+        await user.save(null, { useMasterKey: true });
+
+        // Mark key as used
+        activationKey.set("used", true);
+        await activationKey.save(null, { useMasterKey: true });
+
+        Swal.fire({
+          icon: 'success',
+          title: "Activated!",
+          text: "Your account has been activated.",
+          timer: 1500,
+          showConfirmButton: false
+        }).then(() => {
+          window.location.href = "login.html";
+        });
+
+      } catch (error) {
+        Swal.fire("Error", error.message || "Activation failed.", "error");
+      }
     }
   </script>
 </body>
