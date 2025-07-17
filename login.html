@@ -6,6 +6,11 @@
   <title>LOGIN</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://npmcdn.com/parse/dist/parse.min.js"></script>
+  <script>
+    Parse.initialize("2UbcjCCCAXXdMC34Xsq3se5xHv42l9zpncnBO5zk", "Ryed1qJgdnSd6xxrVqFt95aLpxEDz9DDic1aaVGq");
+    Parse.serverURL = "https://parseapi.back4app.com";
+  </script>
   <style>
     body {
       font-family: 'Inter', sans-serif;
@@ -115,7 +120,7 @@
       return emailRegex.test(email);
     }
 
-    document.getElementById('loginForm').addEventListener('submit', function(e) {
+    document.getElementById('loginForm').addEventListener('submit', async function (e) {
       e.preventDefault();
 
       const emailInput = document.getElementById('email').value.trim();
@@ -132,55 +137,48 @@
         return;
       }
 
-      fetch('/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: emailInput, password })
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (!data.success) {
-          Swal.fire("Login Failed", data.message || "Invalid credentials", "error");
-        } else {
-          localStorage.setItem('role', data.role);
-          localStorage.setItem('username', emailInput);
+      try {
+        const data = await Parse.Cloud.run("loginUser", { username: emailInput, password });
 
-          if (data.role === 'admin') {
-            Swal.fire({
-              icon: 'success',
-              title: 'Welcome Admin',
-              text: 'Redirecting to dashboard...',
-              timer: 1500,
-              showConfirmButton: false
-            }).then(() => {
-              window.location.href = 'dashboard.html';
-            });
-          } else if (data.activated === true) {
-            Swal.fire({
-              icon: 'success',
-              title: 'Welcome',
-              text: 'Redirecting to dashboard...',
-              timer: 1500,
-              showConfirmButton: false
-            }).then(() => {
-              window.location.href = 'dashboard.html';
-            });
-          } else {
-            Swal.fire({
-              icon: 'warning',
-              title: 'Activation Required',
-              text: 'Redirecting to activation page...',
-              timer: 2000,
-              showConfirmButton: false
-            }).then(() => {
-              window.location.href = 'activation.html';
-            });
-          }
+        localStorage.setItem('role', data.role || 'user');
+        localStorage.setItem('username', emailInput);
+        localStorage.setItem('sessionToken', data.sessionToken);
+
+        if (data.role === 'admin') {
+          Swal.fire({
+            icon: 'success',
+            title: 'Welcome Admin',
+            text: 'Redirecting to dashboard...',
+            timer: 1500,
+            showConfirmButton: false
+          }).then(() => {
+            window.location.href = 'dashboard.html';
+          });
+        } else if (data.activated === true) {
+          Swal.fire({
+            icon: 'success',
+            title: 'Welcome',
+            text: 'Redirecting to dashboard...',
+            timer: 1500,
+            showConfirmButton: false
+          }).then(() => {
+            window.location.href = 'dashboard.html';
+          });
+        } else {
+          Swal.fire({
+            icon: 'warning',
+            title: 'Activation Required',
+            text: 'Redirecting to activation page...',
+            timer: 2000,
+            showConfirmButton: false
+          }).then(() => {
+            window.location.href = 'activation.html';
+          });
         }
-      })
-      .catch(() => {
-        Swal.fire("Error", "Failed to connect to server", "error");
-      });
+
+      } catch (err) {
+        Swal.fire("Login Failed", err.message || "Invalid credentials", "error");
+      }
     });
   </script>
 </body>
