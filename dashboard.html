@@ -225,17 +225,18 @@
             }
           });
         } else if (result.isDenied) {
-          const allFeeders = document.querySelectorAll(".feeder-title");
+          const allFeeders = Array.from(document.querySelectorAll(".feeder-column"));
           if (allFeeders.length === 0) {
             Swal.fire("No feeders to delete.");
             return;
           }
 
           let html = '<ul class="list-group">';
-          allFeeders.forEach((titleEl, index) => {
+          allFeeders.forEach((column, index) => {
+            const title = column.querySelector(".feeder-title").textContent;
             html += `<li class="list-group-item d-flex justify-content-between align-items-center">
-              ${titleEl.textContent}
-              <button class="btn btn-sm btn-danger" onclick="document.querySelectorAll('.feeder-column')[${index}].remove()">Delete</button>
+              ${title}
+              <button class="btn btn-sm btn-danger feeder-delete-btn" data-index="${index}">Delete</button>
             </li>`;
           });
           html += "</ul>";
@@ -244,7 +245,19 @@
             title: "Delete Feeders",
             html,
             showCloseButton: true,
-            showConfirmButton: false
+            showConfirmButton: false,
+            didOpen: () => {
+              document.querySelectorAll(".feeder-delete-btn").forEach(btn => {
+                btn.addEventListener("click", () => {
+                  const index = parseInt(btn.getAttribute("data-index"));
+                  const columnToRemove = document.querySelectorAll(".feeder-column")[index];
+                  if (columnToRemove) {
+                    columnToRemove.remove();
+                    Swal.close();
+                  }
+                });
+              });
+            }
           });
         }
       });
