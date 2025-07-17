@@ -6,6 +6,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://npmcdn.com/parse/dist/parse.min.js"></script>
+  <script>
+    Parse.initialize("2UbcjCCCAXXdMC34Xsq3se5xHv42l9zpncnBO5zk", "Ryed1qJgdnSd6xxrVqFt95aLpxEDz9DDic1aaVGq");
+    Parse.serverURL = "https://parseapi.back4app.com";
+  </script>
   <style>
     body {
       margin: 0;
@@ -178,44 +183,48 @@
 
   <script>
     async function loadUsers() {
+      const adminContainer = document.getElementById('adminContainer');
+      const userContainer = document.getElementById('userContainer');
+      adminContainer.innerHTML = '';
+      userContainer.innerHTML = '';
+
       try {
-        const res = await fetch('/api/users');
-        const data = await res.json();
-        const adminContainer = document.getElementById('adminContainer');
-        const userContainer = document.getElementById('userContainer');
+        const query = new Parse.Query(Parse.User);
+        query.ascending("username");
+        const users = await query.find({ useMasterKey: true });
 
-        adminContainer.innerHTML = '';
-        userContainer.innerHTML = '';
-
-        if (!data.users || data.users.length === 0) {
+        if (!users.length) {
           adminContainer.innerHTML = userContainer.innerHTML = '<p style="text-align:center;width:100%;">No users found.</p>';
           return;
         }
 
-        data.users.forEach(user => {
+        users.forEach(user => {
           const card = document.createElement('div');
           card.className = 'user-card';
+          const username = user.get("username");
+          const role = user.get("role") || "user";
+          const activated = user.get("activated");
 
           let innerHTML = `
-            <h3>${user.username}</h3>
-            <span class="badge">Role: ${user.role}</span>
-            <span class="badge status-badge ${user.activated ? 'activated' : 'not-activated'}">
-              ${user.activated ? '✅ Activated' : 'Not Activated'}
+            <h3>${username}</h3>
+            <span class="badge">Role: ${role}</span>
+            <span class="badge status-badge ${activated ? 'activated' : 'not-activated'}">
+              ${activated ? '✅ Activated' : 'Not Activated'}
             </span>
           `;
 
-          if (user.role !== 'admin') {
-            if (user.activated) {
-              innerHTML += `<button class="deactivate-btn" onclick="deactivateUser('${user.username}')">🚫 Deactivate</button>`;
+          if (role !== 'admin') {
+            if (activated) {
+              innerHTML += `<button class="deactivate-btn" onclick="deactivateUser('${user.id}')">🚫 Deactivate</button>`;
             } else {
-              innerHTML += `<button class="activate-btn" onclick="activateUser('${user.username}')">🟢 Activate</button>`;
+              innerHTML += `<button class="activate-btn" onclick="activateUser('${user.id}')">🟢 Activate</button>`;
             }
-            innerHTML += `<button class="delete-btn" onclick="deleteUser('${user.username}')">🗑 Delete</button>`;
+            innerHTML += `<button class="delete-btn" onclick="deleteUser('${user.id}')">🗑 Delete</button>`;
           }
 
           card.innerHTML = innerHTML;
 
-          if (user.role === 'admin') {
+          if (role === 'admin') {
             adminContainer.appendChild(card);
           } else {
             userContainer.appendChild(card);
@@ -226,9 +235,9 @@
       }
     }
 
-    async function deleteUser(username) {
+    async function deleteUser(userId) {
       const confirm = await Swal.fire({
-        title: `Delete user "${username}"?`,
+        title: `Delete user?`,
         text: 'This action cannot be undone.',
         icon: 'warning',
         showCancelButton: true,
@@ -239,67 +248,38 @@
       if (!confirm.isConfirmed) return;
 
       try {
-        const res = await fetch('/api/users/delete', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username })
-        });
-
-        const result = await res.json();
-        if (result.success) {
-          Swal.fire('Deleted!', result.message, 'success');
-          loadUsers();
-        } else {
-          Swal.fire('Error', result.message || 'Failed to delete user.', 'error');
-        }
+        await Parse.Cloud.run("deleteUser", { userId });
+        Swal.fire('Deleted!', 'User has been deleted.', 'success');
+        loadUsers();
       } catch (error) {
-        Swal.fire('Error', 'Failed to delete user.', 'error');
+        Swal.fire('Error', error.message || 'Failed to delete user.', 'error');
       }
     }
 
-    async function activateUser(username) {
+    async function activateUser(userId) {
       try {
-        const res = await fetch('/api/users/activate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username })
-        });
-        const result = await res.json();
-        if (result.success) {
-          Swal.fire('Activated!', result.message, 'success');
-          loadUsers();
-        } else {
-          Swal.fire('Error', result.message || 'Failed to activate user.', 'error');
-        }
+        await Parse.Cloud.run("activateUser", { userId });
+        Swal.fire('Activated!', 'User activated successfully.', 'success');
+        loadUsers();
       } catch (error) {
-        Swal.fire('Error', 'Failed to activate user.', 'error');
+        Swal.fire('Error', error.message || 'Failed to activate user.', 'error');
       }
     }
 
-    async function deactivateUser(username) {
+    async function deactivateUser(userId) {
       try {
-        const res = await fetch('/api/users/deactivate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username })
-        });
-        const result = await res.json();
-        if (result.success) {
-          Swal.fire('Deactivated!', result.message, 'success');
-          loadUsers();
-        } else {
-          Swal.fire('Error', result.message || 'Failed to deactivate user.', 'error');
-        }
+        await Parse.Cloud.run("deactivateUser", { userId });
+        Swal.fire('Deactivated!', 'User deactivated successfully.', 'success');
+        loadUsers();
       } catch (error) {
-        Swal.fire('Error', 'Failed to deactivate user.', 'error');
+        Swal.fire('Error', error.message || 'Failed to deactivate user.', 'error');
       }
     }
 
     async function downloadDatabase() {
       try {
         const response = await fetch('/download-data-folder');
-        if (!response.ok) throw new Error('Network response was not ok');
-
+        if (!response.ok) throw new Error('Network error.');
         const blob = await response.blob();
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
