@@ -12,7 +12,6 @@
     Parse.serverURL = "https://parseapi.back4app.com";
   </script>
   <style>
-    /* your existing CSS remains unchanged */
     body {
       font-family: 'Segoe UI', sans-serif;
       background-color: #f4f6f9;
@@ -290,7 +289,6 @@
       }
     }
 
-    // ✅ CORRECTED: Load from "getFeedersFromDB" without `.json()`
     Parse.Cloud.run("getFeedersFromDB")
       .then(data => {
         data.forEach(feeder => createFeederBox(feeder));
