@@ -170,75 +170,85 @@
     &copy; 2025 132KV GRID STATION MURIDKE FEEDER MONITORING SYSTEM
   </footer>
 
-  <script>
-    const feederContainer = document.getElementById("feeder-container");
+ <script>
+  const feederContainer = document.getElementById("feeder-container");
 
-    function loadFeeders() {
-      Parse.Cloud.run("getFeedersFromDB")
-        .then(feeders => {
-          feederContainer.innerHTML = '';
+  function loadFeeders() {
+    Parse.Cloud.run("getFeedersFromDB")
+      .then(feeders => {
+        console.log("Returned feeders:", feeders); // 🧪 Debug log
+        feederContainer.innerHTML = '';
 
-          feeders.forEach(feeder => {
-            const column = document.createElement("div");
-            column.className = "col-12 col-md-6 col-lg-4 feeder-column";
+        if (!feeders || feeders.length === 0) {
+          feederContainer.innerHTML = `
+            <div class="col-12">
+              <div class="alert alert-warning">No feeder data available in Back4App.</div>
+            </div>`;
+          return;
+        }
 
-            const feederBox = document.createElement("div");
-            feederBox.className = "feeder-box";
+        feeders.forEach(feeder => {
+          const column = document.createElement("div");
+          column.className = "col-12 col-md-6 col-lg-4 feeder-column";
 
-            feederBox.innerHTML = `
-              <div class="feeder-header">
-                <h5 class="feeder-title">${feeder.name}</h5>
-              </div>
+          const feederBox = document.createElement("div");
+          feederBox.className = "feeder-box";
 
-              <div class="mb-2">
-                <label class="form-label">Status</label>
-                <select class="form-select status-select" disabled>
-                  <option value="on" ${feeder.status === 'on' ? 'selected' : ''}>On</option>
-                  <option value="off" ${feeder.status === 'off' ? 'selected' : ''}>Off</option>
-                </select>
-              </div>
+          feederBox.innerHTML = `
+            <div class="feeder-header">
+              <h5 class="feeder-title">${feeder.name}</h5>
+            </div>
 
-              <div class="mb-2">
-                <label class="form-label">Reason</label>
-                <input type="text" class="form-control reason-input" value="${feeder.reason || ''}" readonly>
-              </div>
+            <div class="mb-2">
+              <label class="form-label">Status</label>
+              <select class="form-select status-select" disabled>
+                <option value="on" ${feeder.status === 'on' ? 'selected' : ''}>On</option>
+                <option value="off" ${feeder.status === 'off' ? 'selected' : ''}>Off</option>
+              </select>
+            </div>
 
-              <div class="mb-2">
-                <label class="form-label">Shutdown Time</label>
-                <input type="time" class="form-control shutdown-time" value="${feeder.shutdownTime || ''}" readonly>
-              </div>
+            <div class="mb-2">
+              <label class="form-label">Reason</label>
+              <input type="text" class="form-control reason-input" value="${feeder.reason || ''}" readonly>
+            </div>
 
-              <div class="mb-2">
-                <label class="form-label">Expected Restoration</label>
-                <input type="time" class="form-control restoration-time" value="${feeder.restorationTime || ''}" readonly>
-              </div>
-            `;
+            <div class="mb-2">
+              <label class="form-label">Shutdown Time</label>
+              <input type="time" class="form-control shutdown-time" value="${feeder.shutdownTime || ''}" readonly>
+            </div>
 
-            column.appendChild(feederBox);
-            feederContainer.appendChild(column);
-          });
-        })
-        .catch(error => {
-          console.error('Error loading feeders:', error);
-          Swal.fire({
-            icon: 'error',
-            title: 'Load Error',
-            text: 'Failed to fetch feeder data.'
-          });
+            <div class="mb-2">
+              <label class="form-label">Expected Restoration</label>
+              <input type="time" class="form-control restoration-time" value="${feeder.restorationTime || ''}" readonly>
+            </div>
+          `;
+
+          column.appendChild(feederBox);
+          feederContainer.appendChild(column);
         });
-    }
-
-    function performSearch() {
-      const keyword = document.getElementById("search-input").value.toLowerCase();
-      const feeders = document.querySelectorAll(".feeder-column");
-
-      feeders.forEach(feeder => {
-        const name = feeder.querySelector(".feeder-title").textContent.toLowerCase();
-        feeder.style.display = name.includes(keyword) ? "block" : "none";
+      })
+      .catch(error => {
+        console.error('Error loading feeders:', error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Load Error',
+          text: 'Failed to fetch feeder data.'
+        });
       });
-    }
+  }
 
-    window.addEventListener('DOMContentLoaded', loadFeeders);
-  </script>
+  function performSearch() {
+    const keyword = document.getElementById("search-input").value.toLowerCase();
+    const feeders = document.querySelectorAll(".feeder-column");
+
+    feeders.forEach(feeder => {
+      const name = feeder.querySelector(".feeder-title").textContent.toLowerCase();
+      feeder.style.display = name.includes(keyword) ? "block" : "none";
+    });
+  }
+
+  window.addEventListener('DOMContentLoaded', loadFeeders);
+</script>
+
 </body>
 </html>
