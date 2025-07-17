@@ -123,6 +123,9 @@
     document.getElementById('loginForm').addEventListener('submit', async function (e) {
       e.preventDefault();
 
+      await Parse.User.logOut(); // 🔄 Clear old session
+      localStorage.clear();      // 🔄 Clear localStorage
+
       const emailInput = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value.trim();
       const isAdmin = emailInput.toLowerCase() === 'admin';
@@ -139,12 +142,13 @@
 
       try {
         const data = await Parse.Cloud.run("loginUser", { username: emailInput, password });
-        await Parse.User.become(data.sessionToken); // ← ADD THIS LINE
+
+        await Parse.User.become(data.sessionToken); // ✅ Restore session
+
         localStorage.setItem('role', data.role || 'public');
         localStorage.setItem('username', emailInput);
         localStorage.setItem('sessionToken', data.sessionToken);
 
-        // ✅ NEW: Redirect logic based on role
         if (data.role === 'admin') {
           Swal.fire({
             icon: 'success',
