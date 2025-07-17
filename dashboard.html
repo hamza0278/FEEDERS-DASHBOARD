@@ -142,7 +142,6 @@
       feederBox.innerHTML = `
         <div class="feeder-header">
           <h5 class="feeder-title">${feeder.name || 'New Feeder'}</h5>
-          ${isAdmin ? '<button class="btn btn-sm btn-danger delete-btn">🗑</button>' : ''}
         </div>
         <div class="mb-2 mt-2">
           <label class="form-label">Status</label>
@@ -198,12 +197,6 @@
 
       statusSelect.addEventListener("change", toggleDependentFields);
       toggleDependentFields();
-
-      if (isAdmin && feederBox.querySelector(".delete-btn")) {
-        feederBox.querySelector(".delete-btn").addEventListener("click", () => {
-          column.remove();
-        });
-      }
 
       if (scrollIntoView) {
         setTimeout(() => column.scrollIntoView({ behavior: "smooth" }), 100);
