@@ -242,17 +242,15 @@
         });
       });
 
-      fetch('/api/feeders', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: localStorage.getItem('username'), feeders: data })
+      Parse.Cloud.run("saveFeedersToDB", {
+        username: localStorage.getItem('username'),
+        feeders: data
       })
-      .then(res => res.json())
       .then(result => {
         Swal.fire({
           icon: 'success',
           title: 'Saved!',
-          text: 'All feeder data has been saved.',
+          text: result || 'All feeder data has been saved.',
           confirmButtonColor: '#198754'
         });
       })
@@ -261,7 +259,7 @@
         Swal.fire({
           icon: 'error',
           title: 'Save failed!',
-          text: 'Could not save feeder data.',
+          text: error.message || 'Could not save feeder data.',
           confirmButtonColor: '#dc3545'
         });
       });
