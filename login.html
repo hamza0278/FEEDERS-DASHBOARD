@@ -123,8 +123,8 @@
     document.getElementById('loginForm').addEventListener('submit', async function (e) {
       e.preventDefault();
 
-      await Parse.User.logOut(); // 🔄 Clear old session
-      localStorage.clear();      // 🔄 Clear localStorage
+      await Parse.User.logOut();
+      localStorage.clear();
 
       const emailInput = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value.trim();
@@ -140,10 +140,18 @@
         return;
       }
 
+      // Show instant popup
+      Swal.fire({
+        title: 'Logging in...',
+        text: 'Please wait',
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        didOpen: () => Swal.showLoading()
+      });
+
       try {
         const data = await Parse.Cloud.run("loginUser", { username: emailInput, password });
-
-        await Parse.User.become(data.sessionToken); // ✅ Restore session
+        await Parse.User.become(data.sessionToken);
 
         localStorage.setItem('role', data.role || 'public');
         localStorage.setItem('username', emailInput);
@@ -154,31 +162,28 @@
             icon: 'success',
             title: 'Welcome Admin',
             text: 'Redirecting to dashboard...',
-            timer: 1500,
+            timer: 1000,
             showConfirmButton: false
-          }).then(() => {
-            window.location.href = 'dashboard.html';
           });
+          setTimeout(() => window.location.href = 'dashboard.html', 1000);
         } else if (data.activated === true) {
           Swal.fire({
             icon: 'success',
             title: 'Welcome',
             text: 'Redirecting to dashboard...',
-            timer: 1500,
+            timer: 1000,
             showConfirmButton: false
-          }).then(() => {
-            window.location.href = 'dashboard.html';
           });
+          setTimeout(() => window.location.href = 'dashboard.html', 1000);
         } else {
           Swal.fire({
             icon: 'warning',
             title: 'Activation Required',
             text: 'Redirecting to activation page...',
-            timer: 2000,
+            timer: 1200,
             showConfirmButton: false
-          }).then(() => {
-            window.location.href = 'activation.html';
           });
+          setTimeout(() => window.location.href = 'activation.html', 1200);
         }
 
       } catch (err) {
