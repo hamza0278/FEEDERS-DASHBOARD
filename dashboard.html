@@ -12,10 +12,7 @@
     Parse.serverURL = "https://parseapi.back4app.com";
   </script>
   <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #f4f6f9;
-    }
+    body { font-family: 'Segoe UI', sans-serif; background-color: #f4f6f9; }
     header {
       background-color: #004085;
       color: white;
@@ -24,10 +21,7 @@
       flex-wrap: wrap;
       align-items: center;
     }
-    .header-title {
-      font-size: 1.75rem;
-      font-weight: bold;
-    }
+    .header-title { font-size: 1.75rem; font-weight: bold; }
     .header-right {
       margin-left: auto;
       display: flex;
@@ -49,10 +43,7 @@
     .generate-btn { background-color: #ffc107; color: black; }
     .add-btn { background-color: #0d6efd; }
     .users-btn { background-color: #343a40; }
-    .search-wrapper {
-      display: flex;
-      gap: 5px;
-    }
+    .search-wrapper { display: flex; gap: 5px; }
     .search-input {
       padding: 6px 10px;
       border-radius: 5px;
@@ -66,9 +57,7 @@
       margin-bottom: 1.5rem;
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
-    .form-label {
-      font-weight: 500;
-    }
+    .form-label { font-weight: 500; }
     footer {
       background-color: #004085;
       color: white;
@@ -84,23 +73,14 @@
       align-items: center;
     }
     @media (max-width: 768px) {
-      .header-title {
-        flex: 1 0 100%;
-        margin-bottom: 0.5rem;
-        font-size: 1.4rem;
-      }
+      .header-title { flex: 1 0 100%; margin-bottom: 0.5rem; font-size: 1.4rem; }
       .header-right {
         justify-content: flex-start;
         flex-wrap: wrap;
         gap: 6px;
       }
-      .search-wrapper {
-        flex: 1 0 100%;
-        margin-top: 8px;
-      }
-      .search-input {
-        flex: 1;
-      }
+      .search-wrapper { flex: 1 0 100%; margin-top: 8px; }
+      .search-input { flex: 1; }
     }
   </style>
 </head>
@@ -163,7 +143,6 @@
         <div class="feeder-header">
           <h5 class="feeder-title">${feeder.name || 'New Feeder'}</h5>
         </div>
-
         <div class="mb-2 mt-2">
           <label class="form-label">Status</label>
           <select class="form-select status-select" ${!isAdmin ? 'disabled' : ''}>
@@ -171,7 +150,6 @@
             <option value="off" ${feeder.status === 'off' ? 'selected' : ''}>Off</option>
           </select>
         </div>
-
         <div class="mb-2">
           <label class="form-label">Reason</label>
           <select class="form-select reason-select" ${!isAdmin ? 'disabled' : ''}>
@@ -184,12 +162,10 @@
             <option value="Unknown" ${selectedReason === "Unknown" ? 'selected' : ''}>Unknown</option>
           </select>
         </div>
-
         <div class="mb-2">
           <label class="form-label">Shutdown Time</label>
           <input type="time" class="form-control shutdown-time" value="${feeder.shutdownTime || ''}" ${!isAdmin ? 'disabled' : ''}>
         </div>
-
         <div class="mb-2">
           <label class="form-label">Expected Restoration</label>
           <input type="time" class="form-control restoration-time" value="${feeder.restorationTime || ''}" ${!isAdmin ? 'disabled' : ''}>
@@ -246,11 +222,11 @@
         username: localStorage.getItem('username'),
         feeders: data
       })
-      .then(result => {
+      .then(() => {
         Swal.fire({
           icon: 'success',
           title: 'Saved!',
-          text: result || 'All feeder data has been saved.',
+          text: 'All feeder data has been saved.',
           confirmButtonColor: '#198754'
         });
       })
