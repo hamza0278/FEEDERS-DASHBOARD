@@ -6,6 +6,7 @@
   <title>Password Recovery</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://npmcdn.com/parse/dist/parse.min.js"></script>
   <style>
     body {
       font-family: 'Inter', sans-serif;
@@ -84,6 +85,9 @@
   </div>
 
   <script>
+    Parse.initialize("2UbcjCCCAXXdMC34Xsq3se5xHv42l9zpncnBO5zk", "Ryed1qJgdnSd6xxrVqFt95aLpxEDz9DDic1aaVGq");
+    Parse.serverURL = 'https://parseapi.back4app.com/';
+
     document.getElementById('recoverForm').addEventListener('submit', function(e) {
       e.preventDefault();
       const username = document.getElementById('username').value.trim();
@@ -93,22 +97,13 @@
         return;
       }
 
-      fetch('/api/recover', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: username })
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          Swal.fire("Email Sent", data.message, "success");
-        } else {
-          Swal.fire("Failed", data.message, "error");
-        }
-      })
-      .catch(() => {
-        Swal.fire("Error", "Server error. Please try again.", "error");
-      });
+      Parse.User.requestPasswordReset(username)
+        .then(() => {
+          Swal.fire("Email Sent", "Recovery email sent successfully.", "success");
+        })
+        .catch(error => {
+          Swal.fire("Failed", error.message || "Failed to send recovery email.", "error");
+        });
     });
   </script>
 </body>
