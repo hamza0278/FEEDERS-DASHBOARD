@@ -186,6 +186,12 @@
           reasonSelect.disabled = !isOff;
           shutdownInput.disabled = !isOff;
           restorationInput.disabled = !isOff;
+
+          if (!isOff) {
+            reasonSelect.value = "";
+            shutdownInput.value = "";
+            restorationInput.value = "";
+          }
         }
       }
 
