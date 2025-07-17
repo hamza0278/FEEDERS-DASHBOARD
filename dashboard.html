@@ -6,7 +6,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://npmcdn.com/parse/dist/parse.min.js"></script>
+  <script>
+    Parse.initialize("2UbcjCCCAXXdMC34Xsq3se5xHv42l9zpncnBO5zk", "Ryed1qJgdnSd6xxrVqFt95aLpxEDz9DDic1aaVGq");
+    Parse.serverURL = "https://parseapi.back4app.com";
+  </script>
   <style>
+    /* your existing CSS remains unchanged */
     body {
       font-family: 'Segoe UI', sans-serif;
       background-color: #f4f6f9;
@@ -216,81 +222,6 @@
       }
     }
 
-    function showAddDeleteOptions() {
-      Swal.fire({
-        title: 'Choose Action',
-        icon: 'question',
-        showDenyButton: true,
-        confirmButtonText: 'Add Feeder',
-        denyButtonText: 'Delete Feeder'
-      }).then((result) => {
-        if (result.isConfirmed) {
-          addFeeder();
-        } else if (result.isDenied) {
-          showDeleteFeederPopup();
-        }
-      });
-    }
-
-    function addFeeder() {
-      Swal.fire({
-        title: 'Enter Feeder Name',
-        input: 'text',
-        inputPlaceholder: 'e.g. HASSAN PARK (110801)',
-        showCancelButton: true,
-        confirmButtonText: 'Add Feeder',
-        cancelButtonText: 'Cancel',
-        inputValidator: (value) => {
-          if (!value.trim()) return 'Feeder name is required!';
-        }
-      }).then(result => {
-        if (result.isConfirmed) {
-          createFeederBox({ name: result.value.trim(), status: 'on' }, true);
-        }
-      });
-    }
-
-    function showDeleteFeederPopup() {
-      const feeders = document.querySelectorAll(".feeder-column");
-      if (feeders.length === 0) {
-        Swal.fire('No feeders to delete.', '', 'info');
-        return;
-      }
-
-      let tableHtml = `
-        <table class="table table-bordered">
-          <thead><tr><th>Feeder Name</th><th>Action</th></tr></thead>
-          <tbody>
-      `;
-
-      feeders.forEach((feeder, index) => {
-        const name = feeder.querySelector(".feeder-title").textContent;
-        tableHtml += `
-          <tr>
-            <td>${name}</td>
-            <td><button class="btn btn-danger btn-sm" onclick="deleteFeederByIndex(${index})">Delete</button></td>
-          </tr>
-        `;
-      });
-
-      tableHtml += '</tbody></table>';
-
-      Swal.fire({
-        title: 'Delete Feeders',
-        html: tableHtml,
-        showConfirmButton: false,
-        width: '600px'
-      });
-    }
-
-    function deleteFeederByIndex(index) {
-      const feeders = document.querySelectorAll(".feeder-column");
-      if (feeders[index]) {
-        feeders[index].remove();
-        Swal.fire('Deleted!', 'Feeder removed from page. Click Save to confirm.', 'success');
-      }
-    }
-
     function saveAll() {
       const allBoxes = document.querySelectorAll(".feeder-box");
       const data = [];
@@ -359,9 +290,15 @@
       }
     }
 
-    Parse.Cloud.run("getFeeders")
-      .then(res => res.json())
-      .then(data => data.forEach(feeder => createFeederBox(feeder)));
+    // ✅ CORRECTED: Load from "getFeedersFromDB" without `.json()`
+    Parse.Cloud.run("getFeedersFromDB")
+      .then(data => {
+        data.forEach(feeder => createFeederBox(feeder));
+      })
+      .catch(error => {
+        console.error("Error loading feeders:", error);
+        Swal.fire("Error", "Could not load feeders from database", "error");
+      });
 
     window.addEventListener("DOMContentLoaded", () => {
       const role = localStorage.getItem("role");
