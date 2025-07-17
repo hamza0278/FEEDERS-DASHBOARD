@@ -125,14 +125,13 @@
 
       const emailInput = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value.trim();
-      const isAdmin = emailInput.toLowerCase() === 'admin';
 
       if (!emailInput || !password) {
         Swal.fire("Missing Fields", "Please enter both email and password", "warning");
         return;
       }
 
-      if (!isAdmin && !isValidEmail(emailInput)) {
+      if (emailInput.toLowerCase() !== 'admin' && !isValidEmail(emailInput)) {
         Swal.fire("Invalid Email", "Please enter a valid email address", "error");
         return;
       }
