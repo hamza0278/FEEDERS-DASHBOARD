@@ -87,14 +87,13 @@
   </div>
 
   <script>
-    // ✅ Initialize Parse with your Back4App keys
+    // ✅ Initialize Parse
     Parse.initialize("2UbcjCCCAXXdMC34Xsq3se5xHv42l9zpncnBO5zk", "Ryed1qJgdnSd6xxrVqFt95aLpxEDz9DDic1aaVGq");
     Parse.serverURL = "https://parseapi.back4app.com/";
 
     function isValidEmail(email) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-}
-
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
 
     document.getElementById('signup-form').addEventListener('submit', async function(e) {
       e.preventDefault();
@@ -108,6 +107,15 @@
       if (!isValidEmail(username)) {
         return Swal.fire('Invalid Email', 'Please enter a valid email address.', 'error');
       }
+
+      // 🚀 Instant loading popup
+      Swal.fire({
+        title: 'Creating account...',
+        text: 'Please wait',
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        didOpen: () => Swal.showLoading()
+      });
 
       const user = new Parse.User();
       user.set("username", username);
