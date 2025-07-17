@@ -92,8 +92,9 @@
     Parse.serverURL = "https://parseapi.back4app.com/";
 
     function isValidEmail(email) {
-      return /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email);
-    }
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
 
     document.getElementById('signup-form').addEventListener('submit', async function(e) {
       e.preventDefault();
