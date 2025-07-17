@@ -8,6 +8,7 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="https://npmcdn.com/parse/dist/parse.min.js"></script>
   <style>
+    /* [Same styles as you provided] */
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
@@ -285,7 +286,7 @@
       if (!count || parseInt(count) < 1) return;
 
       try {
-        const result = await Parse.Cloud.run("generateKey", { count: parseInt(count) });
+        const result = await Parse.Cloud.run("generateNormalKey", { count: parseInt(count) });
         if (result.success) {
           Swal.fire({
             icon: 'success',
