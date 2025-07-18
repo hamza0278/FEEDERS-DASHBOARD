@@ -218,13 +218,16 @@
     setTimeout(() => {
       document.getElementById("page-content").classList.add("blurred");
       Swal.fire({
-        title: 'To continue, please login or create an account with us.<br><small>Don\'t forget activation.</small>',
+        title: 'To continue, please login or create an account with us.',
         icon: 'info',
         showCancelButton: true,
         confirmButtonText: 'Login',
         cancelButtonText: 'Signup',
         allowOutsideClick: false,
         allowEscapeKey: false,
+        customClass: {
+          popup: 'swal2-no-blur'
+        },
         didClose: () => {
           document.getElementById("page-content").classList.remove("blurred");
         }
@@ -235,7 +238,7 @@
           window.location.href = 'signup.html';
         }
       });
-    }, 6000); // 06 seconds
+    }, 6000);
   });
 </script>
 
