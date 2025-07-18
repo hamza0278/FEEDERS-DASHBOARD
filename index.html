@@ -1,4 +1,3 @@
-<!-- ✅ Already optimized code begins here -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -18,10 +17,10 @@
       background-color: #f4f6f9;
       margin: 0;
       padding-top: 115px;
-      transition: filter 0.3s ease;
     }
-    body.blurred {
+    #page-content.blurred {
       filter: blur(5px);
+      transition: filter 0.3s ease;
     }
     header {
       background-color: #004085;
@@ -116,6 +115,7 @@
 </head>
 <body>
 
+<div id="page-content">
   <header>
     <h2 class="header-title m-0">FEEDER MONITORING STATUS</h2>
     <div class="header-actions">
@@ -136,106 +136,108 @@
   <footer>
     &copy; 2025 132KV GRID STATION MURIDKE FEEDER MONITORING SYSTEM
   </footer>
+</div>
 
-  <script>
-    const feederContainer = document.getElementById("feeder-container");
+<script>
+  const feederContainer = document.getElementById("feeder-container");
 
-    function loadFeeders() {
-      Parse.Cloud.run("getFeedersFromDB")
-        .then(feeders => {
-          feederContainer.innerHTML = '';
+  function loadFeeders() {
+    Parse.Cloud.run("getFeedersFromDB")
+      .then(feeders => {
+        feederContainer.innerHTML = '';
 
-          feeders.forEach(feeder => {
-            const column = document.createElement("div");
-            column.className = "col-12 col-md-6 col-lg-4 feeder-column";
+        feeders.forEach(feeder => {
+          const column = document.createElement("div");
+          column.className = "col-12 col-md-6 col-lg-4 feeder-column";
 
-            const feederBox = document.createElement("div");
-            feederBox.className = "feeder-box";
+          const feederBox = document.createElement("div");
+          feederBox.className = "feeder-box";
 
-            feederBox.innerHTML = `
-              <div class="feeder-header">
-                <h5 class="feeder-title">${feeder.name}</h5>
+          feederBox.innerHTML = `
+            <div class="feeder-header">
+              <h5 class="feeder-title">${feeder.name}</h5>
+            </div>
+
+            <div class="row mb-2">
+              <div class="col-8">
+                <label class="form-label">Status</label>
+                <select class="form-select status-select" disabled>
+                  <option value="on" ${feeder.status === 'on' ? 'selected' : ''}>On</option>
+                  <option value="off" ${feeder.status === 'off' ? 'selected' : ''}>Off</option>
+                </select>
               </div>
-
-              <div class="row mb-2">
-                <div class="col-8">
-                  <label class="form-label">Status</label>
-                  <select class="form-select status-select" disabled>
-                    <option value="on" ${feeder.status === 'on' ? 'selected' : ''}>On</option>
-                    <option value="off" ${feeder.status === 'off' ? 'selected' : ''}>Off</option>
-                  </select>
-                </div>
-                <div class="col-4">
-                  <label class="form-label">Load</label>
-                  <input type="text" class="form-control" value="${feeder.load || ''}" readonly maxlength="4" pattern="\\d{1,3}[A-Za-z]" style="width: 100%;">
-                </div>
+              <div class="col-4">
+                <label class="form-label">Load</label>
+                <input type="text" class="form-control" value="${feeder.load || ''}" readonly maxlength="4" pattern="\\d{1,3}[A-Za-z]" style="width: 100%;">
               </div>
+            </div>
 
-              <div class="mb-2">
-                <label class="form-label">Reason</label>
-                <input type="text" class="form-control reason-input" value="${feeder.reason || ''}" readonly>
-              </div>
+            <div class="mb-2">
+              <label class="form-label">Reason</label>
+              <input type="text" class="form-control reason-input" value="${feeder.reason || ''}" readonly>
+            </div>
 
-              <div class="mb-2">
-                <label class="form-label">Shutdown Time</label>
-                <input type="time" class="form-control shutdown-time" value="${feeder.shutdownTime || ''}" readonly>
-              </div>
+            <div class="mb-2">
+              <label class="form-label">Shutdown Time</label>
+              <input type="time" class="form-control shutdown-time" value="${feeder.shutdownTime || ''}" readonly>
+            </div>
 
-              <div class="mb-2">
-                <label class="form-label">Expected Restoration</label>
-                <input type="time" class="form-control restoration-time" value="${feeder.restorationTime || ''}" readonly>
-              </div>
-            `;
+            <div class="mb-2">
+              <label class="form-label">Expected Restoration</label>
+              <input type="time" class="form-control restoration-time" value="${feeder.restorationTime || ''}" readonly>
+            </div>
+          `;
 
-            column.appendChild(feederBox);
-            feederContainer.appendChild(column);
-          });
-        })
-        .catch(error => {
-          console.error('Error loading feeders:', error);
-          Swal.fire({
-            icon: 'error',
-            title: 'Load Error',
-            text: 'Failed to fetch feeder data.'
-          });
+          column.appendChild(feederBox);
+          feederContainer.appendChild(column);
         });
-    }
-
-    function performSearch() {
-      const keyword = document.getElementById("search-input").value.toLowerCase();
-      const feeders = document.querySelectorAll(".feeder-column");
-
-      feeders.forEach(feeder => {
-        const name = feeder.querySelector(".feeder-title").textContent.toLowerCase();
-        feeder.style.display = name.includes(keyword) ? "block" : "none";
-      });
-    }
-
-    window.addEventListener('DOMContentLoaded', () => {
-      loadFeeders();
-
-      setTimeout(() => {
-        document.body.classList.add("blurred");
+      })
+      .catch(error => {
+        console.error('Error loading feeders:', error);
         Swal.fire({
-          title: 'To continue, please login or create an account with us.',
-          icon: 'info',
-          showCancelButton: true,
-          confirmButtonText: 'Login',
-          cancelButtonText: 'Signup',
-          allowOutsideClick: false,
-          allowEscapeKey: false,
-          didClose: () => {
-            document.body.classList.remove("blurred");
-          }
-        }).then(result => {
-          if (result.isConfirmed) {
-            window.location.href = 'login.html';
-          } else if (result.dismiss === Swal.DismissReason.cancel) {
-            window.location.href = 'signup.html';
-          }
+          icon: 'error',
+          title: 'Load Error',
+          text: 'Failed to fetch feeder data.'
         });
-      }, 10000); // 10 seconds
+      });
+  }
+
+  function performSearch() {
+    const keyword = document.getElementById("search-input").value.toLowerCase();
+    const feeders = document.querySelectorAll(".feeder-column");
+
+    feeders.forEach(feeder => {
+      const name = feeder.querySelector(".feeder-title").textContent.toLowerCase();
+      feeder.style.display = name.includes(keyword) ? "block" : "none";
     });
-  </script>
+  }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    loadFeeders();
+
+    setTimeout(() => {
+      document.getElementById("page-content").classList.add("blurred");
+      Swal.fire({
+        title: 'To continue, please login or create an account with us.',
+        icon: 'info',
+        showCancelButton: true,
+        confirmButtonText: 'Login',
+        cancelButtonText: 'Signup',
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        didClose: () => {
+          document.getElementById("page-content").classList.remove("blurred");
+        }
+      }).then(result => {
+        if (result.isConfirmed) {
+          window.location.href = 'login.html';
+        } else if (result.dismiss === Swal.DismissReason.cancel) {
+          window.location.href = 'signup.html';
+        }
+      });
+    }, 6000); // 06 seconds
+  });
+</script>
+
 </body>
 </html>
