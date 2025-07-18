@@ -73,18 +73,6 @@
       border-radius: 5px;
       font-size: 14px;
     }
-    .info-banner {
-      position: fixed;
-      top: 72px;
-      width: 100%;
-      background-color: #ffc107;
-      color: #212529;
-      text-align: center;
-      font-weight: 600;
-      padding: 8px 16px;
-      z-index: 999;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
     .feeder-box {
       background: #fff;
       padding: 1rem;
@@ -134,12 +122,6 @@
       <a href="login.html" class="btn btn-warning btn-sm w-100 w-md-auto">Login / Signup</a>
     </div>
   </header>
-
-  <div class="info-banner">
-    (If you want early access to information regarding P.T.W/Shutdowns/Maintenance/Load Shedding Schedules,
-    <a href="signup.html" style="font-weight:bold; color:#004085; text-decoration:underline;">Signup</a>
-    and <strong>Activate</strong> your Account using Activation Key)
-  </div>
 
   <div class="container py-4">
     <div class="row" id="feeder-container">
@@ -225,7 +207,27 @@
       });
     }
 
-    window.addEventListener('DOMContentLoaded', loadFeeders);
+    window.addEventListener('DOMContentLoaded', () => {
+      loadFeeders();
+
+      setTimeout(() => {
+        Swal.fire({
+          title: 'To continue, please login or create an account with us.',
+          icon: 'info',
+          showCancelButton: true,
+          confirmButtonText: 'Login',
+          cancelButtonText: 'Signup',
+          allowOutsideClick: false,
+          allowEscapeKey: false
+        }).then(result => {
+          if (result.isConfirmed) {
+            window.location.href = 'login.html';
+          } else if (result.dismiss === Swal.DismissReason.cancel) {
+            window.location.href = 'signup.html';
+          }
+        });
+      }, 10000); // 10 seconds
+    });
   </script>
 </body>
 </html>
