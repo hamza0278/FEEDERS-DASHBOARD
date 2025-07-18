@@ -236,12 +236,12 @@
           reasonSelect.disabled = !isOff;
           shutdownInput.disabled = !isOff;
           restorationInput.disabled = !isOff;
-          loadInput.disabled = isOff;
-          if (!isOff) return;
-          reasonSelect.value = "";
-          shutdownInput.value = "";
-          restorationInput.value = "";
-          loadInput.value = "";
+          if (isOff) {
+            reasonSelect.value = "";
+            shutdownInput.value = "";
+            restorationInput.value = "";
+            loadInput.value = "0A";
+          }
         }
       }
 
