@@ -170,6 +170,7 @@
           <label class="form-label">Reason</label>
           <select class="form-select reason-select" ${!isAdmin ? 'disabled' : ''}>
             <option value="">Select Reason</option>
+            <option value="P.T.W" ${selectedReason === "P.T.W" ? 'selected' : ''}>P.T.W</option>
             <option value="Shutdown" ${selectedReason === "Shutdown" ? 'selected' : ''}>Shutdown</option>
             <option value="Load Shedding" ${selectedReason === "Load Shedding" ? 'selected' : ''}>Load Shedding</option>
             <option value="Maintenance" ${selectedReason === "Maintenance" ? 'selected' : ''}>Maintenance</option>
@@ -197,6 +198,7 @@
       const reasonSelect = feederBox.querySelector(".reason-select");
       const shutdownInput = feederBox.querySelector(".shutdown-time");
       const restorationInput = feederBox.querySelector(".restoration-time");
+      const loadInput = feederBox.querySelector(".load-input");
 
       function toggleDependentFields() {
         const isOff = statusSelect.value === "off";
@@ -204,11 +206,14 @@
           reasonSelect.disabled = !isOff;
           shutdownInput.disabled = !isOff;
           restorationInput.disabled = !isOff;
-          if (!isOff) {
-            reasonSelect.value = "";
-            shutdownInput.value = "";
-            restorationInput.value = "";
-          }
+          loadInput.disabled = isOff;
+
+          if (!isOff) return;
+
+          reasonSelect.value = "";
+          shutdownInput.value = "";
+          restorationInput.value = "";
+          loadInput.value = "";
         }
       }
 
