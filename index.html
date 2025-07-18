@@ -190,12 +190,18 @@
                 <h5 class="feeder-title">${feeder.name}</h5>
               </div>
 
-              <div class="mb-2">
-                <label class="form-label">Status</label>
-                <select class="form-select status-select" disabled>
-                  <option value="on" ${feeder.status === 'on' ? 'selected' : ''}>On</option>
-                  <option value="off" ${feeder.status === 'off' ? 'selected' : ''}>Off</option>
-                </select>
+              <div class="row mb-2">
+                <div class="col-8">
+                  <label class="form-label">Status</label>
+                  <select class="form-select status-select" disabled>
+                    <option value="on" ${feeder.status === 'on' ? 'selected' : ''}>On</option>
+                    <option value="off" ${feeder.status === 'off' ? 'selected' : ''}>Off</option>
+                  </select>
+                </div>
+                <div class="col-4">
+                  <label class="form-label">Load</label>
+                  <input type="text" class="form-control" value="${feeder.load || ''}" readonly maxlength="4" style="width: 100%;">
+                </div>
               </div>
 
               <div class="mb-2">
