@@ -1,4 +1,3 @@
-<!-- Full HTML code begins here -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -30,7 +29,7 @@
       gap: 10px;
       align-items: center;
     }
-    .logout-btn, .save-all-btn, .search-btn, .generate-btn, .add-btn, .apply-btn {
+    .logout-btn, .save-all-btn, .search-btn, .generate-btn, .add-btn, .users-btn {
       border: none;
       padding: 6px 12px;
       border-radius: 5px;
@@ -43,7 +42,7 @@
     .search-btn { background-color: #0069d9; }
     .generate-btn { background-color: #ffc107; color: black; }
     .add-btn { background-color: #0d6efd; }
-    .apply-btn { background-color: #6f42c1; }
+    .users-btn { background-color: #343a40; }
     .search-wrapper { display: flex; gap: 5px; }
     .search-input {
       padding: 6px 10px;
@@ -89,13 +88,13 @@
   <header>
     <h2 class="header-title m-0">FEEDER MONITORING DASHBOARD</h2>
     <div class="header-right">
+      <button id="users-btn" class="users-btn" onclick="location.href='users.html'">Users</button>
       <button id="add-btn" class="add-btn" onclick="showAddDeleteOptions()">Add/Delete</button>
       <button id="generate-btn" class="generate-btn" onclick="location.href='keys.html'">Generate Keys</button>
       <div class="search-wrapper">
         <input type="text" class="search-input" id="search-input" placeholder="Search feeder...">
         <button class="search-btn" onclick="performSearch()">Search</button>
       </div>
-      <button id="apply-btn" class="apply-btn" onclick="applyToAll()">Apply to All</button>
       <button id="save-btn" class="save-all-btn" onclick="saveAll()">Save</button>
       <button class="logout-btn" onclick="confirmLogout()">Logout</button>
     </div>
@@ -110,261 +109,266 @@
   </footer>
 
   <script>
-    const feederContainer = document.getElementById("feeder-container");
-
-    function showAddDeleteOptions() {
-      Swal.fire({
-        title: 'Add or Delete Feeder?',
-        showDenyButton: true,
-        confirmButtonText: 'Add',
-        denyButtonText: 'Delete',
-        confirmButtonColor: '#0d6efd',
-        denyButtonColor: '#dc3545'
-      }).then((result) => {
-        if (result.isConfirmed) {
-          Swal.fire({
-            title: 'Enter new feeder name:',
-            input: 'text',
-            inputPlaceholder: 'Feeder Name',
-            showCancelButton: true,
-            confirmButtonText: 'Add'
-          }).then((res) => {
-            if (res.isConfirmed && res.value) {
-              createFeederBox({ name: res.value }, true);
-            }
-          });
-        } else if (result.isDenied) {
-          const allBoxes = document.querySelectorAll(".feeder-box");
-          if (allBoxes.length <= 1) {
-            Swal.fire("At least one feeder must remain.");
-            return;
-          }
-
-          let html = '';
-          allBoxes.forEach((box, i) => {
-            const name = box.querySelector(".feeder-title").textContent;
-            html += `<tr><td>${name}</td><td><button class="btn btn-danger btn-sm" onclick="deleteFeeder(${i})">Delete</button></td></tr>`;
-          });
-
-          Swal.fire({
-            title: 'Delete Feeder',
-            html: `<table class="table table-bordered"><thead><tr><th>Feeder</th><th>Action</th></tr></thead><tbody>${html}</tbody></table>`,
-            showConfirmButton: false
-          });
-        }
-      });
-    }
-
-    function deleteFeeder(index) {
-      const feeders = document.querySelectorAll(".feeder-column");
-      if (feeders[index]) {
-        feeders[index].remove();
-        Swal.close();
+  function confirmLogout() {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "You will be logged out.",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, Logout',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#dc3545'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        localStorage.removeItem('role');
+        localStorage.removeItem('username');
+        window.location.href = 'index.html';
       }
-    }
+    });
+  }
 
-    function createFeederBox(feeder = {}, scrollIntoView = false) {
-      const isAdmin = localStorage.getItem("role") === "admin";
-      const column = document.createElement("div");
-      column.className = "col-12 col-md-6 col-lg-4 feeder-column";
+  const feederContainer = document.getElementById("feeder-container");
 
-      const feederBox = document.createElement("div");
-      feederBox.className = "feeder-box";
+  function createFeederBox(feeder = {}, scrollIntoView = false) {
+    const isAdmin = localStorage.getItem("role") === "admin";
+    const column = document.createElement("div");
+    column.className = "col-12 col-md-6 col-lg-4 feeder-column";
 
-      const selectedReason = feeder.reason || "";
-      const loadValue = feeder.load || "";
+    const feederBox = document.createElement("div");
+    feederBox.className = "feeder-box";
 
-      feederBox.innerHTML = `
-        <div class="feeder-header">
-          <h5 class="feeder-title">${feeder.name || 'New Feeder'}</h5>
-        </div>
-        <div class="mb-2 mt-2">
-          <div class="row">
-            <div class="col-7">
-              <label class="form-label">Status</label>
-              <select class="form-select status-select" ${!isAdmin ? 'disabled' : ''}>
-                <option value="on" ${feeder.status === 'on' ? 'selected' : ''}>On</option>
-                <option value="off" ${feeder.status === 'off' ? 'selected' : ''}>Off</option>
-              </select>
-            </div>
-            <div class="col-5">
-              <label class="form-label">Load</label>
-              <input type="text" class="form-control load-input" placeholder="e.g. 120A"
-                value="${loadValue}" ${!isAdmin ? 'readonly' : ''}
-                maxlength="4"
-                pattern="\\d{1,3}[A-Za-z]"
-                title="3 digits followed by 1 letter"
-                style="width: 100%;">
-            </div>
-          </div>
-        </div>
-        <div class="mb-2">
-          <label class="form-label">Reason</label>
-          <select class="form-select reason-select" ${!isAdmin ? 'disabled' : ''}>
-            <option value="">Select Reason</option>
-            <option value="P.T.W" ${selectedReason === "P.T.W" ? 'selected' : ''}>P.T.W</option>
-            <option value="Shutdown" ${selectedReason === "Shutdown" ? 'selected' : ''}>Shutdown</option>
-            <option value="Load Shedding" ${selectedReason === "Load Shedding" ? 'selected' : ''}>Load Shedding</option>
-            <option value="Maintenance" ${selectedReason === "Maintenance" ? 'selected' : ''}>Maintenance</option>
-            <option value="Dead Short" ${selectedReason === "Dead Short" ? 'selected' : ''}>Dead Short</option>
-            <option value="Main Fail" ${selectedReason === "Main Fail" ? 'selected' : ''}>Main Fail</option>
-            <option value="Unknown" ${selectedReason === "Unknown" ? 'selected' : ''}>Unknown</option>
-          </select>
-        </div>
-        <div class="mb-2">
-          <label class="form-label">Shutdown Time</label>
-          <input type="time" class="form-control shutdown-time" value="${feeder.shutdownTime || ''}" ${!isAdmin ? 'disabled' : ''}>
-        </div>
-        <div class="mb-2">
-          <label class="form-label">Expected Restoration</label>
-          <input type="time" class="form-control restoration-time" value="${feeder.restorationTime || ''}" ${!isAdmin ? 'disabled' : ''}>
-        </div>
-      `;
+    const selectedReason = feeder.reason || "";
 
-      column.appendChild(feederBox);
-      feederContainer.appendChild(column);
+    feederBox.innerHTML = `
+      <div class="feeder-header">
+        <h5 class="feeder-title">${feeder.name || 'New Feeder'}</h5>
+      </div>
+      <div class="mb-2 mt-2">
+        <label class="form-label">Status</label>
+        <select class="form-select status-select" ${!isAdmin ? 'disabled' : ''}>
+          <option value="on" ${feeder.status === 'on' ? 'selected' : ''}>On</option>
+          <option value="off" ${feeder.status === 'off' ? 'selected' : ''}>Off</option>
+        </select>
+      </div>
+      <div class="mb-2">
+        <label class="form-label">Reason</label>
+        <select class="form-select reason-select" ${!isAdmin ? 'disabled' : ''}>
+          <option value="">Select Reason</option>
+          <option value="Shutdown" ${selectedReason === "Shutdown" ? 'selected' : ''}>Shutdown</option>
+          <option value="Load Shedding" ${selectedReason === "Load Shedding" ? 'selected' : ''}>Load Shedding</option>
+          <option value="Maintenance" ${selectedReason === "Maintenance" ? 'selected' : ''}>Maintenance</option>
+          <option value="Dead Short" ${selectedReason === "Dead Short" ? 'selected' : ''}>Dead Short</option>
+          <option value="Main Fail" ${selectedReason === "Main Fail" ? 'selected' : ''}>Main Fail</option>
+          <option value="Unknown" ${selectedReason === "Unknown" ? 'selected' : ''}>Unknown</option>
+        </select>
+      </div>
+      <div class="mb-2">
+        <label class="form-label">Shutdown Time</label>
+        <input type="time" class="form-control shutdown-time" value="${feeder.shutdownTime || ''}" ${!isAdmin ? 'disabled' : ''}>
+      </div>
+      <div class="mb-2">
+        <label class="form-label">Expected Restoration</label>
+        <input type="time" class="form-control restoration-time" value="${feeder.restorationTime || ''}" ${!isAdmin ? 'disabled' : ''}>
+      </div>
+    `;
 
-      const statusSelect = feederBox.querySelector(".status-select");
-      const reasonSelect = feederBox.querySelector(".reason-select");
-      const shutdownInput = feederBox.querySelector(".shutdown-time");
-      const restorationInput = feederBox.querySelector(".restoration-time");
-      const loadInput = feederBox.querySelector(".load-input");
+    column.appendChild(feederBox);
+    feederContainer.appendChild(column);
 
-      function toggleDependentFields() {
-        const isOff = statusSelect.value === "off";
-        if (isAdmin) {
-          reasonSelect.disabled = !isOff;
-          shutdownInput.disabled = !isOff;
-          restorationInput.disabled = !isOff;
-          loadInput.disabled = isOff;
-          if (!isOff) return;
+    const statusSelect = feederBox.querySelector(".status-select");
+    const reasonSelect = feederBox.querySelector(".reason-select");
+    const shutdownInput = feederBox.querySelector(".shutdown-time");
+    const restorationInput = feederBox.querySelector(".restoration-time");
+
+    function toggleDependentFields() {
+      const isOff = statusSelect.value === "off";
+      if (isAdmin) {
+        reasonSelect.disabled = !isOff;
+        shutdownInput.disabled = !isOff;
+        restorationInput.disabled = !isOff;
+
+        if (!isOff) {
           reasonSelect.value = "";
           shutdownInput.value = "";
           restorationInput.value = "";
-          loadInput.value = "";
         }
       }
-
-      statusSelect.addEventListener("change", toggleDependentFields);
-      toggleDependentFields();
-
-      if (scrollIntoView) {
-        setTimeout(() => column.scrollIntoView({ behavior: "smooth" }), 100);
-      }
     }
 
-    function applyToAll() {
-      const allBoxes = document.querySelectorAll(".feeder-box");
-      if (allBoxes.length < 2) return;
+    statusSelect.addEventListener("change", toggleDependentFields);
+    toggleDependentFields();
 
-      const first = allBoxes[0];
-      const status = first.querySelector(".status-select").value;
-      const reason = first.querySelector(".reason-select").value;
-      const shutdown = first.querySelector(".shutdown-time").value;
-      const restoration = first.querySelector(".restoration-time").value;
-      const load = first.querySelector(".load-input").value;
-
-      for (let i = 1; i < allBoxes.length; i++) {
-        const box = allBoxes[i];
-        box.querySelector(".status-select").value = status;
-        box.querySelector(".reason-select").value = reason;
-        box.querySelector(".shutdown-time").value = shutdown;
-        box.querySelector(".restoration-time").value = restoration;
-        box.querySelector(".load-input").value = load;
-        box.querySelector(".status-select").dispatchEvent(new Event('change'));
-      }
+    if (scrollIntoView) {
+      setTimeout(() => column.scrollIntoView({ behavior: "smooth" }), 100);
     }
+  }
 
-    function saveAll() {
-      const allBoxes = document.querySelectorAll(".feeder-box");
-      const data = [];
-
-      allBoxes.forEach((box, index) => {
-        const name = box.querySelector(".feeder-title").textContent;
-        const status = box.querySelector(".status-select").value;
-        const reason = box.querySelector(".reason-select").value;
-        const shutdown = box.querySelector(".shutdown-time").value;
-        const restoration = box.querySelector(".restoration-time").value;
-        const load = box.querySelector(".load-input").value;
-
-        data.push({ id: index + 1, name, status, reason, shutdownTime: shutdown, restorationTime: restoration, load });
-      });
-
-      Parse.Cloud.run("saveFeedersToDB", {
-        username: localStorage.getItem("username"),
-        feeders: data
-      }).then(() => {
-        Swal.fire("Saved!", "Feeder data has been saved.", "success");
-      }).catch(error => {
-        Swal.fire("Error", error.message || "Failed to save data", "error");
-      });
-    }
-
-    function performSearch() {
-      const keyword = document.getElementById("search-input").value.toLowerCase();
-      const feeders = document.querySelectorAll(".feeder-column");
-      feeders.forEach(feeder => {
-        const name = feeder.querySelector(".feeder-title").textContent.toLowerCase();
-        feeder.style.display = name.includes(keyword) ? "block" : "none";
-      });
-    }
-
-    function confirmLogout() {
-      Swal.fire({
-        title: "Are you sure?",
-        text: "You will be logged out.",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonText: "Yes, Logout",
-        cancelButtonText: "Cancel",
-        confirmButtonColor: "#dc3545"
-      }).then((result) => {
-        if (result.isConfirmed) {
-          localStorage.removeItem("role");
-          localStorage.removeItem("username");
-          window.location.href = "index.html";
+  function showAddDeleteOptions() {
+    Swal.fire({
+      title: "Add or Delete Feeder?",
+      showDenyButton: true,
+      confirmButtonText: "Add",
+      denyButtonText: `Delete`,
+      confirmButtonColor: "#0d6efd",
+      denyButtonColor: "#dc3545"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        Swal.fire({
+          title: "Enter Feeder Name",
+          input: "text",
+          inputLabel: "Feeder Name",
+          inputPlaceholder: "e.g. Feeder A",
+          showCancelButton: true
+        }).then(inputResult => {
+          if (inputResult.isConfirmed && inputResult.value.trim()) {
+            createFeederBox({ name: inputResult.value.trim() }, true);
+          }
+        });
+      } else if (result.isDenied) {
+        const allFeeders = Array.from(document.querySelectorAll(".feeder-column"));
+        if (allFeeders.length === 0) {
+          Swal.fire("No feeders to delete.");
+          return;
         }
-      });
-    }
 
-    Parse.Cloud.run("getFeedersFromDB")
-      .then(data => {
-        data.forEach(feeder => createFeederBox(feeder));
-      })
-      .catch(error => {
-        Swal.fire("Error", "Could not load feeders from database", "error");
-        console.error(error);
-      });
+        let html = '<ul class="list-group">';
+        allFeeders.forEach((column, index) => {
+          const title = column.querySelector(".feeder-title").textContent;
+          html += `<li class="list-group-item d-flex justify-content-between align-items-center">
+            ${title}
+            <button class="btn btn-sm btn-danger feeder-delete-btn" data-index="${index}">Delete</button>
+          </li>`;
+        });
+        html += "</ul>";
 
-    window.addEventListener("DOMContentLoaded", () => {
-      const role = localStorage.getItem("role");
-      if (role !== "admin") {
-        document.getElementById("save-btn").style.display = "none";
-        document.getElementById("generate-btn").style.display = "none";
-        document.getElementById("add-btn").style.display = "none";
-        document.getElementById("apply-btn").style.display = "none";
-      }
-
-      if (role === "admin") {
-        let timeout;
-        function resetTimer() {
-          clearTimeout(timeout);
-          timeout = setTimeout(() => {
-            localStorage.removeItem("role");
-            localStorage.removeItem("username");
-            Swal.fire("Logged Out", "You were inactive for 5 minutes.", "info").then(() => {
-              window.location.href = "index.html";
+        Swal.fire({
+          title: "Delete Feeders",
+          html,
+          showCloseButton: true,
+          showConfirmButton: false,
+          didOpen: () => {
+            document.querySelectorAll(".feeder-delete-btn").forEach(btn => {
+              btn.addEventListener("click", () => {
+                const index = parseInt(btn.getAttribute("data-index"));
+                const columnToRemove = document.querySelectorAll(".feeder-column")[index];
+                if (columnToRemove) {
+                  columnToRemove.remove();
+                  Swal.close();
+                }
+              });
             });
-          }, 300000);
-        }
-
-        ['click', 'mousemove', 'keydown', 'scroll', 'touchstart'].forEach(evt =>
-          document.addEventListener(evt, resetTimer, false)
-        );
-
-        resetTimer();
+          }
+        });
       }
     });
-  </script>
+  }
+
+  function saveAll() {
+    const allBoxes = document.querySelectorAll(".feeder-box");
+    const data = [];
+
+    allBoxes.forEach((box, index) => {
+      const name = box.querySelector(".feeder-title").textContent;
+      const status = box.querySelector(".status-select").value;
+      const reason = box.querySelector(".reason-select").value;
+      const shutdown = box.querySelector(".shutdown-time").value;
+      const restoration = box.querySelector(".restoration-time").value;
+
+      data.push({
+        id: index + 1,
+        name,
+        status,
+        reason,
+        shutdownTime: shutdown,
+        restorationTime: restoration
+      });
+    });
+
+    Parse.Cloud.run("saveFeedersToDB", {
+      username: localStorage.getItem('username'),
+      feeders: data
+    })
+    .then(() => {
+      Swal.fire({
+        icon: 'success',
+        title: 'Saved!',
+        text: 'All feeder data has been saved.',
+        confirmButtonColor: '#198754'
+      });
+    })
+    .catch(error => {
+      console.error('Error saving data:', error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Save failed!',
+        text: error.message || 'Could not save feeder data.',
+        confirmButtonColor: '#dc3545'
+      });
+    });
+  }
+
+  function performSearch() {
+    const keyword = document.getElementById("search-input").value.toLowerCase();
+    const feeders = document.querySelectorAll(".feeder-column");
+    let found = false;
+
+    feeders.forEach(feeder => {
+      const name = feeder.querySelector(".feeder-title").textContent.toLowerCase();
+      const match = name.includes(keyword);
+      feeder.style.display = match ? "block" : "none";
+      if (match) found = true;
+    });
+
+    if (!found) {
+      Swal.fire({
+        icon: 'info',
+        title: 'No match found',
+        text: 'No feeders match your search.',
+        confirmButtonColor: '#0069d9'
+      });
+    }
+  }
+
+  Parse.Cloud.run("getFeedersFromDB")
+    .then(data => {
+      data.forEach(feeder => createFeederBox(feeder));
+    })
+    .catch(error => {
+      console.error("Error loading feeders:", error);
+      Swal.fire("Error", "Could not load feeders from database", "error");
+    });
+
+  window.addEventListener("DOMContentLoaded", () => {
+    const role = localStorage.getItem("role");
+    if (role !== "admin") {
+      document.getElementById("save-btn").style.display = "none";
+      document.getElementById("generate-btn").style.display = "none";
+      document.getElementById("add-btn").style.display = "none";
+      document.getElementById("users-btn").style.display = "none";
+    }
+
+    // Auto logout admin after 5 minutes of inactivity
+    if (role === "admin") {
+      let timeout;
+      function resetTimer() {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => {
+          localStorage.removeItem("role");
+          localStorage.removeItem("username");
+          Swal.fire("Logged Out", "You were inactive for 5 minutes.", "info").then(() => {
+            window.location.href = "index.html";
+          });
+        }, 300000); // 5 minutes
+      }
+
+      ['click', 'mousemove', 'keydown', 'scroll', 'touchstart'].forEach(evt =>
+        document.addEventListener(evt, resetTimer, false)
+      );
+
+      resetTimer(); // start timer initially
+    }
+  });
+</script>
+
 </body>
 </html>
