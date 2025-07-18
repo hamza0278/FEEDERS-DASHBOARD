@@ -18,6 +18,10 @@
       background-color: #f4f6f9;
       margin: 0;
       padding-top: 115px;
+      transition: filter 0.3s ease;
+    }
+    body.blurred {
+      filter: blur(5px);
     }
     header {
       background-color: #004085;
@@ -211,6 +215,7 @@
       loadFeeders();
 
       setTimeout(() => {
+        document.body.classList.add("blurred");
         Swal.fire({
           title: 'To continue, please login or create an account with us.',
           icon: 'info',
@@ -218,7 +223,10 @@
           confirmButtonText: 'Login',
           cancelButtonText: 'Signup',
           allowOutsideClick: false,
-          allowEscapeKey: false
+          allowEscapeKey: false,
+          didClose: () => {
+            document.body.classList.remove("blurred");
+          }
         }).then(result => {
           if (result.isConfirmed) {
             window.location.href = 'login.html';
