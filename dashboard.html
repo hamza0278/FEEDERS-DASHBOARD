@@ -326,45 +326,56 @@
         }
       });
     }
+    
+    Swal.fire({
+  title: 'Please wait...',
+  text: 'Loading feeder data',
+  allowOutsideClick: false,
+  didOpen: () => {
+    Swal.showLoading();
+  }
+});
 
-    Parse.Cloud.run("getFeedersFromDB")
-      .then(data => {
-        data.forEach(feeder => createFeederBox(feeder));
-      })
-      .catch(error => {
-        Swal.fire("Error", "Could not load feeders from database", "error");
-        console.error(error);
-      });
+Parse.Cloud.run("getFeedersFromDB")
+  .then(data => {
+    Swal.close();
+    data.forEach(feeder => createFeederBox(feeder));
+  })
+  .catch(error => {
+    Swal.close();
+    Swal.fire("Error", "Could not load feeders from database", "error");
+    console.error(error);
+  });
 
-    window.addEventListener("DOMContentLoaded", () => {
-      const role = localStorage.getItem("role");
-      if (role !== "admin") {
-        document.getElementById("save-btn").style.display = "none";
-        document.getElementById("generate-btn").style.display = "none";
-        document.getElementById("add-btn").style.display = "none";
-        document.getElementById("apply-btn").style.display = "none";
-      }
+window.addEventListener("DOMContentLoaded", () => {
+  const role = localStorage.getItem("role");
+  if (role !== "admin") {
+    document.getElementById("save-btn").style.display = "none";
+    document.getElementById("generate-btn").style.display = "none";
+    document.getElementById("add-btn").style.display = "none";
+    document.getElementById("apply-btn").style.display = "none";
+  }
 
-      if (role === "admin") {
-        let timeout;
-        function resetTimer() {
-          clearTimeout(timeout);
-          timeout = setTimeout(() => {
-            localStorage.removeItem("role");
-            localStorage.removeItem("username");
-            Swal.fire("Logged Out", "You were inactive for 5 minutes.", "info").then(() => {
-              window.location.href = "index.html";
-            });
-          }, 300000);
-        }
+  if (role === "admin") {
+    let timeout;
+    function resetTimer() {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => {
+        localStorage.removeItem("role");
+        localStorage.removeItem("username");
+        Swal.fire("Logged Out", "You were inactive for 5 minutes.", "info").then(() => {
+          window.location.href = "index.html";
+        });
+      }, 300000);
+    }
 
-        ['click', 'mousemove', 'keydown', 'scroll', 'touchstart'].forEach(evt =>
-          document.addEventListener(evt, resetTimer, false)
-        );
+    ['click', 'mousemove', 'keydown', 'scroll', 'touchstart'].forEach(evt =>
+      document.addEventListener(evt, resetTimer, false)
+    );
 
-        resetTimer();
-      }
-    });
+    resetTimer();
+  }
+});
   </script>
 </body>
 </html>
