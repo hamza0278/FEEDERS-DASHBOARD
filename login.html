@@ -123,6 +123,15 @@
     document.getElementById('loginForm').addEventListener('submit', async function (e) {
       e.preventDefault();
 
+      // Show the loader first for instant feedback
+      Swal.fire({
+        title: 'Logging in...',
+        text: 'Please wait',
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        didOpen: () => Swal.showLoading()
+      });
+
       await Parse.User.logOut();
       localStorage.clear();
 
@@ -139,15 +148,6 @@
         Swal.fire("Invalid Email", "Please enter a valid email address", "error");
         return;
       }
-
-      // Show instant popup
-      Swal.fire({
-        title: 'Logging in...',
-        text: 'Please wait',
-        allowOutsideClick: false,
-        allowEscapeKey: false,
-        didOpen: () => Swal.showLoading()
-      });
 
       try {
         const data = await Parse.Cloud.run("loginUser", { username: emailInput, password });
