@@ -132,16 +132,13 @@
       user.set("password", password);
 
       try {
-        await user.signUp();
+        const signedUpUser = await user.signUp();
+        await Parse.User.become(signedUpUser.getSessionToken());
 
-        // ✅ Send Welcome Email via Cloud Code
-        Parse.Cloud.run("sendWelcomeEmail", {
+        // Send welcome email via Cloud Function
+        await Parse.Cloud.run("sendWelcomeEmail", {
           toEmail: email,
           username: username
-        }).then(() => {
-          console.log("Welcome email sent");
-        }).catch((err) => {
-          console.error("Failed to send welcome email:", err.message);
         });
 
         Swal.fire({
@@ -152,7 +149,6 @@
         }).then(() => {
           window.location.href = 'login.html';
         });
-
       } catch (error) {
         Swal.fire({
           icon: 'error',
