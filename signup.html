@@ -77,7 +77,8 @@
   <div class="signup-box">
     <h2>Sign Up</h2>
     <form id="signup-form">
-      <input type="text" id="username" placeholder="Enter Email" required />
+      <input type="text" id="username" placeholder="Choose Username" required />
+      <input type="email" id="email" placeholder="Enter Email" required />
       <input type="password" id="password" placeholder="Choose Password" required />
       <button type="submit">Create Account</button>
     </form>
@@ -87,7 +88,6 @@
   </div>
 
   <script>
-    // ✅ Initialize Parse
     Parse.initialize("2UbcjCCCAXXdMC34Xsq3se5xHv42l9zpncnBO5zk", "Ryed1qJgdnSd6xxrVqFt95aLpxEDz9DDic1aaVGq");
     Parse.serverURL = "https://parseapi.back4app.com/";
 
@@ -95,20 +95,29 @@
       return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     }
 
+    function isValidUsername(username) {
+      return /^[a-zA-Z0-9_]+$/.test(username);
+    }
+
     document.getElementById('signup-form').addEventListener('submit', async function(e) {
       e.preventDefault();
+
       const username = document.getElementById('username').value.trim();
+      const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value.trim();
 
-      if (!username || !password) {
-        return Swal.fire('Missing Fields', 'Please fill all required fields.', 'warning');
+      if (!username || !email || !password) {
+        return Swal.fire('Missing Fields', 'Please fill all fields.', 'warning');
       }
 
-      if (!isValidEmail(username)) {
+      if (!isValidUsername(username)) {
+        return Swal.fire('Invalid Username', 'Username must be alphanumeric (a-z, A-Z, 0-9, or _)', 'error');
+      }
+
+      if (!isValidEmail(email)) {
         return Swal.fire('Invalid Email', 'Please enter a valid email address.', 'error');
       }
 
-      // 🚀 Instant loading popup
       Swal.fire({
         title: 'Creating account...',
         text: 'Please wait',
@@ -119,8 +128,8 @@
 
       const user = new Parse.User();
       user.set("username", username);
+      user.set("email", email);
       user.set("password", password);
-      user.set("email", username);
 
       try {
         await user.signUp();
