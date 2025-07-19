@@ -7,9 +7,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="https://npmcdn.com/parse/dist/parse.min.js"></script>
-  <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
+  <!-- ✅ Updated EmailJS SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
   <script>
-    emailjs.init("FCXI2unZNjR1bUUdk"); // ✅ Correctly initialized here
+    emailjs.init("FCXI2unZNjR1bUUdk"); // ✅ Your public key
   </script>
   <style>
     body {
@@ -147,21 +148,12 @@
 
         await user.signUp();
 
-        // ✅ Send Email using EmailJS (with activation_link included)
         const activationLink = `https://hamza0278.github.io/FEEDERS-DASHBOARD/activation.html?user=${username}`;
-        console.log("📤 Preparing to send email via EmailJS...");
-        console.log("To:", email);
-        console.log("Username:", username);
-        console.log("Activation Link:", activationLink);
 
         await emailjs.send("service_jq6klbx", "template_6tdt39m", {
           to_email: email,
           username: username,
           activation_link: activationLink
-        }).then(() => {
-          console.log("✅ Email sent successfully!");
-        }).catch(error => {
-          console.error("❌ Email send failed:", error);
         });
 
         Swal.fire({
@@ -172,6 +164,7 @@
         }).then(() => {
           window.location.href = 'login.html';
         });
+
       } catch (error) {
         console.error("Signup error:", error);
         Swal.fire({
