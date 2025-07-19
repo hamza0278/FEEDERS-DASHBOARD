@@ -126,12 +126,14 @@
         didOpen: () => Swal.showLoading()
       });
 
-      const user = new Parse.User();
-      user.set("username", username);
-      user.set("email", email);
-      user.set("password", password);
-
       try {
+        await Parse.User.logOut(); // ✅ Clear old session to avoid "Invalid session token"
+
+        const user = new Parse.User();
+        user.set("username", username);
+        user.set("email", email);
+        user.set("password", password);
+
         await user.signUp();
 
         Swal.fire({
@@ -143,10 +145,11 @@
           window.location.href = 'login.html';
         });
       } catch (error) {
+        console.error("Signup error:", error);
         Swal.fire({
           icon: 'error',
           title: 'Signup Failed',
-          text: error.message
+          text: `(${error.code}) ${error.message}`
         });
       }
     });
