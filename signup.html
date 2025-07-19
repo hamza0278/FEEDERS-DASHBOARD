@@ -88,71 +88,80 @@
   </div>
 
   <script>
-    Parse.initialize("2UbcjCCCAXXdMC34Xsq3se5xHv42l9zpncnBO5zk", "Ryed1qJgdnSd6xxrVqFt95aLpxEDz9DDic1aaVGq");
-    Parse.serverURL = "https://parseapi.back4app.com/";
+  Parse.initialize("2UbcjCCCAXXdMC34Xsq3se5xHv42l9zpncnBO5zk", "Ryed1qJgdnSd6xxrVqFt95aLpxEDz9DDic1aaVGq");
+  Parse.serverURL = "https://parseapi.back4app.com/";
 
-    function isValidEmail(email) {
-      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  // ✅ Clear any invalid session immediately when the page loads
+  window.addEventListener("load", async () => {
+    try {
+      await Parse.User.logOut();
+      console.log("Session cleared");
+    } catch (err) {
+      console.warn("Error clearing session:", err);
+    }
+  });
+
+  function isValidEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  }
+
+  function isValidUsername(username) {
+    return /^[a-zA-Z0-9_]+$/.test(username);
+  }
+
+  document.getElementById('signup-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const username = document.getElementById('username').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value.trim();
+
+    if (!username || !email || !password) {
+      return Swal.fire('Missing Fields', 'Please fill all fields.', 'warning');
     }
 
-    function isValidUsername(username) {
-      return /^[a-zA-Z0-9_]+$/.test(username);
+    if (!isValidUsername(username)) {
+      return Swal.fire('Invalid Username', 'Username must be alphanumeric (a-z, A-Z, 0-9, or _)', 'error');
     }
 
-    document.getElementById('signup-form').addEventListener('submit', async function(e) {
-      e.preventDefault();
+    if (!isValidEmail(email)) {
+      return Swal.fire('Invalid Email', 'Please enter a valid email address.', 'error');
+    }
 
-      const username = document.getElementById('username').value.trim();
-      const email = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value.trim();
+    Swal.fire({
+      title: 'Creating account...',
+      text: 'Please wait',
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+      didOpen: () => Swal.showLoading()
+    });
 
-      if (!username || !email || !password) {
-        return Swal.fire('Missing Fields', 'Please fill all fields.', 'warning');
-      }
+    try {
+      const user = new Parse.User();
+      user.set("username", username);
+      user.set("email", email);
+      user.set("password", password);
 
-      if (!isValidUsername(username)) {
-        return Swal.fire('Invalid Username', 'Username must be alphanumeric (a-z, A-Z, 0-9, or _)', 'error');
-      }
-
-      if (!isValidEmail(email)) {
-        return Swal.fire('Invalid Email', 'Please enter a valid email address.', 'error');
-      }
+      await user.signUp();
 
       Swal.fire({
-        title: 'Creating account...',
-        text: 'Please wait',
-        allowOutsideClick: false,
-        allowEscapeKey: false,
-        didOpen: () => Swal.showLoading()
+        icon: 'success',
+        title: 'Signup Successful',
+        text: 'You can now log in.',
+        confirmButtonText: 'Go to Login'
+      }).then(() => {
+        window.location.href = 'login.html';
       });
+    } catch (error) {
+      console.error("Signup error:", error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Signup Failed',
+        text: `(${error.code}) ${error.message}`
+      });
+    }
+  });
+</script>
 
-      try {
-        await Parse.User.logOut(); // ✅ Clear old session to avoid "Invalid session token"
-
-        const user = new Parse.User();
-        user.set("username", username);
-        user.set("email", email);
-        user.set("password", password);
-
-        await user.signUp();
-
-        Swal.fire({
-          icon: 'success',
-          title: 'Signup Successful',
-          text: 'You can now log in.',
-          confirmButtonText: 'Go to Login'
-        }).then(() => {
-          window.location.href = 'login.html';
-        });
-      } catch (error) {
-        console.error("Signup error:", error);
-        Swal.fire({
-          icon: 'error',
-          title: 'Signup Failed',
-          text: `(${error.code}) ${error.message}`
-        });
-      }
-    });
-  </script>
 </body>
 </html>
