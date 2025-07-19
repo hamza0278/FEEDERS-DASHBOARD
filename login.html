@@ -97,7 +97,7 @@
   <div class="login-box">
     <h2>Login / Signup</h2>
     <form id="loginForm">
-      <input type="text" id="email" placeholder="Email" required />
+      <input type="text" id="email" placeholder="Username or Email" required />
       <input type="password" id="password" placeholder="Password" required />
       <div class="forgot-link">
         <a href="recover.html">Forgot Password?</a>
@@ -115,15 +115,19 @@
   </div>
 
   <script>
-    function isValidEmail(email) {
+    function isValidEmail(value) {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      return emailRegex.test(email);
+      return emailRegex.test(value);
+    }
+
+    function isValidUsername(value) {
+      const usernameRegex = /^[a-zA-Z0-9_]+$/;
+      return usernameRegex.test(value);
     }
 
     document.getElementById('loginForm').addEventListener('submit', async function (e) {
       e.preventDefault();
 
-      // Show the loader first for instant feedback
       Swal.fire({
         title: 'Logging in...',
         text: 'Please wait',
@@ -137,15 +141,14 @@
 
       const emailInput = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value.trim();
-      const isAdmin = emailInput.toLowerCase() === 'admin';
 
       if (!emailInput || !password) {
-        Swal.fire("Missing Fields", "Please enter both email and password", "warning");
+        Swal.fire("Missing Fields", "Please enter both username/email and password", "warning");
         return;
       }
 
-      if (!isAdmin && !isValidEmail(emailInput)) {
-        Swal.fire("Invalid Email", "Please enter a valid email address", "error");
+      if (!isValidEmail(emailInput) && !isValidUsername(emailInput)) {
+        Swal.fire("Invalid Input", "Please enter a valid username or email address", "error");
         return;
       }
 
