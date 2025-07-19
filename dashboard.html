@@ -73,6 +73,16 @@
       justify-content: space-between;
       align-items: center;
     }
+    .print-btn {
+      background-color: #20c997;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-size: 14px;
+      margin-top: 10px;
+      width: 100%;
+    }
     @media (max-width: 768px) {
       .header-title { flex: 1 0 100%; margin-bottom: 0.5rem; font-size: 1.4rem; }
       .header-right {
@@ -108,274 +118,303 @@
   <footer>
     &copy; 2025 132KV GRID STATION MURIDKE FEEDER MONITORING SYSTEM
   </footer>
+<script>
+  const feederContainer = document.getElementById("feeder-container");
 
-  <script>
-    const feederContainer = document.getElementById("feeder-container");
+  function createFeederBox(feeder = {}, scrollIntoView = false) {
+    const isAdmin = localStorage.getItem("role") === "admin";
+    const column = document.createElement("div");
+    column.className = "col-12 col-md-6 col-lg-4 feeder-column";
 
-    function showAddDeleteOptions() {
-      Swal.fire({
-        title: 'Add or Delete Feeder?',
-        showDenyButton: true,
-        confirmButtonText: 'Add',
-        denyButtonText: 'Delete',
-        confirmButtonColor: '#0d6efd',
-        denyButtonColor: '#dc3545'
-      }).then((result) => {
-        if (result.isConfirmed) {
-          Swal.fire({
-            title: 'Enter new feeder name:',
-            input: 'text',
-            inputPlaceholder: 'Feeder Name',
-            showCancelButton: true,
-            confirmButtonText: 'Add'
-          }).then((res) => {
-            if (res.isConfirmed && res.value) {
-              createFeederBox({ name: res.value }, true);
-            }
-          });
-        } else if (result.isDenied) {
-          const allBoxes = document.querySelectorAll(".feeder-box");
-          if (allBoxes.length <= 1) {
-            Swal.fire("At least one feeder must remain.");
-            return;
-          }
+    const feederBox = document.createElement("div");
+    feederBox.className = "feeder-box";
 
-          let html = '';
-          allBoxes.forEach((box, i) => {
-            const name = box.querySelector(".feeder-title").textContent;
-            html += `<tr><td>${name}</td><td><button class="btn btn-danger btn-sm" onclick="deleteFeeder(${i})">Delete</button></td></tr>`;
-          });
+    const selectedReason = feeder.reason || "";
+    const loadValue = feeder.load || "";
 
-          Swal.fire({
-            title: 'Delete Feeder',
-            html: `<table class="table table-bordered"><thead><tr><th>Feeder</th><th>Action</th></tr></thead><tbody>${html}</tbody></table>`,
-            showConfirmButton: false
-          });
-        }
-      });
-    }
-
-    function deleteFeeder(index) {
-      const feeders = document.querySelectorAll(".feeder-column");
-      if (feeders[index]) {
-        feeders[index].remove();
-        Swal.close();
-      }
-    }
-
-    function createFeederBox(feeder = {}, scrollIntoView = false) {
-      const isAdmin = localStorage.getItem("role") === "admin";
-      const column = document.createElement("div");
-      column.className = "col-12 col-md-6 col-lg-4 feeder-column";
-
-      const feederBox = document.createElement("div");
-      feederBox.className = "feeder-box";
-
-      const selectedReason = feeder.reason || "";
-      const loadValue = feeder.load || "";
-
-      feederBox.innerHTML = `
-        <div class="feeder-header">
-          <h5 class="feeder-title">${feeder.name || 'New Feeder'}</h5>
-        </div>
-        <div class="mb-2 mt-2">
-          <div class="row">
-            <div class="col-7">
-              <label class="form-label">Status</label>
-              <select class="form-select status-select" ${!isAdmin ? 'disabled' : ''}>
-                <option value="on" ${feeder.status === 'on' ? 'selected' : ''}>On</option>
-                <option value="off" ${feeder.status === 'off' ? 'selected' : ''}>Off</option>
-              </select>
-            </div>
-            <div class="col-5">
-              <label class="form-label">Load</label>
-              <input type="text" class="form-control load-input" placeholder="e.g. 120A"
-                value="${loadValue}" ${!isAdmin ? 'readonly' : ''}
-                maxlength="4"
-                pattern="\\d{1,3}[A-Za-z]"
-                title="3 digits followed by 1 letter"
-                style="width: 100%;">
-            </div>
+    feederBox.innerHTML = `
+      <div class="feeder-header">
+        <h5 class="feeder-title">${feeder.name || 'New Feeder'}</h5>
+      </div>
+      <div class="mb-2 mt-2">
+        <div class="row">
+          <div class="col-7">
+            <label class="form-label">Status</label>
+            <select class="form-select status-select" ${!isAdmin ? 'disabled' : ''}>
+              <option value="on" ${feeder.status === 'on' ? 'selected' : ''}>On</option>
+              <option value="off" ${feeder.status === 'off' ? 'selected' : ''}>Off</option>
+            </select>
+          </div>
+          <div class="col-5">
+            <label class="form-label">Load</label>
+            <input type="text" class="form-control load-input" placeholder="e.g. 120A"
+              value="${loadValue}" ${!isAdmin ? 'readonly' : ''}
+              maxlength="4"
+              pattern="\\d{1,3}[A-Za-z]"
+              title="3 digits followed by 1 letter"
+              style="width: 100%;">
           </div>
         </div>
-        <div class="mb-2">
-          <label class="form-label">Reason</label>
-          <select class="form-select reason-select" ${!isAdmin ? 'disabled' : ''}>
-            <option value="">Select Reason</option>
-            <option value="P.T.W" ${selectedReason === "P.T.W" ? 'selected' : ''}>P.T.W</option>
-            <option value="Shutdown" ${selectedReason === "Shutdown" ? 'selected' : ''}>Shutdown</option>
-            <option value="Load Shedding" ${selectedReason === "Load Shedding" ? 'selected' : ''}>Load Shedding</option>
-            <option value="Maintenance" ${selectedReason === "Maintenance" ? 'selected' : ''}>Maintenance</option>
-            <option value="Dead Short" ${selectedReason === "Dead Short" ? 'selected' : ''}>Dead Short</option>
-            <option value="Main Fail" ${selectedReason === "Main Fail" ? 'selected' : ''}>Main Fail</option>
-            <option value="Unknown" ${selectedReason === "Unknown" ? 'selected' : ''}>Unknown</option>
-          </select>
-        </div>
-        <div class="mb-2">
-          <label class="form-label">Shutdown Time</label>
-          <input type="time" class="form-control shutdown-time" value="${feeder.shutdownTime || ''}" ${!isAdmin ? 'disabled' : ''}>
-        </div>
-        <div class="mb-2">
-          <label class="form-label">Expected Restoration</label>
-          <input type="time" class="form-control restoration-time" value="${feeder.restorationTime || ''}" ${!isAdmin ? 'disabled' : ''}>
-        </div>
-      `;
+      </div>
+      <div class="mb-2">
+        <label class="form-label">Reason</label>
+        <select class="form-select reason-select" ${!isAdmin ? 'disabled' : ''}>
+          <option value="">Select Reason</option>
+          <option value="P.T.W" ${selectedReason === "P.T.W" ? 'selected' : ''}>P.T.W</option>
+          <option value="Shutdown" ${selectedReason === "Shutdown" ? 'selected' : ''}>Shutdown</option>
+          <option value="Load Shedding" ${selectedReason === "Load Shedding" ? 'selected' : ''}>Load Shedding</option>
+          <option value="Maintenance" ${selectedReason === "Maintenance" ? 'selected' : ''}>Maintenance</option>
+          <option value="Dead Short" ${selectedReason === "Dead Short" ? 'selected' : ''}>Dead Short</option>
+          <option value="Main Fail" ${selectedReason === "Main Fail" ? 'selected' : ''}>Main Fail</option>
+          <option value="Unknown" ${selectedReason === "Unknown" ? 'selected' : ''}>Unknown</option>
+        </select>
+      </div>
+      <div class="mb-2">
+        <label class="form-label">Shutdown Time</label>
+        <input type="time" class="form-control shutdown-time" value="${feeder.shutdownTime || ''}" ${!isAdmin ? 'disabled' : ''}>
+      </div>
+      <div class="mb-2">
+        <label class="form-label">Expected Restoration</label>
+        <input type="time" class="form-control restoration-time" value="${feeder.restorationTime || ''}" ${!isAdmin ? 'disabled' : ''}>
+      </div>
+      ${isAdmin ? `<button class="print-btn" onclick="printLogs('${feeder.name}')">Print Logs</button>` : ''}
+    `;
 
-      column.appendChild(feederBox);
-      feederContainer.appendChild(column);
+    column.appendChild(feederBox);
+    feederContainer.appendChild(column);
 
-      const statusSelect = feederBox.querySelector(".status-select");
-      const reasonSelect = feederBox.querySelector(".reason-select");
-      const shutdownInput = feederBox.querySelector(".shutdown-time");
-      const restorationInput = feederBox.querySelector(".restoration-time");
-      const loadInput = feederBox.querySelector(".load-input");
+    const statusSelect = feederBox.querySelector(".status-select");
+    const reasonSelect = feederBox.querySelector(".reason-select");
+    const shutdownInput = feederBox.querySelector(".shutdown-time");
+    const restorationInput = feederBox.querySelector(".restoration-time");
+    const loadInput = feederBox.querySelector(".load-input");
 
-      function toggleDependentFields() {
-        const isOff = statusSelect.value === "off";
-        if (isAdmin) {
-          reasonSelect.disabled = !isOff;
-          shutdownInput.disabled = !isOff;
-          restorationInput.disabled = !isOff;
-          if (isOff) {
-            reasonSelect.value = "";
-            shutdownInput.value = "";
-            restorationInput.value = "";
-            loadInput.value = "0A";
-          }
+    function toggleDependentFields() {
+      const isOff = statusSelect.value === "off";
+      if (isAdmin) {
+        reasonSelect.disabled = !isOff;
+        shutdownInput.disabled = !isOff;
+        restorationInput.disabled = !isOff;
+        if (isOff) {
+          reasonSelect.value = "";
+          shutdownInput.value = "";
+          restorationInput.value = "";
+          loadInput.value = "0A";
         }
       }
+    }
 
-      statusSelect.addEventListener("change", toggleDependentFields);
-      toggleDependentFields();
+    statusSelect.addEventListener("change", toggleDependentFields);
+    toggleDependentFields();
 
-      if (scrollIntoView) {
-        setTimeout(() => column.scrollIntoView({ behavior: "smooth" }), 100);
+    if (scrollIntoView) {
+      setTimeout(() => column.scrollIntoView({ behavior: "smooth" }), 100);
+    }
+  }
+  function printLogs(feederName) {
+  Swal.fire({
+    title: 'Select Date Range',
+    html:
+      `<input type="date" id="start-date" class="swal2-input" placeholder="Start Date">
+       <input type="date" id="end-date" class="swal2-input" placeholder="End Date">`,
+    confirmButtonText: 'Show Logs',
+    preConfirm: () => {
+      const start = document.getElementById('start-date').value;
+      const end = document.getElementById('end-date').value;
+      if (!start || !end) {
+        Swal.showValidationMessage("Both start and end dates are required");
+        return false;
       }
+      return { start, end };
     }
+  }).then((result) => {
+    if (!result.isConfirmed) return;
 
-    function applyToAll() {
-      const allBoxes = document.querySelectorAll(".feeder-box");
-      if (allBoxes.length < 2) return;
-
-      const first = allBoxes[0];
-      const status = first.querySelector(".status-select").value;
-      const reason = first.querySelector(".reason-select").value;
-      const shutdown = first.querySelector(".shutdown-time").value;
-      const restoration = first.querySelector(".restoration-time").value;
-      const load = first.querySelector(".load-input").value;
-
-      for (let i = 1; i < allBoxes.length; i++) {
-        const box = allBoxes[i];
-        box.querySelector(".status-select").value = status;
-        box.querySelector(".reason-select").value = reason;
-        box.querySelector(".shutdown-time").value = shutdown;
-        box.querySelector(".restoration-time").value = restoration;
-        box.querySelector(".load-input").value = load;
-        box.querySelector(".status-select").dispatchEvent(new Event('change'));
+    const { start, end } = result.value;
+    const Feeder = Parse.Object.extend("Feeders");
+    const feederQuery = new Parse.Query(Feeder);
+    feederQuery.equalTo("name", feederName);
+    feederQuery.first().then(feederObj => {
+      if (!feederObj) {
+        Swal.fire("Feeder Not Found", `No feeder named "${feederName}"`, "warning");
+        return;
       }
-    }
 
-    function saveAll() {
-      const allBoxes = document.querySelectorAll(".feeder-box");
-      const data = [];
+      return Parse.Cloud.run("getFeederLogs", { feederId: feederObj.id });
+    }).then(results => {
+      if (!results || results.length === 0) {
+        Swal.fire("No logs found", `No logs found for feeder: ${feederName}`, "info");
+        return;
+      }
 
-      allBoxes.forEach((box, index) => {
-        const name = box.querySelector(".feeder-title").textContent;
-        const status = box.querySelector(".status-select").value;
-        const reason = box.querySelector(".reason-select").value;
-        const shutdown = box.querySelector(".shutdown-time").value;
-        const restoration = box.querySelector(".restoration-time").value;
-        const load = box.querySelector(".load-input").value;
+      const logsByDate = {};
+      const startDate = new Date(start);
+      const endDate = new Date(end);
+      endDate.setHours(23, 59, 59, 999); // include full end day
 
-        data.push({ id: index + 1, name, status, reason, shutdownTime: shutdown, restorationTime: restoration, load });
+      results.forEach(log => {
+        const logTime = new Date(log.timestamp);
+        if (logTime >= startDate && logTime <= endDate) {
+          const dateKey = logTime.toLocaleDateString();
+          if (!logsByDate[dateKey]) logsByDate[dateKey] = [];
+          logsByDate[dateKey].push({ ...log, time: logTime.toLocaleTimeString() });
+        }
       });
 
-      Parse.Cloud.run("saveFeedersToDB", {
-        username: localStorage.getItem("username"),
-        feeders: data
-      }).then(() => {
-        Swal.fire("Saved!", "Feeder data has been saved.", "success");
-      }).catch(error => {
-        Swal.fire("Error", error.message || "Failed to save data", "error");
-      });
-    }
+      let html = `<div style="text-align:left;">`;
+      for (let date in logsByDate) {
+        html += `<h5>${date}</h5><ul>`;
+        logsByDate[date].forEach(log => {
+          html += `<li><b>${log.time}</b> - Status: ${log.status}, Load: ${log.load}, Reason: ${log.reason}, Shutdown: ${log.shutdownTime}, Restoration: ${log.restorationTime}, By: ${log.updatedBy}</li>`;
+        });
+        html += `</ul>`;
+      }
+      html += `</div>`;
 
-    function performSearch() {
-      const keyword = document.getElementById("search-input").value.toLowerCase();
-      const feeders = document.querySelectorAll(".feeder-column");
-      feeders.forEach(feeder => {
-        const name = feeder.querySelector(".feeder-title").textContent.toLowerCase();
-        feeder.style.display = name.includes(keyword) ? "block" : "none";
-      });
-    }
-
-    function confirmLogout() {
       Swal.fire({
-        title: "Are you sure?",
-        text: "You will be logged out.",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonText: "Yes, Logout",
-        cancelButtonText: "Cancel",
-        confirmButtonColor: "#dc3545"
-      }).then((result) => {
-        if (result.isConfirmed) {
-          localStorage.removeItem("role");
-          localStorage.removeItem("username");
-          window.location.href = "index.html";
-        }
+        title: `Logs for ${feederName}`,
+        html,
+        width: 700
       });
-    }
-    
-    Swal.fire({
-  title: 'Please Wait...',
-  text: 'Loading Feeders Data',
-  allowOutsideClick: false,
-  didOpen: () => {
-    Swal.showLoading();
-  }
-});
-
-Parse.Cloud.run("getFeedersFromDB")
-  .then(data => {
-    Swal.close();
-    data.forEach(feeder => createFeederBox(feeder));
-  })
-  .catch(error => {
-    Swal.close();
-    Swal.fire("Error", "Could not load feeders from database", "error");
-    console.error(error);
+    }).catch(err => {
+      console.error(err);
+      Swal.fire("Error", "Failed to fetch logs", "error");
+    });
   });
+}
 
-window.addEventListener("DOMContentLoaded", () => {
-  const role = localStorage.getItem("role");
-  if (role !== "admin") {
-    document.getElementById("save-btn").style.display = "none";
-    document.getElementById("generate-btn").style.display = "none";
-    document.getElementById("add-btn").style.display = "none";
-    document.getElementById("apply-btn").style.display = "none";
+
+  function deleteFeeder(index) {
+    const feeders = document.querySelectorAll(".feeder-column");
+    if (feeders[index]) {
+      feeders[index].remove();
+      Swal.close();
+    }
   }
 
-  if (role === "admin") {
-    let timeout;
-    function resetTimer() {
-      clearTimeout(timeout);
-      timeout = setTimeout(() => {
+  function applyToAll() {
+    const allBoxes = document.querySelectorAll(".feeder-box");
+    if (allBoxes.length < 2) return;
+
+    const first = allBoxes[0];
+    const status = first.querySelector(".status-select").value;
+    const reason = first.querySelector(".reason-select").value;
+    const shutdown = first.querySelector(".shutdown-time").value;
+    const restoration = first.querySelector(".restoration-time").value;
+    const load = first.querySelector(".load-input").value;
+
+    for (let i = 1; i < allBoxes.length; i++) {
+      const box = allBoxes[i];
+      box.querySelector(".status-select").value = status;
+      box.querySelector(".reason-select").value = reason;
+      box.querySelector(".shutdown-time").value = shutdown;
+      box.querySelector(".restoration-time").value = restoration;
+      box.querySelector(".load-input").value = load;
+      box.querySelector(".status-select").dispatchEvent(new Event('change'));
+    }
+  }
+
+  function saveAll() {
+    const allBoxes = document.querySelectorAll(".feeder-box");
+    const data = [];
+
+    allBoxes.forEach((box, index) => {
+      const name = box.querySelector(".feeder-title").textContent;
+      const status = box.querySelector(".status-select").value;
+      const reason = box.querySelector(".reason-select").value;
+      const shutdown = box.querySelector(".shutdown-time").value;
+      const restoration = box.querySelector(".restoration-time").value;
+      const load = box.querySelector(".load-input").value;
+
+      data.push({ id: index + 1, name, status, reason, shutdownTime: shutdown, restorationTime: restoration, load });
+    });
+
+    Parse.Cloud.run("saveFeedersToDB", {
+      username: localStorage.getItem("username"),
+      feeders: data
+    }).then(() => {
+      Swal.fire("Saved!", "Feeder data has been saved.", "success");
+    }).catch(error => {
+      Swal.fire("Error", error.message || "Failed to save data", "error");
+    });
+  }
+
+  function performSearch() {
+    const keyword = document.getElementById("search-input").value.toLowerCase();
+    const feeders = document.querySelectorAll(".feeder-column");
+    feeders.forEach(feeder => {
+      const name = feeder.querySelector(".feeder-title").textContent.toLowerCase();
+      feeder.style.display = name.includes(keyword) ? "block" : "none";
+    });
+  }
+
+  function confirmLogout() {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You will be logged out.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, Logout",
+      cancelButtonText: "Cancel",
+      confirmButtonColor: "#dc3545"
+    }).then((result) => {
+      if (result.isConfirmed) {
         localStorage.removeItem("role");
         localStorage.removeItem("username");
-        Swal.fire("Logged Out", "You were inactive for 5 minutes.", "info").then(() => {
-          window.location.href = "index.html";
-        });
-      }, 300000);
+        window.location.href = "index.html";
+      }
+    });
+  }
+
+  Swal.fire({
+    title: 'Please Wait...',
+    text: 'Loading Feeders Data',
+    allowOutsideClick: false,
+    didOpen: () => {
+      Swal.showLoading();
+    }
+  });
+
+  Parse.Cloud.run("getFeedersFromDB")
+    .then(data => {
+      Swal.close();
+      data.forEach(feeder => createFeederBox(feeder));
+    })
+    .catch(error => {
+      Swal.close();
+      Swal.fire("Error", "Could not load feeders from database", "error");
+      console.error(error);
+    });
+
+  window.addEventListener("DOMContentLoaded", () => {
+    const role = localStorage.getItem("role");
+    if (role !== "admin") {
+      document.getElementById("save-btn").style.display = "none";
+      document.getElementById("generate-btn").style.display = "none";
+      document.getElementById("add-btn").style.display = "none";
+      document.getElementById("apply-btn").style.display = "none";
     }
 
-    ['click', 'mousemove', 'keydown', 'scroll', 'touchstart'].forEach(evt =>
-      document.addEventListener(evt, resetTimer, false)
-    );
+    if (role === "admin") {
+      let timeout;
+      function resetTimer() {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => {
+          localStorage.removeItem("role");
+          localStorage.removeItem("username");
+          Swal.fire("Logged Out", "You were inactive for 5 minutes.", "info").then(() => {
+            window.location.href = "index.html";
+          });
+        }, 300000);
+      }
 
-    resetTimer();
-  }
-});
-  </script>
+      ['click', 'mousemove', 'keydown', 'scroll', 'touchstart'].forEach(evt =>
+        document.addEventListener(evt, resetTimer, false)
+      );
+
+      resetTimer();
+    }
+  });
+</script>
 </body>
 </html>
