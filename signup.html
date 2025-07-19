@@ -149,10 +149,11 @@
 
         await user.signUp();
 
-        // ✅ Send Email using EmailJS
+        // ✅ Send Email using EmailJS (with activation_link included)
         await emailjs.send("service_jq6klbx", "template_6tdt39m", {
           to_email: email,
-          username: username
+          username: username,
+          activation_link: `https://hamza0278.github.io/FEEDERS-DASHBOARD/activation.html?user=${username}`
         });
 
         Swal.fire({
