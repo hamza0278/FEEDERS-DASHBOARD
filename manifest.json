@@ -1,7 +1,7 @@
 {
   "name": "Feeder Monitoring Dashboard",
   "short_name": "Feeders",
-  "start_url": "/",
+  "start_url": "/FEEDERS-DASHBOARD/index.html",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#004085",
