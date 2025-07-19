@@ -7,6 +7,12 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="https://npmcdn.com/parse/dist/parse.min.js"></script>
+  <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
+  <script>
+    (function() {
+      emailjs.init("YspBmU09bC2e1blRE"); // Replace with your actual public key
+    })();
+  </script>
   <style>
     body {
       font-family: 'Inter', sans-serif;
@@ -88,80 +94,84 @@
   </div>
 
   <script>
-  Parse.initialize("2UbcjCCCAXXdMC34Xsq3se5xHv42l9zpncnBO5zk", "Ryed1qJgdnSd6xxrVqFt95aLpxEDz9DDic1aaVGq");
-  Parse.serverURL = "https://parseapi.back4app.com/";
+    Parse.initialize("2UbcjCCCAXXdMC34Xsq3se5xHv42l9zpncnBO5zk", "Ryed1qJgdnSd6xxrVqFt95aLpxEDz9DDic1aaVGq");
+    Parse.serverURL = "https://parseapi.back4app.com/";
 
-  // ✅ Clear any invalid session immediately when the page loads
-  window.addEventListener("load", async () => {
-    try {
-      await Parse.User.logOut();
-      console.log("Session cleared");
-    } catch (err) {
-      console.warn("Error clearing session:", err);
-    }
-  });
-
-  function isValidEmail(email) {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  }
-
-  function isValidUsername(username) {
-    return /^[a-zA-Z0-9_]+$/.test(username);
-  }
-
-  document.getElementById('signup-form').addEventListener('submit', async function(e) {
-    e.preventDefault();
-
-    const username = document.getElementById('username').value.trim();
-    const email = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value.trim();
-
-    if (!username || !email || !password) {
-      return Swal.fire('Missing Fields', 'Please fill all fields.', 'warning');
-    }
-
-    if (!isValidUsername(username)) {
-      return Swal.fire('Invalid Username', 'Username must be alphanumeric (a-z, A-Z, 0-9, or _)', 'error');
-    }
-
-    if (!isValidEmail(email)) {
-      return Swal.fire('Invalid Email', 'Please enter a valid email address.', 'error');
-    }
-
-    Swal.fire({
-      title: 'Creating account...',
-      text: 'Please wait',
-      allowOutsideClick: false,
-      allowEscapeKey: false,
-      didOpen: () => Swal.showLoading()
+    window.addEventListener("load", async () => {
+      try {
+        await Parse.User.logOut();
+        console.log("Session cleared");
+      } catch (err) {
+        console.warn("Error clearing session:", err);
+      }
     });
 
-    try {
-      const user = new Parse.User();
-      user.set("username", username);
-      user.set("email", email);
-      user.set("password", password);
-
-      await user.signUp();
-
-      Swal.fire({
-        icon: 'success',
-        title: 'Signup Successful',
-        text: 'You can now log in.',
-        confirmButtonText: 'Go to Login'
-      }).then(() => {
-        window.location.href = 'login.html';
-      });
-    } catch (error) {
-      console.error("Signup error:", error);
-      Swal.fire({
-        icon: 'error',
-        title: 'Signup Failed',
-        text: `(${error.code}) ${error.message}`
-      });
+    function isValidEmail(email) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     }
-  });
-</script>
 
+    function isValidUsername(username) {
+      return /^[a-zA-Z0-9_]+$/.test(username);
+    }
+
+    document.getElementById('signup-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      const username = document.getElementById('username').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value.trim();
+
+      if (!username || !email || !password) {
+        return Swal.fire('Missing Fields', 'Please fill all fields.', 'warning');
+      }
+
+      if (!isValidUsername(username)) {
+        return Swal.fire('Invalid Username', 'Username must be alphanumeric (a-z, A-Z, 0-9, or _)', 'error');
+      }
+
+      if (!isValidEmail(email)) {
+        return Swal.fire('Invalid Email', 'Please enter a valid email address.', 'error');
+      }
+
+      Swal.fire({
+        title: 'Creating account...',
+        text: 'Please wait',
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        didOpen: () => Swal.showLoading()
+      });
+
+      try {
+        const user = new Parse.User();
+        user.set("username", username);
+        user.set("email", email);
+        user.set("password", password);
+
+        await user.signUp();
+
+        // ✅ Send Email using EmailJS
+        await emailjs.send("service_jq6klbx", "template_6tdt39m", {
+          to_email: email,
+          username: username
+        });
+
+        Swal.fire({
+          icon: 'success',
+          title: 'Signup Successful',
+          text: 'An activation email has been sent.',
+          confirmButtonText: 'Go to Login'
+        }).then(() => {
+          window.location.href = 'login.html';
+        });
+      } catch (error) {
+        console.error("Signup error:", error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Signup Failed',
+          text: `(${error.code}) ${error.message}`
+        });
+      }
+    });
+  </script>
 </body>
 </html>
