@@ -132,14 +132,7 @@
       user.set("password", password);
 
       try {
-        const signedUpUser = await user.signUp();
-        await Parse.User.become(signedUpUser.getSessionToken());
-
-        // Send welcome email via Cloud Function
-        await Parse.Cloud.run("sendWelcomeEmail", {
-          toEmail: email,
-          username: username
-        });
+        await user.signUp();
 
         Swal.fire({
           icon: 'success',
