@@ -376,6 +376,60 @@ window.addEventListener("DOMContentLoaded", () => {
     resetTimer();
   }
 });
+async function fetchFeeders() {
+      const Feeder = Parse.Object.extend("Feeder");
+      const query = new Parse.Query(Feeder);
+      const results = await query.find();
+      const container = document.getElementById("feederList");
+      container.innerHTML = "";
+
+      results.forEach((f) => {
+        const div = document.createElement("div");
+        div.classList.add("feeder");
+        div.innerHTML = `
+          <p><strong>Name:</strong> ${f.get("name")}</p>
+          <label>Status: <select class="status">
+            <option value="on" ${f.get("status") === "on" ? "selected" : ""}>On</option>
+            <option value="off" ${f.get("status") === "off" ? "selected" : ""}>Off</option>
+          </select></label><br/>
+          <label>Reason: <input type="text" class="reason" value="${f.get("reason") || ""}" /></label><br/>
+          <label>Shutdown Time: <input type="text" class="shutdownTime" value="${f.get("shutdownTime") || ""}" /></label><br/>
+          <label>Restoration Time: <input type="text" class="restorationTime" value="${f.get("restorationTime") || ""}" /></label><br/>
+          <label>Load: <input type="text" class="load" value="${f.get("load") || ""}" /></label><br/>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    async function saveFeeders() {
+      const username = "admin";
+      const feeders = [];
+      const feederDivs = document.querySelectorAll(".feeder");
+
+      feederDivs.forEach((div) => {
+        const name = div.querySelector("p strong").nextSibling.textContent.trim();
+        const status = div.querySelector(".status").value;
+        const reason = div.querySelector(".reason").value;
+        const shutdownTime = div.querySelector(".shutdownTime").value;
+        const restorationTime = div.querySelector(".restorationTime").value;
+        const load = div.querySelector(".load").value;
+
+        feeders.push({ name, status, reason, shutdownTime, restorationTime, load });
+      });
+
+      try {
+        const res = await Parse.Cloud.run("saveFeedersToDB", {
+          username,
+          feeders,
+        });
+        alert(res.message);
+        fetchFeeders(); // refresh display
+      } catch (err) {
+        alert("❌ Error: " + err.message);
+      }
+    }
+
+    fetchFeeders();
   </script>
 </body>
 </html>
