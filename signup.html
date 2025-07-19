@@ -11,6 +11,7 @@
   <script>
     (function() {
       emailjs.init("YspBmU09bC2e1blRE"); // Replace with your actual public key
+      emailjs.send(...)
     })();
   </script>
   <style>
@@ -150,10 +151,20 @@
         await user.signUp();
 
         // ✅ Send Email using EmailJS (with activation_link included)
+        const activationLink = `https://hamza0278.github.io/FEEDERS-DASHBOARD/activation.html?user=${username}`;
+        console.log("📤 Preparing to send email via EmailJS...");
+        console.log("To:", email);
+        console.log("Username:", username);
+        console.log("Activation Link:", activationLink);
+
         await emailjs.send("service_jq6klbx", "template_6tdt39m", {
           to_email: email,
           username: username,
-          activation_link: `https://hamza0278.github.io/FEEDERS-DASHBOARD/activation.html?user=${username}`
+          activation_link: activationLink
+        }).then(() => {
+          console.log("✅ Email sent successfully!");
+        }).catch(error => {
+          console.error("❌ Email send failed:", error);
         });
 
         Swal.fire({
