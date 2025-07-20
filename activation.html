@@ -6,6 +6,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://npmcdn.com/parse/dist/parse.min.js"></script>
+  <script>
+    Parse.initialize("2UbcjCCCAXXdMC34Xsq3se5xHv42l9zpncnBO5zk", "Ryed1qJgdnSd6xxrVqFt95aLpxEDz9DDic1aaVGq");
+    Parse.serverURL = "https://parseapi.back4app.com";
+  </script>
   <style>
     body {
       font-family: 'Inter', sans-serif;
@@ -87,7 +92,7 @@
   <div class="box">
     <h2>Activate Account</h2>
     <form onsubmit="activate(); return false;">
-      <input type="email" id="email" placeholder="Email" required>
+      <input type="text" id="username" placeholder="Username" required>
       <input type="text" id="key" placeholder="Activation Key" required>
       <button type="submit">Activate</button>
     </form>
@@ -103,44 +108,33 @@
   </div>
 
   <script>
-    async function activate() {
-      const email = document.getElementById('email').value.trim();
-      const key = document.getElementById('key').value.trim();
+  async function activate() {
+    const username = document.getElementById('username').value.trim();
+    const key = document.getElementById('key').value.trim();
 
-      if (!email || !key) {
-        Swal.fire("Missing Info", "Please enter both email and activation key.", "warning");
-        return;
-      }
-
-      try {
-        const response = await fetch('/api/activate', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ email, key })
-        });
-
-        const result = await response.json();
-
-        if (response.ok) {
-          Swal.fire({
-            icon: 'success',
-            title: "Activated!",
-            text: result.message,
-            timer: 1500,
-            showConfirmButton: false
-          }).then(() => {
-            window.location.href = "login.html";
-          });
-        } else {
-          Swal.fire("Error", result.message || "Activation failed.", "error");
-        }
-
-      } catch (error) {
-        Swal.fire("Error", "Network or server error occurred.", "error");
-      }
+    if (!username || !key) {
+      Swal.fire("Missing Info", "Please enter both username and activation key.", "warning");
+      return;
     }
-  </script>
+
+    try {
+      const result = await Parse.Cloud.run("activateUserWithKey", { username, key });
+
+      Swal.fire({
+        icon: 'success',
+        title: "Activated!",
+        text: result.message,
+        timer: 1500,
+        showConfirmButton: false
+      }).then(() => {
+        window.location.href = "login.html";
+      });
+
+    } catch (error) {
+      Swal.fire("Error", error.message || "Activation failed.", "error");
+    }
+  }
+</script>
+
 </body>
 </html>
