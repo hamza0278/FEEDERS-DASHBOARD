@@ -40,11 +40,11 @@
     }
     .field-group {
       position: relative;
+      margin-bottom: 1rem;
     }
     input, button {
       width: 100%;
       padding: 10px;
-      margin-bottom: 1rem;
       border-radius: 6px;
       font-size: 14px;
       box-sizing: border-box;
@@ -54,17 +54,12 @@
     }
     .toggle-password {
       position: absolute;
-      right: 10px;
+      right: 12px;
       top: 50%;
       transform: translateY(-50%);
-      background: none;
-      border: none;
       cursor: pointer;
-      padding: 0;
-    }
-    .toggle-password i {
-      font-size: 16px;
       color: #666;
+      font-size: 16px;
     }
     button {
       background-color: #28a745;
@@ -73,6 +68,7 @@
       font-weight: bold;
       font-size: 15px;
       cursor: pointer;
+      margin-top: 5px;
     }
     button:hover {
       background-color: #218838;
@@ -99,16 +95,12 @@
 
       <div class="field-group">
         <input type="password" id="password" placeholder="Choose Password" required />
-        <button type="button" class="toggle-password" onclick="toggleVisibility('password', this)">
-          <i class="fa-regular fa-eye"></i>
-        </button>
+        <i class="fa-regular fa-eye toggle-password" onclick="toggleVisibility('password', this)"></i>
       </div>
 
       <div class="field-group">
         <input type="password" id="confirm-password" placeholder="Confirm Password" required />
-        <button type="button" class="toggle-password" onclick="toggleVisibility('confirm-password', this)">
-          <i class="fa-regular fa-eye"></i>
-        </button>
+        <i class="fa-regular fa-eye toggle-password" onclick="toggleVisibility('confirm-password', this)"></i>
       </div>
 
       <button type="submit">Create Account</button>
@@ -130,17 +122,16 @@
       }
     });
 
-    function toggleVisibility(id, btn) {
+    function toggleVisibility(id, iconElement) {
       const input = document.getElementById(id);
-      const icon = btn.querySelector("i");
       if (input.type === "password") {
         input.type = "text";
-        icon.classList.remove("fa-eye");
-        icon.classList.add("fa-eye-slash");
+        iconElement.classList.remove("fa-eye");
+        iconElement.classList.add("fa-eye-slash");
       } else {
         input.type = "password";
-        icon.classList.remove("fa-eye-slash");
-        icon.classList.add("fa-eye");
+        iconElement.classList.remove("fa-eye-slash");
+        iconElement.classList.add("fa-eye");
       }
     }
 
