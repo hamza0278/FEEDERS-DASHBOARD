@@ -11,6 +11,8 @@
   <script>
     emailjs.init("FCXI2unZNjR1bUUdk");
   </script>
+  <!-- Font Awesome for eye icon -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <style>
     body {
       font-family: 'Inter', sans-serif;
@@ -58,6 +60,7 @@
       background: none;
       border: none;
       cursor: pointer;
+      padding: 0;
     }
     .toggle-password i {
       font-size: 16px;
@@ -93,18 +96,18 @@
       <input type="text" id="username" placeholder="Choose Username" required />
       <input type="email" id="email" placeholder="Enter Email" required />
       <input type="tel" id="mobile" placeholder="Enter Mobile Number" required pattern="[0-9]{10,15}" />
-      
+
       <div class="field-group">
         <input type="password" id="password" placeholder="Choose Password" required />
-        <button type="button" class="toggle-password" onclick="toggleVisibility('password')">
-          👁️
+        <button type="button" class="toggle-password" onclick="toggleVisibility('password', this)">
+          <i class="fa-regular fa-eye"></i>
         </button>
       </div>
 
       <div class="field-group">
         <input type="password" id="confirm-password" placeholder="Confirm Password" required />
-        <button type="button" class="toggle-password" onclick="toggleVisibility('confirm-password')">
-          👁️
+        <button type="button" class="toggle-password" onclick="toggleVisibility('confirm-password', this)">
+          <i class="fa-regular fa-eye"></i>
         </button>
       </div>
 
@@ -127,9 +130,18 @@
       }
     });
 
-    function toggleVisibility(id) {
-      const field = document.getElementById(id);
-      field.type = field.type === "password" ? "text" : "password";
+    function toggleVisibility(id, btn) {
+      const input = document.getElementById(id);
+      const icon = btn.querySelector("i");
+      if (input.type === "password") {
+        input.type = "text";
+        icon.classList.remove("fa-eye");
+        icon.classList.add("fa-eye-slash");
+      } else {
+        input.type = "password";
+        icon.classList.remove("fa-eye-slash");
+        icon.classList.add("fa-eye");
+      }
     }
 
     function isValidEmail(email) {
