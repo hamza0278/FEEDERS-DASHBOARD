@@ -17,27 +17,32 @@
       margin: 0;
       padding: 0;
       height: 100vh;
-      background: url("images/login bg.jpg") no-repeat center center fixed;
+      background: url("images/grid-dark-bg.jpg") no-repeat center center fixed;
       background-size: cover;
       display: flex;
       justify-content: center;
       align-items: center;
+      color: #ffffff;
     }
 
     .login-box {
-      background: rgba(255, 255, 255, 0.92);
+      background: rgba(0, 0, 0, 0.75);
       padding: 2rem;
-      border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      border-radius: 16px;
+      box-shadow: 0 0 20px rgba(0, 255, 255, 0.4);
+      border: 1px solid rgba(0, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
       width: 100%;
-      max-width: 320px;
+      max-width: 360px;
       box-sizing: border-box;
+      color: #fff;
     }
 
     .login-box h2 {
       text-align: center;
       margin-bottom: 1.5rem;
-      color: #333;
+      font-size: 1.6rem;
+      color: #00ffff;
     }
 
     input, button {
@@ -50,20 +55,27 @@
     }
 
     input {
-      border: 1px solid #ccc;
+      border: 1px solid #00ffff;
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+
+    input::placeholder {
+      color: #aaa;
     }
 
     button {
-      background-color: #0056b3;
+      background-color: #00bcd4;
       color: white;
       border: none;
       font-weight: bold;
       font-size: 15px;
       cursor: pointer;
+      transition: background-color 0.3s ease;
     }
 
     button:hover {
-      background-color: #004494;
+      background-color: #0097a7;
     }
 
     .forgot-link {
@@ -73,25 +85,27 @@
     }
 
     .forgot-link a {
-      color: #dc3545;
-      font-size: 0.9rem;
+      color: #ff4081;
+      font-size: 0.85rem;
       text-decoration: none;
     }
 
     .signup-link, .contact-info {
       text-align: center;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       margin-top: 10px;
+      color: #ccc;
     }
 
     .signup-link a {
-      color: #28a745;
+      color: #76ff03;
       font-weight: bold;
       text-decoration: none;
     }
 
     .contact-info {
       font-weight: bold;
+      color: #f0f0f0;
     }
   </style>
 </head>
