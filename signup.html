@@ -40,7 +40,7 @@
     }
     .field-group {
       position: relative;
-      margin-bottom: 1rem;
+      margin-bottom: 1.2rem;
     }
     input, button {
       width: 100%;
@@ -89,9 +89,17 @@
   <div class="signup-box">
     <h2>Sign Up</h2>
     <form id="signup-form">
-      <input type="text" id="username" placeholder="Choose Username" required />
-      <input type="email" id="email" placeholder="Enter Email" required />
-      <input type="tel" id="mobile" placeholder="Enter Mobile Number" required pattern="[0-9]{10,15}" />
+      <div class="field-group">
+        <input type="text" id="username" placeholder="Choose Username" required />
+      </div>
+
+      <div class="field-group">
+        <input type="email" id="email" placeholder="Enter Email" required />
+      </div>
+
+      <div class="field-group">
+        <input type="tel" id="mobile" placeholder="Enter Mobile Number" required pattern="[0-9]{10,15}" />
+      </div>
 
       <div class="field-group">
         <input type="password" id="password" placeholder="Choose Password" required />
