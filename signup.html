@@ -42,30 +42,14 @@
       position: relative;
     }
 
-    input, button {
+    .input-wrapper input {
       width: 100%;
-      padding: 10px;
+      padding: 10px 35px 10px 10px;
       margin-bottom: 1rem;
       border-radius: 6px;
       font-size: 14px;
       box-sizing: border-box;
-    }
-
-    input {
       border: 1px solid #ccc;
-    }
-
-    button {
-      background-color: #28a745;
-      color: white;
-      border: none;
-      font-weight: bold;
-      font-size: 15px;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background-color: #218838;
     }
 
     .toggle-password {
@@ -73,10 +57,27 @@
       right: 10px;
       top: 50%;
       transform: translateY(-50%);
+      background: none;
+      border: none;
       cursor: pointer;
-      font-size: 12px;
-      color: #007bff;
-      user-select: none;
+      font-size: 18px;
+      color: #666;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      border-radius: 6px;
+      font-size: 15px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #218838;
     }
 
     .login-link {
@@ -98,16 +99,16 @@
     <form id="signup-form">
       <input type="text" id="username" placeholder="Choose Username" required />
       <input type="email" id="email" placeholder="Enter Email" required />
-      <input type="tel" id="mobile" placeholder="Enter Mobile Number" pattern="[0-9]{10,15}" required />
+      <input type="tel" id="mobile" placeholder="Mobile Number" pattern="[0-9]{10,15}" required />
 
       <div class="input-wrapper">
         <input type="password" id="password" placeholder="Choose Password" required />
-        <span class="toggle-password" onclick="togglePassword('password', this)">Show</span>
+        <button type="button" class="toggle-password" onclick="togglePassword('password')">👁️</button>
       </div>
 
       <div class="input-wrapper">
         <input type="password" id="confirm-password" placeholder="Confirm Password" required />
-        <span class="toggle-password" onclick="togglePassword('confirm-password', this)">Show</span>
+        <button type="button" class="toggle-password" onclick="togglePassword('confirm-password')">👁️</button>
       </div>
 
       <button type="submit">Create Account</button>
@@ -138,15 +139,9 @@
       return /^[a-zA-Z0-9_]+$/.test(username);
     }
 
-    function togglePassword(fieldId, el) {
-      const input = document.getElementById(fieldId);
-      if (input.type === "password") {
-        input.type = "text";
-        el.textContent = "Hide";
-      } else {
-        input.type = "password";
-        el.textContent = "Show";
-      }
+    function togglePassword(id) {
+      const input = document.getElementById(id);
+      input.type = input.type === "password" ? "text" : "password";
     }
 
     document.getElementById('signup-form').addEventListener('submit', async function(e) {
@@ -158,16 +153,16 @@
       const password = document.getElementById('password').value.trim();
       const confirmPassword = document.getElementById('confirm-password').value.trim();
 
-      if (!username || !email || !mobile || !password || !confirmPassword) {
+      if (!username || !email || !password || !confirmPassword || !mobile) {
         return Swal.fire('Missing Fields', 'Please fill all fields.', 'warning');
       }
 
       if (!isValidUsername(username)) {
-        return Swal.fire('Invalid Username', 'Username must be alphanumeric (a-z, A-Z, 0-9, or _)', 'error');
+        return Swal.fire('Invalid Username', 'Username must be alphanumeric.', 'error');
       }
 
       if (!isValidEmail(email)) {
-        return Swal.fire('Invalid Email', 'Please enter a valid email address.', 'error');
+        return Swal.fire('Invalid Email', 'Please enter a valid email.', 'error');
       }
 
       if (password !== confirmPassword) {
