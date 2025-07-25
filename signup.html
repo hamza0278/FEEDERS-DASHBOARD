@@ -21,7 +21,6 @@
       height: 100vh;
       margin: 0;
     }
-
     .signup-box {
       background: #fff;
       padding: 2rem;
@@ -30,28 +29,27 @@
       width: 100%;
       max-width: 320px;
       box-sizing: border-box;
+      position: relative;
     }
-
     h2 {
       text-align: center;
       margin-bottom: 1.5rem;
       color: #333;
     }
-
-    .input-wrapper {
+    .field-group {
       position: relative;
     }
-
-    .input-wrapper input {
+    input, button {
       width: 100%;
-      padding: 10px 35px 10px 10px;
+      padding: 10px;
       margin-bottom: 1rem;
       border-radius: 6px;
       font-size: 14px;
       box-sizing: border-box;
+    }
+    input {
       border: 1px solid #ccc;
     }
-
     .toggle-password {
       position: absolute;
       right: 10px;
@@ -60,32 +58,27 @@
       background: none;
       border: none;
       cursor: pointer;
-      font-size: 18px;
+    }
+    .toggle-password i {
+      font-size: 16px;
       color: #666;
     }
-
     button {
-      width: 100%;
-      padding: 10px;
-      border-radius: 6px;
-      font-size: 15px;
       background-color: #28a745;
       color: white;
       border: none;
       font-weight: bold;
+      font-size: 15px;
       cursor: pointer;
     }
-
     button:hover {
       background-color: #218838;
     }
-
     .login-link {
       margin-top: 10px;
       text-align: center;
       font-size: 0.9rem;
     }
-
     .login-link a {
       color: #0056b3;
       font-weight: bold;
@@ -99,16 +92,20 @@
     <form id="signup-form">
       <input type="text" id="username" placeholder="Choose Username" required />
       <input type="email" id="email" placeholder="Enter Email" required />
-      <input type="tel" id="mobile" placeholder="Mobile Number" pattern="[0-9]{10,15}" required />
-
-      <div class="input-wrapper">
+      <input type="tel" id="mobile" placeholder="Enter Mobile Number" required pattern="[0-9]{10,15}" />
+      
+      <div class="field-group">
         <input type="password" id="password" placeholder="Choose Password" required />
-        <button type="button" class="toggle-password" onclick="togglePassword('password')">👁️</button>
+        <button type="button" class="toggle-password" onclick="toggleVisibility('password')">
+          👁️
+        </button>
       </div>
 
-      <div class="input-wrapper">
+      <div class="field-group">
         <input type="password" id="confirm-password" placeholder="Confirm Password" required />
-        <button type="button" class="toggle-password" onclick="togglePassword('confirm-password')">👁️</button>
+        <button type="button" class="toggle-password" onclick="toggleVisibility('confirm-password')">
+          👁️
+        </button>
       </div>
 
       <button type="submit">Create Account</button>
@@ -125,11 +122,15 @@
     window.addEventListener("load", async () => {
       try {
         await Parse.User.logOut();
-        console.log("Session cleared");
       } catch (err) {
         console.warn("Error clearing session:", err);
       }
     });
+
+    function toggleVisibility(id) {
+      const field = document.getElementById(id);
+      field.type = field.type === "password" ? "text" : "password";
+    }
 
     function isValidEmail(email) {
       return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -137,11 +138,6 @@
 
     function isValidUsername(username) {
       return /^[a-zA-Z0-9_]+$/.test(username);
-    }
-
-    function togglePassword(id) {
-      const input = document.getElementById(id);
-      input.type = input.type === "password" ? "text" : "password";
     }
 
     document.getElementById('signup-form').addEventListener('submit', async function(e) {
@@ -153,16 +149,16 @@
       const password = document.getElementById('password').value.trim();
       const confirmPassword = document.getElementById('confirm-password').value.trim();
 
-      if (!username || !email || !password || !confirmPassword || !mobile) {
+      if (!username || !email || !mobile || !password || !confirmPassword) {
         return Swal.fire('Missing Fields', 'Please fill all fields.', 'warning');
       }
 
       if (!isValidUsername(username)) {
-        return Swal.fire('Invalid Username', 'Username must be alphanumeric.', 'error');
+        return Swal.fire('Invalid Username', 'Username must be alphanumeric (a-z, A-Z, 0-9, or _)', 'error');
       }
 
       if (!isValidEmail(email)) {
-        return Swal.fire('Invalid Email', 'Please enter a valid email.', 'error');
+        return Swal.fire('Invalid Email', 'Please enter a valid email address.', 'error');
       }
 
       if (password !== confirmPassword) {
