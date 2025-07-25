@@ -7,10 +7,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="https://npmcdn.com/parse/dist/parse.min.js"></script>
-  <!-- ✅ Updated EmailJS SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
   <script>
-    emailjs.init("FCXI2unZNjR1bUUdk"); // ✅ Your public key
+    emailjs.init("FCXI2unZNjR1bUUdk");
   </script>
   <style>
     body {
@@ -84,6 +83,7 @@
     <form id="signup-form">
       <input type="text" id="username" placeholder="Choose Username" required />
       <input type="email" id="email" placeholder="Enter Email" required />
+      <input type="number" id="number" placeholder="Enter Mobile Number" required />
       <input type="password" id="password" placeholder="Choose Password" required />
       <button type="submit">Create Account</button>
     </form>
@@ -118,9 +118,10 @@
 
       const username = document.getElementById('username').value.trim();
       const email = document.getElementById('email').value.trim();
+      const number = document.getElementById('number').value.trim();
       const password = document.getElementById('password').value.trim();
 
-      if (!username || !email || !password) {
+      if (!username || !email || !password || !number) {
         return Swal.fire('Missing Fields', 'Please fill all fields.', 'warning');
       }
 
@@ -145,6 +146,7 @@
         user.set("username", username);
         user.set("email", email);
         user.set("password", password);
+        user.set("number", number);
 
         await user.signUp();
 
