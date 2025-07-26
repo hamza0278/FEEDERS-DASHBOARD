@@ -30,6 +30,9 @@
       width: 100%;
       max-width: 320px;
       box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
 
     .login-box h2 {
@@ -38,26 +41,27 @@
       color: #333;
     }
 
-    input, button {
+    input {
       width: 100%;
       padding: 10px;
       margin-bottom: 1rem;
       border-radius: 6px;
       font-size: 14px;
+      border: 1px solid #ccc;
       box-sizing: border-box;
     }
 
-    input {
-      border: 1px solid #ccc;
-    }
-
     button {
+      width: 100%;
+      padding: 10px;
+      border-radius: 6px;
+      font-size: 15px;
+      font-weight: bold;
       background-color: #0056b3;
       color: white;
       border: none;
-      font-weight: bold;
-      font-size: 15px;
       cursor: pointer;
+      margin-top: 10px;
     }
 
     button:hover {
@@ -66,8 +70,8 @@
 
     .forgot-link {
       text-align: right;
+      width: 100%;
       margin-top: -0.5rem;
-      margin-bottom: 1rem;
     }
 
     .forgot-link a {
@@ -80,6 +84,7 @@
       text-align: center;
       font-size: 0.9rem;
       margin-top: 10px;
+      width: 100%;
     }
 
     .signup-link a {
@@ -91,27 +96,62 @@
     .contact-info {
       font-weight: bold;
     }
+
+    .policy-links {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 0.85rem;
+      width: 100%;
+    }
+
+    .policy-links a {
+      color: #555;
+      text-decoration: underline;
+      margin: 0 6px;
+      cursor: pointer;
+    }
+
+    .swal2-html-container::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .swal2-html-container::-webkit-scrollbar-track {
+      background: #f0f0f0;
+    }
+
+    .swal2-html-container::-webkit-scrollbar-thumb {
+      background: #999;
+      border-radius: 4px;
+    }
   </style>
 </head>
 <body>
   <div class="login-box">
     <h2>Login / Signup</h2>
-    <form id="loginForm">
+    <form id="loginForm" style="width: 100%;">
       <input type="text" id="email" placeholder="Username or Email" required />
       <input type="password" id="password" placeholder="Password" required />
+
       <div class="forgot-link">
         <a href="recover.html">Forgot Password?</a>
       </div>
+
       <button type="submit">Login</button>
+
+      <div class="signup-link">
+        Don't have an account? <a href="signup.html">Sign Up</a>
+      </div>
+
+      <p class="contact-info">
+        <strong>In order to complete the signup process, you need an activation key.</strong>
+      </p>
     </form>
 
-    <div class="signup-link">
-      Don't have an account? <a href="signup.html">Sign Up</a>
+    <div class="policy-links">
+      <a id="termsLink">Terms & Conditions</a>
+      <a id="privacyLink">Privacy Policy</a>
+      <a id="refundLink">Refund Policy</a>
     </div>
-
-    <p class="contact-info">
-      <strong>In order to complete the signup process, you need an activation key.</strong>
-    </p>
   </div>
 
   <script>
@@ -161,37 +201,93 @@
         localStorage.setItem('sessionToken', data.sessionToken);
 
         if (data.role === 'admin') {
-          Swal.fire({
-            icon: 'success',
-            title: 'Welcome Admin',
-            text: 'Redirecting to dashboard...',
-            timer: 1000,
-            showConfirmButton: false
-          });
+          Swal.fire({ icon: 'success', title: 'Welcome Admin', text: 'Redirecting...', timer: 1000, showConfirmButton: false });
           setTimeout(() => window.location.href = 'dashboard.html', 1000);
         } else if (data.activated === true) {
-          Swal.fire({
-            icon: 'success',
-            title: 'Welcome',
-            text: 'Redirecting to dashboard...',
-            timer: 1000,
-            showConfirmButton: false
-          });
+          Swal.fire({ icon: 'success', title: 'Welcome', text: 'Redirecting...', timer: 1000, showConfirmButton: false });
           setTimeout(() => window.location.href = 'dashboard.html', 1000);
         } else {
-          Swal.fire({
-            icon: 'warning',
-            title: 'Activation Required',
-            text: 'Redirecting to activation page...',
-            timer: 1200,
-            showConfirmButton: false
-          });
+          Swal.fire({ icon: 'warning', title: 'Activation Required', text: 'Redirecting to activation page...', timer: 1200, showConfirmButton: false });
           setTimeout(() => window.location.href = 'activation.html', 1200);
         }
 
       } catch (err) {
         Swal.fire("Login Failed", err.message || "Invalid credentials", "error");
       }
+    });
+
+    document.getElementById('termsLink').addEventListener('click', () => {
+      Swal.fire({
+        title: 'Terms & Conditions',
+        html: `
+        <div style="text-align: left; max-height: 400px; overflow-y: auto;">
+          <p><strong>Effective Date:</strong> July 25, 2025</p>
+          <p>By accessing or using the Feeders Dashboard Website, you agree to the following terms and conditions:</p>
+          <p><strong>1. Authorized Use:</strong> Only registered users with valid login credentials and activation (if required) are allowed to access the dashboard.</p>
+          <p><strong>2. User Responsibilities:</strong> You are responsible for maintaining the confidentiality of your login information and any data you modify in the system.</p>
+          <p><strong>3. Data Accuracy:</strong> You must ensure the accuracy of feeder status entries and related operational data.</p>
+          <p><strong>4. Restrictions:</strong></p>
+          <ul style="padding-left: 20px;">
+            <li>Do not share login credentials or activation keys.</li>
+            <li>Do not attempt to hack, exploit, or misuse the system.</li>
+            <li>Do not modify system files or bypass access controls.</li>
+          </ul>
+          <p><strong>5. Account Suspension:</strong> Accounts found violating rules may be suspended or removed without notice.</p>
+          <p><strong>6. Limitation of Liability:</strong> We are not responsible for data loss, inaccuracies, or downtime resulting from misuse or local system issues.</p>
+          <p><strong>7. Changes to Terms:</strong> We may revise these terms at any time. Updates will appear here.</p>
+        </div>
+        `,
+        icon: 'info',
+        confirmButtonText: 'Close'
+      });
+    });
+
+    document.getElementById('privacyLink').addEventListener('click', () => {
+      Swal.fire({
+        title: 'Privacy Policy',
+        html: `
+        <div style="text-align: left; max-height: 400px; overflow-y: auto;">
+          <p><strong>Effective Date:</strong> July 25, 2025</p>
+          <p>We may collect login credentials, user roles, feeder data, and activation keys. No personal contact details are collected unless explicitly provided.</p>
+          <p><strong>Use of Information:</strong> Your data is used only to manage system access, display feeder status, and enforce user permissions.</p>
+          <p><strong>Data Storage:</strong> All information is stored in Back4app databases. Nothing is shared with third parties or individual users except their own.</p>
+          <p><strong>Security:</strong> We use role-based access and activation keys to protect your data.</p>
+          <p><strong>User Rights:</strong> You may request access or deactivation of your account by contacting the admin.</p>
+          <p><strong>Policy Changes:</strong> We may update this policy and will reflect any changes here.</p>
+        </div>
+        `,
+        icon: 'info',
+        confirmButtonText: 'Close'
+      });
+    });
+
+    document.getElementById('refundLink').addEventListener('click', () => {
+      Swal.fire({
+        title: 'Refund Policy',
+        html: `
+        <div style="text-align: left; max-height: 400px; overflow-y: auto;">
+          <p><strong>Effective Date:</strong> July 25, 2025</p>
+          <p><strong>1. Activation Key Purchases:</strong> All sales are final. Activation keys are not refundable once delivered.</p>
+          <p><strong>2. Refund Exceptions:</strong></p>
+          <ul style="padding-left: 20px;">
+            <li>Duplicate charges</li>
+            <li>Undelivered key with no support resolution in 7 days</li>
+            <li>System defect not fixed within a reasonable time</li>
+          </ul>
+          <p><strong>3. Not Eligible:</strong></p>
+          <ul style="padding-left: 20px;">
+            <li>Changed your mind</li>
+            <li>Incorrect understanding of system features</li>
+            <li>Lost credentials</li>
+            <li>Key misused or shared</li>
+          </ul>
+          <p><strong>4. Requesting a Refund:</strong> Email <em>your-email@example.com</em> with proof of payment, username, and explanation. We’ll review in 5–7 business days.</p>
+          <p><strong>5. Changes:</strong> We may update this policy anytime. Updates will appear here.</p>
+        </div>
+        `,
+        icon: 'info',
+        confirmButtonText: 'Close'
+      });
     });
   </script>
 </body>
