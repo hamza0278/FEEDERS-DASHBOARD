@@ -221,44 +221,59 @@
     });
 
     document.getElementById('privacyLink').addEventListener('click', () => {
-      Swal.fire({
-        title: 'Privacy Policy',
-        html: `
-          <div style="text-align:left;">
-            <strong>Effective Date:</strong> July 25, 2025<br><br>
-            Your privacy is important to us. This policy outlines how we handle your data:<br><br>
-            - We collect only the necessary data to operate the system (e.g., username, feeder inputs).<br>
-            - All data is stored securely and encrypted where applicable.<br>
-            - We do not share, sell, or transfer your personal information.<br>
-            - You can request deletion of your data by contacting the admin.<br>
-            - For any concerns, contact support or your site administrator.
-          </div>`,
-        icon: 'info'
-      });
-    });
+  Swal.fire({
+    title: 'Privacy Policy',
+    html: `
+      <div style="text-align:left;">
+        <strong>Effective Date:</strong> July 25, 2025<br><br>
+        Your privacy is important to us. This policy outlines how we handle your data:<br><br>
+        <ol style="padding-left: 1.2em;">
+          <li><strong>Data Collection:</strong> We collect only the necessary data to operate the system (e.g., username, feeder inputs).</li>
+          <li><strong>Data Security:</strong> All data is stored securely and encrypted where applicable.</li>
+          <li><strong>Privacy Commitment:</strong> We do not share, sell, or transfer your personal information.</li>
+          <li><strong>Data Deletion:</strong> You can request deletion of your data by contacting the admin.</li>
+          <li><strong>Support:</strong> For any concerns, contact support or your site administrator.</li>
+        </ol>
+      </div>`,
+    icon: 'info'
+  });
+});
 
     document.getElementById('refundLink').addEventListener('click', () => {
-      Swal.fire({
-        title: 'Refund Policy',
-        html: `
-          <div style="text-align:left;">
-            <strong>Effective Date:</strong> July 25, 2025<br><br>
-            This refund policy applies to activation key purchases:<br><br>
-            - <strong>All Activation Key Sales Are Final.</strong><br>
-            - Refunds are only considered if:<br>
-              • You were charged more than once<br>
-              • You didn’t receive the key and support couldn’t resolve it in 7 days<br>
-              • System failure occurred and couldn't be fixed in a reasonable time<br>
-            - Refunds are <strong>not</strong> provided for:<br>
-              • Changing your mind<br>
-              • Misunderstanding the system<br>
-              • Lost credentials<br>
-              • Unauthorized use after delivery<br><br>
-            Contact us with proof of purchase and explanation for review.
-          </div>`,
-        icon: 'info'
-      });
-    });
+  Swal.fire({
+    title: 'Refund Policy',
+    html: `
+      <div style="text-align:left;">
+        <strong>Effective Date:</strong> July 25, 2025<br><br>
+        This refund policy applies to activation key purchases:<br><br>
+
+        <ol style="padding-left: 1.2em;">
+          <li><strong>Final Sale:</strong> All activation key purchases are final and non-refundable.</li>
+
+          <li><strong>Refunds Are Only Considered If:</strong>
+            <ol type="a" style="padding-left: 1.5em;">
+              <li>You were charged more than once</li>
+              <li>You didn’t receive the key and support couldn’t resolve it within 7 days</li>
+              <li>The system failed and couldn’t be fixed in a reasonable time</li>
+            </ol>
+          </li>
+
+          <li><strong>Refunds Are Not Provided For:</strong>
+            <ol type="a" style="padding-left: 1.5em;">
+              <li>You changed your mind</li>
+              <li>You misunderstood the system or its features</li>
+              <li>Lost login credentials</li>
+              <li>Unauthorized or shared use after key delivery</li>
+            </ol>
+          </li>
+
+          <li><strong>Request Process:</strong> Contact us with proof of purchase and a brief explanation. Each case is reviewed within 5–7 business days.</li>
+        </ol>
+      </div>
+    `,
+    icon: 'info'
+  });
+});
   </script>
 </body>
 </html>
