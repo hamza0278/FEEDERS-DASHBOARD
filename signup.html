@@ -1,4 +1,3 @@
-<!-- Full Updated SIGNUP.HTML -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -109,7 +108,7 @@
         <input type="email" id="email" placeholder="Enter Email" required />
       </div>
       <div class="field-group">
-        <input type="tel" id="mobile" placeholder="Enter Mobile Number" required pattern="[0-9]{10,15}" />
+        <input type="tel" id="mobile" placeholder="Enter Mobile Number (e.g. 3001234567)" required pattern="[0-9+]{10,15}" />
       </div>
       <div class="field-group">
         <input type="password" id="password" placeholder="Choose Password" required />
@@ -165,6 +164,17 @@
     function isValidUsername(username) {
       return /^[a-zA-Z0-9_]+$/.test(username);
     }
+
+    // Automatically prepend +92 if not present
+    document.getElementById("mobile").addEventListener("blur", function () {
+      let val = this.value.trim();
+      if (!val.startsWith("+92")) {
+        if (val.startsWith("0")) {
+          val = val.substring(1);
+        }
+        this.value = "+92" + val;
+      }
+    });
 
     document.getElementById('signup-form').addEventListener('submit', async function(e) {
       e.preventDefault();
@@ -235,67 +245,63 @@
       }
     });
 
-   document.getElementById("termsLink").addEventListener("click", () => {
-  Swal.fire({
-    title: "Terms & Conditions",
-    html: `
-      <div style="text-align: left;">
-        <strong>Effective Date:</strong> July 25, 2025<br><br>
-        By signing up for and using the Feeder Monitoring System, you agree to the following terms:<br><br>
-
-        <strong>1. Account Registration</strong>
-        <ul>
-          <li>You must provide accurate and complete registration information.</li>
-          <li>You may not use false or misleading information to create an account.</li>
-        </ul>
-
-        <strong>2. Account Security</strong>
-        <ul>
-          <li>You are responsible for maintaining the confidentiality of your login credentials.</li>
-          <li>Notify the system administrator immediately if you suspect unauthorized access.</li>
-        </ul>
-
-        <strong>3. Authorized Usage</strong>
-        <ul>
-          <li>This system is strictly for authorized LESCO staff and feeder monitoring purposes only.</li>
-          <li>Unauthorized access, sharing, or tampering with data is prohibited.</li>
-        </ul>
-
-        <strong>4. System Monitoring</strong>
-        <ul>
-          <li>All user activity may be logged for audit and security purposes.</li>
-          <li>Misuse may result in suspension, investigation, or termination of your access.</li>
-        </ul>
-
-        <strong>5. Agreement</strong>
-        <ul>
-          <li>By creating an account, you agree to abide by all system policies and terms.</li>
-        </ul>
-      </div>
-    `,
-    icon: "info",
-    confirmButtonText: "Close"
-  });
-});
+    document.getElementById("termsLink").addEventListener("click", () => {
+      Swal.fire({
+        title: "Terms & Conditions",
+        html: `
+          <div style="text-align: left;">
+            <strong>Effective Date:</strong> July 25, 2025<br><br>
+            By signing up for and using the Feeder Monitoring System, you agree to the following terms:<br><br>
+            <strong>1. Account Registration</strong>
+            <ul>
+              <li>You must provide accurate and complete registration information.</li>
+              <li>You may not use false or misleading information to create an account.</li>
+            </ul>
+            <strong>2. Account Security</strong>
+            <ul>
+              <li>You are responsible for maintaining the confidentiality of your login credentials.</li>
+              <li>Notify the system administrator immediately if you suspect unauthorized access.</li>
+            </ul>
+            <strong>3. Authorized Usage</strong>
+            <ul>
+              <li>This system is strictly for authorized LESCO staff and feeder monitoring purposes only.</li>
+              <li>Unauthorized access, sharing, or tampering with data is prohibited.</li>
+            </ul>
+            <strong>4. System Monitoring</strong>
+            <ul>
+              <li>All user activity may be logged for audit and security purposes.</li>
+              <li>Misuse may result in suspension, investigation, or termination of your access.</li>
+            </ul>
+            <strong>5. Agreement</strong>
+            <ul>
+              <li>By creating an account, you agree to abide by all system policies and terms.</li>
+            </ul>
+          </div>
+        `,
+        icon: "info",
+        confirmButtonText: "Close"
+      });
+    });
 
     document.getElementById('privacyLink').addEventListener('click', () => {
-  Swal.fire({
-    title: 'Privacy Policy',
-    html: `
-      <div style="text-align:left;">
-        <strong>Effective Date:</strong> July 25, 2025<br><br>
-        Your privacy is important to us. This policy outlines how we handle your data:<br><br>
-        <ol style="padding-left: 1.2em;">
-          <li><strong>Data Collection:</strong> We collect only the necessary data to operate the system (e.g., username, feeder inputs).</li>
-          <li><strong>Data Security:</strong> All data is stored securely and encrypted where applicable.</li>
-          <li><strong>Privacy Commitment:</strong> We do not share, sell, or transfer your personal information.</li>
-          <li><strong>Data Deletion:</strong> You can request deletion of your data by contacting the admin.</li>
-          <li><strong>Support:</strong> For any concerns, contact support or your site administrator.</li>
-        </ol>
-      </div>`,
-    icon: 'info'
-  });
-});
+      Swal.fire({
+        title: 'Privacy Policy',
+        html: `
+          <div style="text-align:left;">
+            <strong>Effective Date:</strong> July 25, 2025<br><br>
+            Your privacy is important to us. This policy outlines how we handle your data:<br><br>
+            <ol style="padding-left: 1.2em;">
+              <li><strong>Data Collection:</strong> We collect only the necessary data to operate the system (e.g., username, feeder inputs).</li>
+              <li><strong>Data Security:</strong> All data is stored securely and encrypted where applicable.</li>
+              <li><strong>Privacy Commitment:</strong> We do not share, sell, or transfer your personal information.</li>
+              <li><strong>Data Deletion:</strong> You can request deletion of your data by contacting the admin.</li>
+              <li><strong>Support:</strong> For any concerns, contact support or your site administrator.</li>
+            </ol>
+          </div>`,
+        icon: 'info'
+      });
+    });
+
     document.getElementById('refundLink').addEventListener('click', () => {
       Swal.fire({
         title: 'Refund Policy',
