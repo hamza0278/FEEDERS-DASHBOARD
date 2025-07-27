@@ -47,9 +47,16 @@
     .iban-group {
       display: flex;
       gap: 10px;
+      margin-top: 12px;
     }
     .iban-group input {
       flex: 1;
+    }
+    .iban-group button {
+      width: auto;
+      padding: 0 14px;
+      font-size: 14px;
+      white-space: nowrap;
     }
     .note {
       font-size: 13px;
@@ -95,7 +102,6 @@
   </div>
 
   <script>
-    // ✅ Initialize Parse with your actual keys
     Parse.initialize("2UbcjCCCAXXdMC34Xsq3se5xHv42l9zpncnBO5zk", "Ryed1qJgdnSd6xxrVqFt95aLpxEDz9DDic1aaVGq");
     Parse.serverURL = "https://parseapi.back4app.com/";
 
