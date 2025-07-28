@@ -3,9 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Payment Information</title>
+  <title>Purchase Activation Key</title>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="https://npmcdn.com/parse/dist/parse.min.js"></script>
+  <script src="https://sandbox-api.getsafepay.com/js/sdk.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -26,7 +27,7 @@
       text-align: center;
       margin-bottom: 20px;
     }
-    input, select, button {
+    input, button {
       width: 100%;
       padding: 12px;
       margin-top: 12px;
@@ -44,157 +45,76 @@
     button:hover {
       background-color: #0056b3;
     }
-    .iban-group {
-      display: flex;
-      gap: 10px;
-      margin-top: 12px;
-    }
-    .iban-group input {
-      flex: 1;
-    }
-    .iban-group button {
-      width: auto;
-      padding: 0 14px;
-      font-size: 14px;
-      white-space: nowrap;
-    }
-    .note {
-      font-size: 13px;
-      color: #777;
-      margin-top: 10px;
-      text-align: center;
-    }
-    #step2 {
-      display: none;
-    }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>Payment Form</h2>
+    <h2>Buy Activation Key</h2>
 
-    <input type="text" id="firstName" placeholder="First Name" />
+    <input type="text" id="firstName" placeholder="Full Name" />
     <input type="email" id="email" placeholder="Email" />
-    <button id="nextBtn" onclick="goToStep2()">Next</button>
 
-    <div id="step2">
-      <select id="bankSelect" onchange="showIBAN()">
-        <option value="">-- Select Bank --</option>
-        <option value="allied">Allied Bank</option>
-        <option value="ubl">UBL</option>
-        <option value="alfalah">Bank Alfalah</option>
-      </select>
-
-      <div id="ibanWrapper" class="iban-group" style="display: none;">
-        <input type="text" id="ibanField" readonly />
-        <button onclick="copyIBAN()">Copy</button>
-      </div>
-
-      <input type="text" id="transactionId" placeholder="Transaction ID" />
-      <input type="text" id="transactionDate" placeholder="Transaction Date and Time" />
-
-      <div class="note">
-        Please make sure you entered correct account name and transaction ID.
-      </div>
-
-      <button onclick="submitForm()">Submit</button>
-    </div>
+    <button onclick="startPayment()">Buy Now (Rs 500)</button>
   </div>
 
   <script>
+    // Initialize Parse
     Parse.initialize("2UbcjCCCAXXdMC34Xsq3se5xHv42l9zpncnBO5zk", "Ryed1qJgdnSd6xxrVqFt95aLpxEDz9DDic1aaVGq");
     Parse.serverURL = "https://parseapi.back4app.com/";
 
-    function goToStep2() {
+    async function startPayment() {
       const name = document.getElementById('firstName').value.trim();
       const email = document.getElementById('email').value.trim();
 
       if (!name || !email) {
         Swal.fire({
           icon: 'warning',
-          title: 'Missing Information',
-          text: 'Please enter both name and email.'
+          title: 'Required',
+          text: 'Please enter your name and email.'
         });
         return;
       }
-
-      document.getElementById('step2').style.display = 'block';
-      document.getElementById('nextBtn').style.display = 'none';
-    }
-
-    function showIBAN() {
-      const bank = document.getElementById('bankSelect').value;
-      const ibanField = document.getElementById('ibanField');
-      const ibanWrapper = document.getElementById('ibanWrapper');
-
-      let iban = '';
-      if (bank === 'allied') {
-        iban = 'PK10ABPA1234567890123456';
-      } else if (bank === 'ubl') {
-        iban = 'PK45UNIL1234567890123456';
-      } else if (bank === 'alfalah') {
-        iban = 'PK78ALFH1234567890123456';
-      }
-
-      if (iban) {
-        ibanField.value = iban;
-        ibanWrapper.style.display = 'flex';
-      } else {
-        ibanField.value = '';
-        ibanWrapper.style.display = 'none';
-      }
-    }
-
-    function copyIBAN() {
-      const ibanField = document.getElementById('ibanField');
-      navigator.clipboard.writeText(ibanField.value).then(() => {
-        Swal.fire({
-          icon: 'success',
-          title: 'Copied!',
-          text: 'IBAN copied to clipboard.'
-        });
-      });
-    }
-
-    async function submitForm() {
-      const firstName = document.getElementById('firstName').value.trim();
-      const email = document.getElementById('email').value.trim();
-      const bank = document.getElementById('bankSelect').value;
-      const iban = document.getElementById('ibanField').value;
-      const transactionId = document.getElementById('transactionId').value.trim();
-      const transactionDate = document.getElementById('transactionDate').value.trim();
-
-      if (!transactionId || !transactionDate || !bank) {
-        Swal.fire({
-          icon: 'warning',
-          title: 'Incomplete Information',
-          text: 'Please fill in all fields.'
-        });
-        return;
-      }
-
-      const Payment = Parse.Object.extend("Payments");
-      const payment = new Payment();
-
-      payment.set("firstName", firstName);
-      payment.set("email", email);
-      payment.set("bank", bank);
-      payment.set("iban", iban);
-      payment.set("transactionId", transactionId);
-      payment.set("transactionDate", transactionDate);
 
       try {
-        await payment.save();
-        Swal.fire({
-          icon: 'success',
-          title: 'Submitted!',
-          text: 'Your payment info has been saved.'
+        // Call cloud function to create payment session
+        const response = await Parse.Cloud.run('createSafepaySession', {
+          name,
+          email,
+          amount: 500 // In PKR
         });
+
+        const token = response.token;
+
+        Safepay.checkout({
+          environment: 'sandbox',
+          clientKey: 'sec_78a65b5a-7bb5-4c0b-99a9-5103e452c3d7', // Replace this!
+          checkoutToken: token,
+          onSuccess: async () => {
+            const result = await Parse.Cloud.run('getActivationKey', { email });
+
+            Swal.fire({
+              icon: 'success',
+              title: 'Payment Successful!',
+              html: `<b>Your Activation Key:</b><br><code>${result.key}</code>`,
+              confirmButtonText: 'Copy Key'
+            }).then(() => {
+              navigator.clipboard.writeText(result.key);
+            });
+          },
+          onFailure: () => {
+            Swal.fire({
+              icon: 'error',
+              title: 'Payment Failed',
+              text: 'Something went wrong during payment.'
+            });
+          }
+        });
+
       } catch (error) {
         Swal.fire({
           icon: 'error',
           title: 'Error',
-          text: error.message
+          text: error.message || 'Unable to initiate payment.'
         });
       }
     }
