@@ -6,7 +6,6 @@
   <title>Purchase Activation Key</title>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="https://npmcdn.com/parse/dist/parse.min.js"></script>
-  <script src="https://getsafepay.com/js/sdk.js"></script> <!-- ✅ Production SDK -->
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -84,28 +83,8 @@
           throw new Error('Invalid session response from server.');
         }
 
-        Safepay.checkout({
-          environment: 'production', // ✅ Production mode
-          clientKey: 'sec_d72de10b-1d3f-4616-8929-470f4b81b749', // ✅ Replace with your real production client key
-          checkoutToken: response.token,
-          onSuccess: function(result) {
-            Swal.fire({
-              icon: 'success',
-              title: 'Payment Successful!',
-              html: <b>Your Activation Key:</b><br><code>${result.key || 'Key will be emailed shortly.'}</code>,
-              confirmButtonText: 'Copy Key'
-            }).then(() => {
-              if (result.key) navigator.clipboard.writeText(result.key);
-            });
-          },
-          onFailure: function() {
-            Swal.fire({
-              icon: 'error',
-              title: 'Payment Failed',
-              text: 'Something went wrong during payment.'
-            });
-          }
-        });
+        // Redirect to Safepay checkout directly
+        window.location.href = `https://getsafepay.com/checkout/${response.token}`;
 
       } catch (error) {
         Swal.fire({
