@@ -85,12 +85,11 @@
         const token = response.token;
 
         Safepay.checkout({
-          environment: 'sandbox',
-          clientKey: 'sec_78a65b5a-7bb5-4c0b-99a9-5103e452c3d7', // Replace this
-          checkoutToken: token,
-          onSuccess: async () => {
-            const result = await Parse.Cloud.run('getActivationKey', { email });
-
+  environment: 'sandbox',
+  clientKey: 'sec_78a65b5a-7bb5-4c0b-99a9-5103e452c3d7', // your public key
+  checkoutToken: token,
+  ...
+});
             Swal.fire({
               icon: 'success',
               title: 'Payment Successful!',
