@@ -4,16 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Purchase Activation Key</title>
-
-  <!-- SweetAlert2 -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-  <!-- Parse SDK -->
   <script src="https://npmcdn.com/parse/dist/parse.min.js"></script>
-
-  <!-- ✅ Correct Production Safepay SDK -->
-  <script src="https://api.getsafepay.com/js/sdk.js"></script>
-
+  <script src="https://getsafepay.com/js/sdk.js"></script> <!-- ✅ Production SDK -->
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -93,13 +86,13 @@
 
         Safepay.checkout({
           environment: 'production', // ✅ Production mode
-          clientKey: 'sec_d72de10b-1d3f-4616-8929-470f4b81b749', // ✅ Replace with your real client key
+          clientKey: 'sec_d72de10b-1d3f-4616-8929-470f4b81b749', // ✅ Replace with your real production client key
           checkoutToken: response.token,
           onSuccess: function(result) {
             Swal.fire({
               icon: 'success',
               title: 'Payment Successful!',
-              html: `<b>Your Activation Key:</b><br><code>${result.key || 'Key will be emailed shortly.'}</code>`,
+              html: <b>Your Activation Key:</b><br><code>${result.key || 'Key will be emailed shortly.'}</code>,
               confirmButtonText: 'Copy Key'
             }).then(() => {
               if (result.key) navigator.clipboard.writeText(result.key);
