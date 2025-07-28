@@ -144,27 +144,26 @@
   <script>
     // Show popup on page load with system meta details
     window.addEventListener('load', () => {
-      Swal.fire({
-       title: 'Welcome',
-        html: '<strong>Feeder Monitoring Dashboard</strong>',
-        html: `
-          <div style="text-align:left;">
-            <strong>System Name:</strong>Feeder Monitoring Dashboard<br><br>
-            <strong>Version:</strong> 1.0.0<br>
-            <strong>Last Updated:</strong> July 28, 2025<br><br>
-            <strong>Purpose:</strong><br>
-            - Monitor all feeders status (on/off)<br>
-            - Show reason, shutdown time, restoration time<br>
-            <strong>Activation Notice:</strong><br>
-            All new users must enter an activation key after signup.<br><br>
-            <strong>Contact:</strong><br>
-            Email Admin — feederdashboard@gmail.com<br>
-            IT Help Desk — +92-311-4085433
-          </div>
-        `,
-        icon: 'info',
-        confirmButtonText: 'Got it'
-      });
+     Swal.fire({
+  icon: 'info',
+  title: '👋 Welcome',
+  html: `
+    <p><strong>System Name:</strong> Feeder Monitoring Dashboard</p>
+    <p><strong>Version:</strong> 1.0.0<br>
+    <strong>Last Updated:</strong> July 28, 2025</p>
+    <p><strong>Purpose:</strong><br>
+    - Monitor all feeders status (on/off)<br>
+    - Show reason, shutdown time, restoration time</p>
+    <p><strong>Activation Notice:</strong><br>
+    All new users must enter an activation key after signup.</p>
+    <p><strong>Contact:</strong><br>
+    Email Admin — feederdashboard@gmail.com<br>
+    IT Help Desk — +92-311-4085433</p>
+  `,
+  confirmButtonText: 'Continue',
+  width: 600
+});
+
     });
 
     function isValidEmail(value) {
