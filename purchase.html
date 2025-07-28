@@ -50,10 +50,8 @@
 <body>
   <div class="container">
     <h2>Buy Activation Key</h2>
-
     <input type="text" id="firstName" placeholder="Full Name" />
     <input type="email" id="email" placeholder="Email" />
-
     <button onclick="startPayment()">Buy Now (Rs 500)</button>
   </div>
 
@@ -82,24 +80,25 @@
           amount: 500
         });
 
-        const token = response.token;
+        if (!response || !response.token) {
+          throw new Error('Invalid session response from server.');
+        }
 
         Safepay.checkout({
-  environment: 'sandbox',
-  clientKey: 'sec_78a65b5a-7bb5-4c0b-99a9-5103e452c3d7', // your public key
-  checkoutToken: token,
-  ...
-});
+          environment: 'sandbox',
+          clientKey: 'sec_78a65b5a-7bb5-4c0b-99a9-5103e452c3d7',
+          checkoutToken: response.token,
+          onSuccess: function(result) {
             Swal.fire({
               icon: 'success',
               title: 'Payment Successful!',
-              html: `<b>Your Activation Key:</b><br><code>${result.key}</code>`,
+              html: `<b>Your Activation Key:</b><br><code>${result.key || 'Key will be emailed shortly.'}</code>`,
               confirmButtonText: 'Copy Key'
             }).then(() => {
-              navigator.clipboard.writeText(result.key);
+              if (result.key) navigator.clipboard.writeText(result.key);
             });
           },
-          onFailure: () => {
+          onFailure: function() {
             Swal.fire({
               icon: 'error',
               title: 'Payment Failed',
