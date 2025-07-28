@@ -6,7 +6,7 @@
   <title>Purchase Activation Key</title>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="https://npmcdn.com/parse/dist/parse.min.js"></script>
-  <script src="https://sandbox-api.getsafepay.com/js/sdk.js"></script>
+  <script src="https://getsafepay.com/js/sdk.js"></script> <!-- ✅ Production SDK -->
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -85,8 +85,8 @@
         }
 
         Safepay.checkout({
-          environment: 'sandbox',
-          clientKey: 'sec_78a65b5a-7bb5-4c0b-99a9-5103e452c3d7',
+          environment: 'production', // ✅ Production mode
+          clientKey: 'sec_d72de10b-1d3f-4616-8929-470f4b81b749', // ✅ Replace with your real production client key
           checkoutToken: response.token,
           onSuccess: function(result) {
             Swal.fire({
