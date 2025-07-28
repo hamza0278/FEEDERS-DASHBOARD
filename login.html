@@ -142,6 +142,31 @@
   </div>
 
   <script>
+    // Show popup on page load with system meta details
+    window.addEventListener('load', () => {
+      Swal.fire({
+       title: 'Welcome',
+        html: '<strong>Feeder Monitoring Dashboard</strong>',
+        html: `
+          <div style="text-align:left;">
+            <strong>System Name:</strong>Feeder Monitoring Dashboard<br><br>
+            <strong>Version:</strong> 1.0.0<br>
+            <strong>Last Updated:</strong> July 28, 2025<br><br>
+            <strong>Purpose:</strong><br>
+            - Monitor all feeders status (on/off)<br>
+            - Show reason, shutdown time, restoration time<br>
+            <strong>Activation Notice:</strong><br>
+            All new users must enter an activation key after signup.<br><br>
+            <strong>Contact:</strong><br>
+            Email Admin — feederdashboard@gmail.com<br>
+            IT Help Desk — +92-311-4085433
+          </div>
+        `,
+        icon: 'info',
+        confirmButtonText: 'Got it'
+      });
+    });
+
     function isValidEmail(value) {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       return emailRegex.test(value);
@@ -210,70 +235,48 @@
           <div style="text-align:left;">
             <strong>Effective Date:</strong> July 25, 2025<br><br>
             By accessing and using the Feeders Dashboard system, you agree to the following:<br><br>
-            1. <strong>Usage:</strong> The system is for authorized users only. Do not misuse the platform.<br>
-            2. <strong>Account Responsibility:</strong> Keep your login credentials secure. You are responsible for all activity under your account.<br>
-            3. <strong>Data Accuracy:</strong> You are expected to update feeder information truthfully.<br>
-            4. <strong>Termination:</strong> Admin reserves the right to suspend accounts without prior notice for violations.<br>
-            5. <strong>Changes:</strong> Terms may be updated at any time. Continued use indicates acceptance.
+            1. <strong>Usage:</strong> The system is for authorized users only.<br>
+            2. <strong>Account Responsibility:</strong> Keep your login credentials secure.<br>
+            3. <strong>Data Accuracy:</strong> Update feeder info truthfully.<br>
+            4. <strong>Termination:</strong> Admin may suspend accounts for violations.<br>
+            5. <strong>Changes:</strong> Terms may be updated anytime.
           </div>`,
         icon: 'info'
       });
     });
 
     document.getElementById('privacyLink').addEventListener('click', () => {
-  Swal.fire({
-    title: 'Privacy Policy',
-    html: `
-      <div style="text-align:left;">
-        <strong>Effective Date:</strong> July 25, 2025<br><br>
-        Your privacy is important to us. This policy outlines how we handle your data:<br><br>
-        <ol style="padding-left: 1.2em;">
-          <li><strong>Data Collection:</strong> We collect only the necessary data to operate the system (e.g., username, feeder inputs).</li>
-          <li><strong>Data Security:</strong> All data is stored securely and encrypted where applicable.</li>
-          <li><strong>Privacy Commitment:</strong> We do not share, sell, or transfer your personal information.</li>
-          <li><strong>Data Deletion:</strong> You can request deletion of your data by contacting the admin.</li>
-          <li><strong>Support:</strong> For any concerns, contact support or your site administrator.</li>
-        </ol>
-      </div>`,
-    icon: 'info'
-  });
-});
+      Swal.fire({
+        title: 'Privacy Policy',
+        html: `
+          <div style="text-align:left;">
+            <strong>Effective Date:</strong> July 25, 2025<br><br>
+            - We collect only essential data.<br>
+            - Your data is encrypted and not shared.<br>
+            - You may request deletion of your data.<br>
+            - Contact admin for support or privacy concerns.
+          </div>`,
+        icon: 'info'
+      });
+    });
 
     document.getElementById('refundLink').addEventListener('click', () => {
-  Swal.fire({
-    title: 'Refund Policy',
-    html: `
-      <div style="text-align:left;">
-        <strong>Effective Date:</strong> July 25, 2025<br><br>
-        This refund policy applies to activation key purchases:<br><br>
-
-        <ol style="padding-left: 1.2em;">
-          <li><strong>Final Sale:</strong> All activation key purchases are final and non-refundable.</li>
-
-          <li><strong>Refunds Are Only Considered If:</strong>
-            <ol type="a" style="padding-left: 1.5em;">
-              <li>You were charged more than once</li>
-              <li>You didn’t receive the key and support couldn’t resolve it within 7 days</li>
-              <li>The system failed and couldn’t be fixed in a reasonable time</li>
-            </ol>
-          </li>
-
-          <li><strong>Refunds Are Not Provided For:</strong>
-            <ol type="a" style="padding-left: 1.5em;">
-              <li>You changed your mind</li>
-              <li>You misunderstood the system or its features</li>
-              <li>Lost login credentials</li>
-              <li>Unauthorized or shared use after key delivery</li>
-            </ol>
-          </li>
-
-          <li><strong>Request Process:</strong> Contact us with proof of purchase and a brief explanation. Each case is reviewed within 5–7 business days.</li>
-        </ol>
-      </div>
-    `,
-    icon: 'info'
-  });
-});
+      Swal.fire({
+        title: 'Refund Policy',
+        html: `
+          <div style="text-align:left;">
+            <strong>Effective Date:</strong> July 25, 2025<br><br>
+            - Activation key purchases are final.<br>
+            - Refunds are only offered in special cases:<br>
+            &nbsp;&nbsp;a) Charged more than once<br>
+            &nbsp;&nbsp;b) Didn’t receive key and unresolved after 7 days<br>
+            &nbsp;&nbsp;c) System failure not fixed in reasonable time<br><br>
+            - No refunds for lost credentials or misunderstanding features.
+          </div>
+        `,
+        icon: 'info'
+      });
+    });
   </script>
 </body>
 </html>
