@@ -89,9 +89,8 @@
   <header>
     <h2 class="header-title m-0">FEEDER MONITORING DASHBOARD</h2>
     <div class="header-right">
-      <button class="generate-btn" id="sendSMSBtn">SMS</button><!-- ✅ New SMS Button -->
       <button id="add-btn" class="add-btn" onclick="showAddDeleteOptions()">Add/Delete</button>
-      <button id="generate-btn" class="generate-btn" onclick="location.href='keys.html'">Keys</button>
+      <button id="generate-btn" class="generate-btn" onclick="location.href='keys.html'">Generate Keys</button>
       <div class="search-wrapper">
         <input type="text" class="search-input" id="search-input" placeholder="Search feeder...">
         <button class="search-btn" onclick="performSearch()">Search</button>
@@ -429,37 +428,6 @@ async function fetchFeeders() {
         alert("❌ Error: " + err.message);
       }
     }
-    // ✅ SMS Button Event Listener
-    document.getElementById("sendSMSBtn").addEventListener("click", async () => {
-      const { value: formValues } = await Swal.fire({
-        title: "Send Feeder SMS",
-        html:
-          '<input id="feeder-name" class="swal2-input" placeholder="Feeder Name">' +
-          '<input id="reason" class="swal2-input" placeholder="Reason">' +
-          '<input id="shutdown" class="swal2-input" placeholder="Shutdown Time">' +
-          '<input id="restoration" class="swal2-input" placeholder="Expected Restoration">',
-        focusConfirm: false,
-        showCancelButton: true,
-        confirmButtonText: "Send",
-        preConfirm: () => {
-          return {
-            name: document.getElementById("feeder-name").value,
-            reason: document.getElementById("reason").value,
-            shutdown: document.getElementById("shutdown").value,
-            restoration: document.getElementById("restoration").value,
-          };
-        },
-      });
-
-      if (formValues) {
-        try {
-          await Parse.Cloud.run("sendFeederSMS", formValues); // ✅ Cloud Code Call
-          Swal.fire("Success", "SMS sent successfully!", "success");
-        } catch (error) {
-          Swal.fire("Error", error.message, "error");
-        }
-      }
-    });
 
     fetchFeeders();
   </script>
