@@ -101,6 +101,17 @@
       <button class="logout-btn" onclick="confirmLogout()">Logout</button>
     </div>
   </header>
+<!-- SMS Modal Form -->
+<div id="smsFormContainer" style="display: none; position: fixed; top: 20%; left: 50%; transform: translateX(-50%); background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px gray; z-index: 9999;">
+  <h3>Send SMS</h3>
+  <input type="text" id="feederName" placeholder="Feeder Name"><br><br>
+  <input type="text" id="reason" placeholder="Reason"><br><br>
+  <input type="text" id="offTime" placeholder="Off Time"><br><br>
+  <input type="text" id="expectedTime" placeholder="Expected Time"><br><br>
+  <textarea id="messageContent" placeholder="Additional Message"></textarea><br><br>
+  <button onclick="sendSMS()">Send</button>
+  <button onclick="document.getElementById('smsFormContainer').style.display='none'">Cancel</button>
+</div>
 
   <div class="container py-4">
     <div class="row" id="feeder-container"></div>
