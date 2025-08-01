@@ -89,7 +89,7 @@
   <header>
     <h2 class="header-title m-0">FEEDER MONITORING DASHBOARD</h2>
     <div class="header-right">
-      <button id="sendSMSBtn" class="generate-btn">SMS</button>
+      <button class="generate-btn" id="sendSMSBtn">SMS</button><!-- ✅ New SMS Button -->
       <button id="add-btn" class="add-btn" onclick="showAddDeleteOptions()">Add/Delete</button>
       <button id="generate-btn" class="generate-btn" onclick="location.href='keys.html'">Keys</button>
       <div class="search-wrapper">
@@ -101,17 +101,6 @@
       <button class="logout-btn" onclick="confirmLogout()">Logout</button>
     </div>
   </header>
-<!-- SMS Modal Form -->
-<div id="smsFormContainer" style="display: none; position: fixed; top: 20%; left: 50%; transform: translateX(-50%); background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px gray; z-index: 9999;">
-  <h3>Send SMS</h3>
-  <input type="text" id="feederName" placeholder="Feeder Name"><br><br>
-  <input type="text" id="reason" placeholder="Reason"><br><br>
-  <input type="text" id="offTime" placeholder="Off Time"><br><br>
-  <input type="text" id="expectedTime" placeholder="Expected Time"><br><br>
-  <textarea id="messageContent" placeholder="Additional Message"></textarea><br><br>
-  <button onclick="sendSMS()">Send</button>
-  <button onclick="document.getElementById('smsFormContainer').style.display='none'">Cancel</button>
-</div>
 
   <div class="container py-4">
     <div class="row" id="feeder-container"></div>
@@ -440,10 +429,39 @@ async function fetchFeeders() {
         alert("❌ Error: " + err.message);
       }
     }
+    // ✅ SMS Button Event Listener
+    document.getElementById("sendSMSBtn").addEventListener("click", async () => {
+      const { value: formValues } = await Swal.fire({
+        title: "Send Feeder SMS",
+        html:
+          '<input id="feeder-name" class="swal2-input" placeholder="Feeder Name">' +
+          '<input id="reason" class="swal2-input" placeholder="Reason">' +
+          '<input id="shutdown" class="swal2-input" placeholder="Shutdown Time">' +
+          '<input id="restoration" class="swal2-input" placeholder="Expected Restoration">',
+        focusConfirm: false,
+        showCancelButton: true,
+        confirmButtonText: "Send",
+        preConfirm: () => {
+          return {
+            name: document.getElementById("feeder-name").value,
+            reason: document.getElementById("reason").value,
+            shutdown: document.getElementById("shutdown").value,
+            restoration: document.getElementById("restoration").value,
+          };
+        },
+      });
+
+      if (formValues) {
+        try {
+          await Parse.Cloud.run("sendFeederSMS", formValues); // ✅ Cloud Code Call
+          Swal.fire("Success", "SMS sent successfully!", "success");
+        } catch (error) {
+          Swal.fire("Error", error.message, "error");
+        }
+      }
+    });
 
     fetchFeeders();
-});
-
   </script>
 </body>
 </html>
