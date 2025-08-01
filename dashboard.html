@@ -442,36 +442,6 @@ async function fetchFeeders() {
     }
 
     fetchFeeders();
-    document.getElementById("sendSMSBtn").addEventListener("click", () => {
-  document.getElementById("smsFormContainer").style.display = "block";
-});
-
-async function sendSMS() {
-  const feederName = document.getElementById("feederName").value;
-  const reason = document.getElementById("reason").value;
-  const offTime = document.getElementById("offTime").value;
-  const expectedTime = document.getElementById("expectedTime").value;
-  const messageContent = document.getElementById("messageContent").value;
-
-  if (!feederName || !reason || !offTime || !expectedTime || !messageContent) {
-    alert("Please fill in all fields.");
-    return;
-  }
-
-  try {
-    const result = await Parse.Cloud.run("sendBulkSMS", {
-      feederName,
-      reason,
-      offTime,
-      expectedTime,
-      messageContent
-    });
-    alert(result);
-    document.getElementById("smsFormContainer").style.display = "none";
-  } catch (error) {
-    alert("Failed: " + error.message);
-  }
-}
 });
 
   </script>
