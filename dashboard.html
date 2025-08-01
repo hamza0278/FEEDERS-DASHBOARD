@@ -89,7 +89,7 @@
   <header>
     <h2 class="header-title m-0">FEEDER MONITORING DASHBOARD</h2>
     <div class="header-right">
-      <button class="generate-btn" id="sendSMSBtn">SMS</button><!-- ✅ New SMS Button -->
+      <button id="sendSMSBtn" class="generate-btn">SMS</button>
       <button id="add-btn" class="add-btn" onclick="showAddDeleteOptions()">Add/Delete</button>
       <button id="generate-btn" class="generate-btn" onclick="location.href='keys.html'">Keys</button>
       <div class="search-wrapper">
@@ -429,39 +429,47 @@ async function fetchFeeders() {
         alert("❌ Error: " + err.message);
       }
     }
-    // ✅ SMS Button Event Listener
-    document.getElementById("sendSMSBtn").addEventListener("click", async () => {
-      const { value: formValues } = await Swal.fire({
-        title: "Send Feeder SMS",
-        html:
-          '<input id="feeder-name" class="swal2-input" placeholder="Feeder Name">' +
-          '<input id="reason" class="swal2-input" placeholder="Reason">' +
-          '<input id="shutdown" class="swal2-input" placeholder="Shutdown Time">' +
-          '<input id="restoration" class="swal2-input" placeholder="Expected Restoration">',
-        focusConfirm: false,
-        showCancelButton: true,
-        confirmButtonText: "Send",
-        preConfirm: () => {
-          return {
-            name: document.getElementById("feeder-name").value,
-            reason: document.getElementById("reason").value,
-            shutdown: document.getElementById("shutdown").value,
-            restoration: document.getElementById("restoration").value,
-          };
-        },
-      });
-
-      if (formValues) {
-        try {
-          await Parse.Cloud.run("sendFeederSMS", formValues); // ✅ Cloud Code Call
-          Swal.fire("Success", "SMS sent successfully!", "success");
-        } catch (error) {
-          Swal.fire("Error", error.message, "error");
-        }
-      }
-    });
-
     fetchFeeders();
+document.getElementById("sendSMSBtn").addEventListener("click", () => {
+  Swal.fire({
+    title: "Send SMS",
+    html: `
+      <input id="feederName" class="swal2-input" placeholder="Feeder Name">
+      <input id="reason" class="swal2-input" placeholder="Reason">
+      <input id="offTime" class="swal2-input" placeholder="Off Time">
+      <input id="expectedTime" class="swal2-input" placeholder="Expected Time">
+      <textarea id="messageContent" class="swal2-textarea" placeholder="Additional Message"></textarea>
+    `,
+    showCancelButton: true,
+    confirmButtonText: "Send",
+    preConfirm: async () => {
+      const feederName = document.getElementById("feederName").value.trim();
+      const reason = document.getElementById("reason").value.trim();
+      const offTime = document.getElementById("offTime").value.trim();
+      const expectedTime = document.getElementById("expectedTime").value.trim();
+      const messageContent = document.getElementById("messageContent").value.trim();
+
+      if (!feederName || !reason || !offTime || !expectedTime || !messageContent) {
+        Swal.showValidationMessage("All fields are required.");
+        return false;
+      }
+
+      try {
+        const result = await Parse.Cloud.run("sendBulkSMS", {
+          feederName,
+          reason,
+          offTime,
+          expectedTime,
+          messageContent
+        });
+        Swal.fire("Success", result, "success");
+      } catch (err) {
+        Swal.fire("Error", err.message || err, "error");
+      }
+    }
+  });
+});
+    
   </script>
 </body>
 </html>
