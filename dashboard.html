@@ -101,7 +101,7 @@
       <button class="logout-btn" onclick="confirmLogout()">Logout</button>
     </div>
   </header>
-  
+
   <div class="container py-4">
     <div class="row" id="feeder-container"></div>
   </div>
@@ -431,35 +431,30 @@ async function fetchFeeders() {
     }
     // ✅ SMS Button Event Listener
     document.getElementById("sendSMSBtn").addEventListener("click", () => {
-  document.getElementById("smsFormContainer").style.display = "block";
-});
+    const form = document.getElementById("smsForm");
+    form.style.display = form.style.display === "none" ? "block" : "none";
+  });
 
-async function sendSMS() {
-  const feederName = document.getElementById("feederName").value.trim();
-  const reason = document.getElementById("reason").value.trim();
-  const offTime = document.getElementById("offTime").value.trim();
-  const expectedTime = document.getElementById("expectedTime").value.trim();
-  const messageContent = document.getElementById("messageContent").value.trim();
+  async function sendSMS() {
+    const feederName = document.getElementById("feederNameInput").value;
+    const reason = document.getElementById("reasonInput").value;
+    const offTime = document.getElementById("offTimeInput").value;
+    const expectedTime = document.getElementById("expectedTimeInput").value;
+    const messageContent = document.getElementById("messageInput").value;
 
-  if (!feederName || !reason || !offTime || !expectedTime || !messageContent) {
-    alert("Please fill in all fields.");
-    return;
+    try {
+      await Parse.Cloud.run("sendBulkSMS", {
+        feederName,
+        reason,
+        offTime,
+        expectedTime,
+        messageContent
+      });
+      alert("SMS sent successfully.");
+    } catch (error) {
+      alert("Failed: " + error.message);
+    }
   }
-
-  try {
-    const result = await Parse.Cloud.run("sendBulkSMS", {
-      feederName,
-      reason,
-      offTime,
-      expectedTime,
-      messageContent
-    });
-    alert(result);
-    document.getElementById("smsFormContainer").style.display = "none";
-  } catch (error) {
-    alert("Failed to send SMS: " + (error.message || error));
-  }
-}
     });
 
     fetchFeeders();
