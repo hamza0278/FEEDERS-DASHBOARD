@@ -89,6 +89,7 @@
   <header>
     <h2 class="header-title m-0">FEEDER MONITORING DASHBOARD</h2>
     <div class="header-right">
+      <button id="sendSMSBtn">Send SMS</button>
       <button id="add-btn" class="add-btn" onclick="showAddDeleteOptions()">Add/Delete</button>
       <button id="generate-btn" class="generate-btn" onclick="location.href='keys.html'">Keys</button>
       <div class="search-wrapper">
@@ -430,6 +431,42 @@ async function fetchFeeders() {
     }
 
     fetchFeeders();
+    document.getElementById('sendSMSBtn').addEventListener('click', async () => {
+  const { value: formValues } = await Swal.fire({
+    title: 'Send SMS Notification',
+    html:
+      '<input id="feeder" class="swal2-input" placeholder="Feeder Name">' +
+      '<input id="reason" class="swal2-input" placeholder="Reason">' +
+      '<input id="offTime" class="swal2-input" placeholder="Off Time">' +
+      '<input id="expectedTime" class="swal2-input" placeholder="Expected Time">',
+    focusConfirm: false,
+    showCancelButton: true,
+    confirmButtonText: 'Send',
+    preConfirm: () => {
+      return {
+        feeder: document.getElementById('feeder').value,
+        reason: document.getElementById('reason').value,
+        offTime: document.getElementById('offTime').value,
+        expectedTime: document.getElementById('expectedTime').value,
+      };
+    }
+  });
+
+  if (formValues) {
+    const message = `Feeder ${formValues.feeder} is off due to ${formValues.reason}.
+Off Time: ${formValues.offTime}
+Expected Restoration: ${formValues.expectedTime}`;
+
+    try {
+      const result = await Parse.Cloud.run("sendBulkSMS", { message });
+      Swal.fire("Sent!", "SMS has been sent to activated users.", "success");
+    } catch (error) {
+      console.error(error);
+      Swal.fire("Error", "Failed to send SMS: " + error.message, "error");
+    }
+  }
+});
+
   </script>
 </body>
 </html>
