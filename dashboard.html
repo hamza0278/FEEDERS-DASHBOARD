@@ -101,7 +101,16 @@
       <button class="logout-btn" onclick="confirmLogout()">Logout</button>
     </div>
   </header>
-
+  <div id="smsFormContainer" style="display: none; position: fixed; top: 20%; left: 50%; transform: translateX(-50%); background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px gray; z-index: 9999;">
+  <h3>Send SMS to Activated Users</h3>
+  <input type="text" id="feederName" placeholder="Feeder Name" style="width: 100%; margin-bottom: 10px;" /><br />
+  <input type="text" id="reason" placeholder="Reason" style="width: 100%; margin-bottom: 10px;" /><br />
+  <input type="text" id="offTime" placeholder="Off Time" style="width: 100%; margin-bottom: 10px;" /><br />
+  <input type="text" id="expectedTime" placeholder="Expected Time" style="width: 100%; margin-bottom: 10px;" /><br />
+  <textarea id="messageContent" placeholder="Additional Message" rows="4" style="width: 100%; margin-bottom: 10px;"></textarea><br />
+  <button onclick="sendSMS()" style="background-color: green; color: white; padding: 6px 12px; border: none; border-radius: 5px;">Send</button>
+  <button onclick="document.getElementById('smsFormContainer').style.display='none'" style="margin-left: 10px;">Cancel</button>
+</div>
   <div class="container py-4">
     <div class="row" id="feeder-container"></div>
   </div>
@@ -430,35 +439,36 @@ async function fetchFeeders() {
       }
     }
     // ✅ SMS Button Event Listener
-    document.getElementById("sendSMSBtn").addEventListener("click", async () => {
-      const { value: formValues } = await Swal.fire({
-        title: "Send Feeder SMS",
-        html:
-          '<input id="feeder-name" class="swal2-input" placeholder="Feeder Name">' +
-          '<input id="reason" class="swal2-input" placeholder="Reason">' +
-          '<input id="shutdown" class="swal2-input" placeholder="Shutdown Time">' +
-          '<input id="restoration" class="swal2-input" placeholder="Expected Restoration">',
-        focusConfirm: false,
-        showCancelButton: true,
-        confirmButtonText: "Send",
-        preConfirm: () => {
-          return {
-            name: document.getElementById("feeder-name").value,
-            reason: document.getElementById("reason").value,
-            shutdown: document.getElementById("shutdown").value,
-            restoration: document.getElementById("restoration").value,
-          };
-        },
-      });
+    document.getElementById("sendSMSBtn").addEventListener("click", () => {
+  document.getElementById("smsFormContainer").style.display = "block";
+});
 
-      if (formValues) {
-        try {
-          await Parse.Cloud.run("sendFeederSMS", formValues); // ✅ Cloud Code Call
-          Swal.fire("Success", "SMS sent successfully!", "success");
-        } catch (error) {
-          Swal.fire("Error", error.message, "error");
-        }
-      }
+async function sendSMS() {
+  const feederName = document.getElementById("feederName").value.trim();
+  const reason = document.getElementById("reason").value.trim();
+  const offTime = document.getElementById("offTime").value.trim();
+  const expectedTime = document.getElementById("expectedTime").value.trim();
+  const messageContent = document.getElementById("messageContent").value.trim();
+
+  if (!feederName || !reason || !offTime || !expectedTime || !messageContent) {
+    alert("Please fill in all fields.");
+    return;
+  }
+
+  try {
+    const result = await Parse.Cloud.run("sendBulkSMS", {
+      feederName,
+      reason,
+      offTime,
+      expectedTime,
+      messageContent
+    });
+    alert(result);
+    document.getElementById("smsFormContainer").style.display = "none";
+  } catch (error) {
+    alert("Failed to send SMS: " + (error.message || error));
+  }
+}
     });
 
     fetchFeeders();
