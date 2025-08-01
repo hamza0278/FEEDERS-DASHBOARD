@@ -101,16 +101,7 @@
       <button class="logout-btn" onclick="confirmLogout()">Logout</button>
     </div>
   </header>
-  <div id="smsFormContainer" style="display: none; position: fixed; top: 20%; left: 50%; transform: translateX(-50%); background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px gray; z-index: 9999;">
-  <h3>Send SMS to Activated Users</h3>
-  <input type="text" id="feederName" placeholder="Feeder Name" style="width: 100%; margin-bottom: 10px;" /><br />
-  <input type="text" id="reason" placeholder="Reason" style="width: 100%; margin-bottom: 10px;" /><br />
-  <input type="text" id="offTime" placeholder="Off Time" style="width: 100%; margin-bottom: 10px;" /><br />
-  <input type="text" id="expectedTime" placeholder="Expected Time" style="width: 100%; margin-bottom: 10px;" /><br />
-  <textarea id="messageContent" placeholder="Additional Message" rows="4" style="width: 100%; margin-bottom: 10px;"></textarea><br />
-  <button onclick="sendSMS()" style="background-color: green; color: white; padding: 6px 12px; border: none; border-radius: 5px;">Send</button>
-  <button onclick="document.getElementById('smsFormContainer').style.display='none'" style="margin-left: 10px;">Cancel</button>
-</div>
+  
   <div class="container py-4">
     <div class="row" id="feeder-container"></div>
   </div>
