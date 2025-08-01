@@ -430,31 +430,35 @@ async function fetchFeeders() {
       }
     }
     // ✅ SMS Button Event Listener
-    document.getElementById("sendSMSBtn").addEventListener("click", () => {
-    const form = document.getElementById("smsForm");
-    form.style.display = form.style.display === "none" ? "block" : "none";
-  });
-
-  async function sendSMS() {
-    const feederName = document.getElementById("feederNameInput").value;
-    const reason = document.getElementById("reasonInput").value;
-    const offTime = document.getElementById("offTimeInput").value;
-    const expectedTime = document.getElementById("expectedTimeInput").value;
-    const messageContent = document.getElementById("messageInput").value;
-
-    try {
-      await Parse.Cloud.run("sendBulkSMS", {
-        feederName,
-        reason,
-        offTime,
-        expectedTime,
-        messageContent
+    document.getElementById("sendSMSBtn").addEventListener("click", async () => {
+      const { value: formValues } = await Swal.fire({
+        title: "Send Feeder SMS",
+        html:
+          '<input id="feeder-name" class="swal2-input" placeholder="Feeder Name">' +
+          '<input id="reason" class="swal2-input" placeholder="Reason">' +
+          '<input id="shutdown" class="swal2-input" placeholder="Shutdown Time">' +
+          '<input id="restoration" class="swal2-input" placeholder="Expected Restoration">',
+        focusConfirm: false,
+        showCancelButton: true,
+        confirmButtonText: "Send",
+        preConfirm: () => {
+          return {
+            name: document.getElementById("feeder-name").value,
+            reason: document.getElementById("reason").value,
+            shutdown: document.getElementById("shutdown").value,
+            restoration: document.getElementById("restoration").value,
+          };
+        },
       });
-      alert("SMS sent successfully.");
-    } catch (error) {
-      alert("Failed: " + error.message);
-    }
-  }
+
+      if (formValues) {
+        try {
+          await Parse.Cloud.run("sendFeederSMS", formValues); // ✅ Cloud Code Call
+          Swal.fire("Success", "SMS sent successfully!", "success");
+        } catch (error) {
+          Swal.fire("Error", error.message, "error");
+        }
+      }
     });
 
     fetchFeeders();
