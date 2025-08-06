@@ -429,91 +429,38 @@ async function fetchFeeders() {
         alert("❌ Error: " + err.message);
       }
     }
-async function sendMessage() {
-  const feederBox = document.querySelector(".feeder-box");
-  if (!feederBox) {
-    Swal.fire("No feeder data found.");
-    return;
-  }
-
-  // Get values (or use blanks if empty)
-  const feederName = feederBox.querySelector(".feeder-title")?.textContent.trim() || "______";
-  const reason = feederBox.querySelector(".reason-select")?.value.trim() || "______";
-  const shutdown = feederBox.querySelector(".shutdown-time")?.value.trim() || "____";
-  const restoration = feederBox.querySelector(".restoration-time")?.value.trim() || "____";
-
-  // Build message
-  const message = `Feeder ${feederName} is shutting down due to ${reason} from ${shutdown} to ${restoration}.`;
-
-  // Fetch activated users from Back4App
-  const User = Parse.User;  // This refers to the _User class
-  const query = new Parse.Query(User);
-  query.equalTo("activated", true);
-
-  try {
-    const results = await query.find();
-
-    if (results.length === 0) {
-      Swal.fire("No activated users found.");
-      return;
-    }
-
-    const options = {};
-    results.forEach(user => {
-      const name = user.get("name") || "Unnamed";
-      const mobile = user.get("mobile");
-      if (mobile && mobile.startsWith("+")) {
-        const clean = mobile.replace(/\+/g, '');
-        options[clean] = `${name} (${mobile})`;
-      }
-    });
-
-    if (Object.keys(options).length === 0) {
-      Swal.fire("No valid WhatsApp numbers found.");
-      return;
-    }
-
-    // Choose user
-    const { value: selectedNumber } = await Swal.fire({
-      title: 'Select Recipient',
-      input: 'select',
-      inputOptions: options,
-      inputPlaceholder: 'Choose a user',
-      showCancelButton: true
-    });
-
-    if (!selectedNumber) return;
-
-    // Confirm/edit message
-    const { value: finalMsg } = await Swal.fire({
+async function sendToAllActivatedUsers() {
+    const { value: message } = await Swal.fire({
       title: 'Send WhatsApp Message',
       input: 'textarea',
-      inputLabel: 'Edit Message (if needed)',
-      inputValue: message,
+      inputLabel: 'Type message (it will be sent to ALL activated users)',
+      inputPlaceholder: 'e.g. Power will be restored by 5 PM...',
       showCancelButton: true,
-      confirmButtonText: 'Send',
-      confirmButtonColor: '#25D366'
+      confirmButtonText: 'Send to All',
+      confirmButtonColor: '#25D366',
+      inputValidator: (value) => {
+        if (!value || !value.trim()) return 'Please enter a message.';
+      }
     });
 
-    if (finalMsg && finalMsg.trim()) {
-      // Call cloud function
-      const result = await Parse.Cloud.run("sendWhatsAppMessage", {
-        to: selectedNumber,
-        message: finalMsg.trim()
-      });
+    if (!message) return;
 
-      if (result.success) {
-        Swal.fire("Success", "Message sent via WhatsApp API!", "success");
-      } else {
-        Swal.fire("Failed", "Something went wrong!", "error");
-      }
+    try {
+      const result = await Parse.Cloud.run("sendWhatsAppToActivatedUsers", { message });
+
+      Swal.fire(
+        'Success!',
+        `Message sent to ${result.sentCount} user(s).`,
+        'success'
+      );
+    } catch (err) {
+      console.error(err);
+      Swal.fire('Error', err.message || 'Something went wrong.', 'error');
     }
-
-  } catch (err) {
-    console.error(err);
-    Swal.fire("Error", "Failed to fetch users or send message.", "error");
   }
-}
+
+  // Example: bind to button click
+  document.getElementById("sendBtn").addEventListener("click", sendToAllActivatedUsers);
 
     fetchFeeders();
   </script>
