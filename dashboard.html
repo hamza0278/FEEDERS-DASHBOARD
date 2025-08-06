@@ -461,10 +461,10 @@ async function sendMessage() {
         </select><br/>
 
         <label>Start Time:</label>
-        <input type="datetime-local" id="start-time" class="swal2-input"><br/>
+        <input type="time" id="start-time" class="swal2-input"><br/>
 
         <label>Expected Time:</label>
-        <input type="datetime-local" id="expected-time" class="swal2-input">`,
+        <input type="time" id="expected-time" class="swal2-input">`,
       focusConfirm: false,
       preConfirm: () => {
         const feeder = document.getElementById('feeder-select').value;
@@ -483,7 +483,7 @@ async function sendMessage() {
 
     if (!formValues) return;
 
-    // Step 3: Send to cloud function
+    // Step 3: Call cloud function
     const response = await Parse.Cloud.run("sendWhatsAppToActivatedUsers", {
       feederName: formValues.feeder,
       reason: formValues.reason,
