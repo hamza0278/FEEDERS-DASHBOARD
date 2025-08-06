@@ -428,31 +428,6 @@ async function fetchFeeders() {
         alert("❌ Error: " + err.message);
       }
     }
- async function sendMessage() {
-    const message = document.getElementById("whatsappMsg").value.trim();
-
-    if (!message || message.length < 5) {
-      Swal.fire("Error", "Please enter a valid message.", "error");
-      return;
-    }
-
-    Swal.fire({
-      title: "Sending...",
-      text: "Please wait while messages are being sent.",
-      allowOutsideClick: false,
-      didOpen: () => {
-        Swal.showLoading();
-      },
-    });
-
-    try {
-      const result = await Parse.Cloud.run("sendWhatsAppToActivatedUsers", { message });
-
-      Swal.fire(
-        "Messages Sent",
-        `${result.sentCount} message(s) successfully sent!`,
-        "success"
-      );
 
       console.log("Full Results:", result.results); // Debug info
     } catch (error) {
