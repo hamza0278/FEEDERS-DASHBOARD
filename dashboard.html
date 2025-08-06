@@ -436,16 +436,16 @@ async function sendMessage() {
     return;
   }
 
-  // Get each field, or fallback to an empty string
-  const feederName = feederBox.querySelector(".feeder-title")?.textContent.trim() || "";
-  const reason = feederBox.querySelector(".reason-select")?.value.trim() || "";
-  const shutdown = feederBox.querySelector(".shutdown-time")?.value.trim() || "";
-  const restoration = feederBox.querySelector(".restoration-time")?.value.trim() || "";
+  // Get values (or use blanks if empty)
+  const feederName = feederBox.querySelector(".feeder-title")?.textContent.trim() || "______";
+  const reason = feederBox.querySelector(".reason-select")?.value.trim() || "______";
+  const shutdown = feederBox.querySelector(".shutdown-time")?.value.trim() || "____";
+  const restoration = feederBox.querySelector(".restoration-time")?.value.trim() || "____";
 
-  // Build message with blanks if values are missing
-  const message = `Feeder ${feederName || "______"} is shutting down due to ${reason || "______"} from ${shutdown || "____"} to ${restoration || "____"}.`;
+  // Build message
+  const message = `Feeder ${feederName} is shutting down due to ${reason} from ${shutdown} to ${restoration}.`;
 
-  // Fetch activated users
+  // Fetch activated users from Back4App
   const User = Parse.Object.extend("user");
   const query = new Parse.Query(User);
   query.equalTo("activated", true);
@@ -463,8 +463,8 @@ async function sendMessage() {
       const name = user.get("name") || "Unnamed";
       const mobile = user.get("mobile");
       if (mobile && mobile.startsWith("+")) {
-        const cleanNumber = mobile.replace(/\+/g, '');
-        options[cleanNumber] = `${name} (${mobile})`;
+        const clean = mobile.replace(/\+/g, '');
+        options[clean] = `${name} (${mobile})`;
       }
     });
 
@@ -473,7 +473,7 @@ async function sendMessage() {
       return;
     }
 
-    // Select recipient
+    // Choose user
     const { value: selectedNumber } = await Swal.fire({
       title: 'Select Recipient',
       input: 'select',
@@ -484,7 +484,7 @@ async function sendMessage() {
 
     if (!selectedNumber) return;
 
-    // Show prefilled message
+    // Confirm/edit message
     const { value: finalMsg } = await Swal.fire({
       title: 'Send WhatsApp Message',
       input: 'textarea',
@@ -496,9 +496,17 @@ async function sendMessage() {
     });
 
     if (finalMsg && finalMsg.trim()) {
-      const encoded = encodeURIComponent(finalMsg.trim());
-      const url = `https://wa.me/${selectedNumber}?text=${encoded}`;
-      window.open(url, '_blank');
+      // Call cloud function
+      const result = await Parse.Cloud.run("sendWhatsAppMessage", {
+        to: selectedNumber,
+        message: finalMsg.trim()
+      });
+
+      if (result.success) {
+        Swal.fire("Success", "Message sent via WhatsApp API!", "success");
+      } else {
+        Swal.fire("Failed", "Something went wrong!", "error");
+      }
     }
 
   } catch (err) {
@@ -506,7 +514,6 @@ async function sendMessage() {
     Swal.fire("Error", "Failed to fetch users or send message.", "error");
   }
 }
-
 
     fetchFeeders();
   </script>
