@@ -446,7 +446,7 @@ async function sendMessage() {
   const message = `Feeder ${feederName} is shutting down due to ${reason} from ${shutdown} to ${restoration}.`;
 
   // Fetch activated users from Back4App
-  const User = Parse.Object.extend("user");
+  const User = Parse.User;  // This refers to the _User class
   const query = new Parse.Query(User);
   query.equalTo("activated", true);
 
