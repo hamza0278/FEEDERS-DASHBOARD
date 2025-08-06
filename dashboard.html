@@ -429,39 +429,43 @@ async function fetchFeeders() {
         alert("❌ Error: " + err.message);
       }
     }
-async function sendToAllActivatedUsers() {
-    const { value: message } = await Swal.fire({
+async function sendMessage() {
+    const { value: userMessage } = await Swal.fire({
       title: 'Send WhatsApp Message',
       input: 'textarea',
-      inputLabel: 'Type message (it will be sent to ALL activated users)',
-      inputPlaceholder: 'e.g. Power will be restored by 5 PM...',
+      inputLabel: 'Message content',
+      inputPlaceholder: 'e.g. Feeder XYZ is shutting down from 2 PM to 4 PM.',
       showCancelButton: true,
-      confirmButtonText: 'Send to All',
+      confirmButtonText: 'Send to Activated Users',
       confirmButtonColor: '#25D366',
       inputValidator: (value) => {
-        if (!value || !value.trim()) return 'Please enter a message.';
+        if (!value || !value.trim()) return 'Message cannot be empty.';
       }
     });
 
-    if (!message) return;
+    if (!userMessage) return;
+
+    Swal.fire({
+      title: 'Sending...',
+      allowOutsideClick: false,
+      didOpen: () => Swal.showLoading()
+    });
 
     try {
-      const result = await Parse.Cloud.run("sendWhatsAppToActivatedUsers", { message });
+      const result = await Parse.Cloud.run("sendWhatsAppToActivatedUsers", {
+        message: userMessage
+      });
 
       Swal.fire(
         'Success!',
-        `Message sent to ${result.sentCount} user(s).`,
+        `Message sent to ${result.sentCount} activated user(s).`,
         'success'
       );
-    } catch (err) {
-      console.error(err);
-      Swal.fire('Error', err.message || 'Something went wrong.', 'error');
+    } catch (error) {
+      console.error(error);
+      Swal.fire('Error', error.message || 'Failed to send messages.', 'error');
     }
   }
-
-  // Example: bind to button click
-  document.getElementById("sendBtn").addEventListener("click", sendToAllActivatedUsers);
-
     fetchFeeders();
   </script>
 </body>
