@@ -90,7 +90,7 @@
     <h2 class="header-title m-0">FEEDER MONITORING DASHBOARD</h2>
     <div class="header-right">
       <button id="add-btn" class="add-btn" onclick="showAddDeleteOptions()">Add/Delete</button>
-      <button id="generate-btn" class="generate-btn" onclick="location.href='keys.html'">Keys</button>
+      <button id="generate-btn" class="generate-btn" onclick="location.href='keys.html'">Generate Keys</button>
       <div class="search-wrapper">
         <input type="text" class="search-input" id="search-input" placeholder="Search feeder...">
         <button class="search-btn" onclick="performSearch()">Search</button>
@@ -428,47 +428,8 @@ async function fetchFeeders() {
         alert("❌ Error: " + err.message);
       }
     }
+
     fetchFeeders();
-document.getElementById("sendSMSBtn").addEventListener("click", () => {
-  Swal.fire({
-    title: "Send SMS",
-    html: `
-      <input id="feederName" class="swal2-input" placeholder="Feeder Name">
-      <input id="reason" class="swal2-input" placeholder="Reason">
-      <input id="offTime" class="swal2-input" placeholder="Off Time">
-      <input id="expectedTime" class="swal2-input" placeholder="Expected Time">
-      <textarea id="messageContent" class="swal2-textarea" placeholder="Additional Message"></textarea>
-    `,
-    showCancelButton: true,
-    confirmButtonText: "Send",
-    preConfirm: async () => {
-      const feederName = document.getElementById("feederName").value.trim();
-      const reason = document.getElementById("reason").value.trim();
-      const offTime = document.getElementById("offTime").value.trim();
-      const expectedTime = document.getElementById("expectedTime").value.trim();
-      const messageContent = document.getElementById("messageContent").value.trim();
-
-      if (!feederName || !reason || !offTime || !expectedTime || !messageContent) {
-        Swal.showValidationMessage("All fields are required.");
-        return false;
-      }
-
-      try {
-        const result = await Parse.Cloud.run("sendBulkSMS", {
-          feederName,
-          reason,
-          offTime,
-          expectedTime,
-          messageContent
-        });
-        Swal.fire("Success", result, "success");
-      } catch (err) {
-        Swal.fire("Error", err.message || err, "error");
-      }
-    }
-  });
-});
-    
   </script>
 </body>
 </html>
