@@ -89,6 +89,7 @@
   <header>
     <h2 class="header-title m-0">FEEDER MONITORING DASHBOARD</h2>
     <div class="header-right">
+      <button id="msg-btn" class="btn btn-info text-white" onclick="sendMessage()">Msg</button>
       <button id="add-btn" class="add-btn" onclick="showAddDeleteOptions()">Add/Delete</button>
       <button id="generate-btn" class="generate-btn" onclick="location.href='keys.html'">Generate Keys</button>
       <div class="search-wrapper">
@@ -428,6 +429,26 @@ async function fetchFeeders() {
         alert("❌ Error: " + err.message);
       }
     }
+function sendMessage() {
+  Swal.fire({
+    title: 'Send Message',
+    input: 'textarea',
+    inputLabel: 'Write your message below',
+    inputPlaceholder: 'Type your message...',
+    inputAttributes: {
+      'aria-label': 'Type your message here'
+    },
+    showCancelButton: true,
+    confirmButtonText: 'Send',
+    confirmButtonColor: '#0d6efd'
+  }).then((result) => {
+    if (result.isConfirmed && result.value.trim()) {
+      const message = result.value.trim();
+      // Replace this with your actual message-sending logic
+      Swal.fire('Message Sent!', `Your message: "${message}"`, 'success');
+    }
+  });
+}
 
     fetchFeeders();
   </script>
