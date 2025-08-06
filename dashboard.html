@@ -101,6 +101,14 @@
       <button class="logout-btn" onclick="confirmLogout()">Logout</button>
     </div>
   </header>
+  
+<div class="card mb-4">
+  <div class="card-header"><b>Send WhatsApp Message</b></div>
+  <div class="card-body">
+    <textarea id="whatsappMsg" class="form-control" rows="5" placeholder="Enter message..."></textarea>
+    <button class="btn btn-success mt-3" onclick="sendMessage()">Send Message</button>
+  </div>
+</div>
 
   <div class="container py-4">
     <div class="row" id="feeder-container"></div>
@@ -429,42 +437,37 @@ async function fetchFeeders() {
         alert("❌ Error: " + err.message);
       }
     }
-async function sendMessage() {
-  const { value: message } = await Swal.fire({
-    title: 'Send WhatsApp Message',
-    input: 'textarea',
-    inputLabel: 'Enter WhatsApp message to send',
-    inputPlaceholder: 'Type the full message here...',
-    inputAttributes: {
-      'aria-label': 'Type the message here'
-    },
-    showCancelButton: true,
-    confirmButtonText: 'Send',
-    inputValidator: (value) => {
-      if (!value) {
-        return 'Message cannot be empty!';
-      }
+ async function sendMessage() {
+    const message = document.getElementById("whatsappMsg").value.trim();
+
+    if (!message || message.length < 5) {
+      Swal.fire("Error", "Please enter a valid message.", "error");
+      return;
     }
-  });
 
-  if (!message) return;
+    Swal.fire({
+      title: "Sending...",
+      text: "Please wait while messages are being sent.",
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      },
+    });
 
-  try {
-    const res = await Parse.Cloud.run("sendWhatsAppToActivatedUsers", { message });
-    Swal.fire("Done", `${res.sentCount} messages sent!`, "success");
-  } catch (err) {
-    console.error(err);
-    Swal.fire("Error", "Something went wrong!", "error");
+    try {
+      const result = await Parse.Cloud.run("sendWhatsAppToActivatedUsers", { message });
+
+      Swal.fire(
+        "Messages Sent",
+        `${result.sentCount} message(s) successfully sent!`,
+        "success"
+      );
+
+      console.log("Full Results:", result.results); // Debug info
+    } catch (error) {
+      Swal.fire("Failed", error.message || "Something went wrong!", "error");
+    }
   }
-}
-     Parse.User.currentAsync()
-    .then(user => {
-      if (!user) {
-        console.log("No user logged in");
-        document.getElementById("msg-btn").style.display = "none";
-        return;
-      }
-
       const role = user.get("role");
       console.log("Logged in user:", user.get("username"));
       console.log("User role:", role);
