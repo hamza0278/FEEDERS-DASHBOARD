@@ -457,14 +457,28 @@ async function sendMessage() {
     Swal.fire("Error", "Something went wrong!", "error");
   }
 }
-      Parse.User.currentAsync().then(user => {
-    if (!user || user.get("role") !== "admin") {
+     Parse.User.currentAsync()
+    .then(user => {
+      if (!user) {
+        console.log("No user logged in");
+        document.getElementById("msg-btn").style.display = "none";
+        return;
+      }
+
+      const role = user.get("role");
+      console.log("Logged in user:", user.get("username"));
+      console.log("User role:", role);
+
+      if (role !== "admin") {
+        document.getElementById("msg-btn").style.display = "none";
+      } else {
+        document.getElementById("msg-btn").style.display = "inline-block";
+      }
+    })
+    .catch(error => {
+      console.error("Error checking user role:", error);
       document.getElementById("msg-btn").style.display = "none";
-    }
-  }).catch(err => {
-    console.error("User check failed:", err);
-    document.getElementById("msg-btn").style.display = "none";
-  });
+    });
     fetchFeeders();
   </script>
 </body>
