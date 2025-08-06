@@ -430,72 +430,31 @@ async function fetchFeeders() {
       }
     }
 async function sendMessage() {
-  try {
-    // Step 1: Fetch feeder names from Parse
-    const Feeder = Parse.Object.extend("Feeder");
-    const query = new Parse.Query(Feeder);
-    const results = await query.find();
-
-    const feederNames = results.map(feeder => feeder.get("name"));
-
-    if (feederNames.length === 0) {
-      return Swal.fire("No feeders found!", "", "warning");
-    }
-
-    // Step 2: Show SweetAlert2 prompt
-    const { value: formValues } = await Swal.fire({
-      title: 'Send WhatsApp Message',
-      html:
-        `<label>Feeder:</label>
-        <select id="feeder-select" class="swal2-input">
-          ${feederNames.map(name => `<option value="${name}">${name}</option>`).join("")}
-        </select><br/>
-
-        <label>Reason:</label>
-        <select id="reason-select" class="swal2-input">
-          <option value="P.T.W">P.T.W</option>
-          <option value="Deadshort">Deadshort</option>
-          <option value="Shutdown">Shutdown</option>
-          <option value="Maintenance">Maintenance</option>
-          <option value="Main Fail">Main Fail</option>
-        </select><br/>
-
-        <label>Start Time:</label>
-        <input type="time" id="start-time" class="swal2-input"><br/>
-
-        <label>Expected Time:</label>
-        <input type="time" id="expected-time" class="swal2-input">`,
-      focusConfirm: false,
-      preConfirm: () => {
-        const feeder = document.getElementById('feeder-select').value;
-        const reason = document.getElementById('reason-select').value;
-        const start = document.getElementById('start-time').value;
-        const expected = document.getElementById('expected-time').value;
-
-        if (!feeder || !reason || !start || !expected) {
-          Swal.showValidationMessage("All fields are required!");
-          return;
-        }
-
-        return { feeder, reason, start, expected };
+  const { value: message } = await Swal.fire({
+    title: 'Send WhatsApp Message',
+    input: 'textarea',
+    inputLabel: 'Enter WhatsApp message to send',
+    inputPlaceholder: 'Type the full message here...',
+    inputAttributes: {
+      'aria-label': 'Type the message here'
+    },
+    showCancelButton: true,
+    confirmButtonText: 'Send',
+    inputValidator: (value) => {
+      if (!value) {
+        return 'Message cannot be empty!';
       }
-    });
+    }
+  });
 
-    if (!formValues) return;
+  if (!message) return;
 
-    // Step 3: Call cloud function
-    const response = await Parse.Cloud.run("sendWhatsAppToActivatedUsers", {
-      feederName: formValues.feeder,
-      reason: formValues.reason,
-      startTime: formValues.start,
-      expectedTime: formValues.expected
-    });
-
-    Swal.fire("Success", `${response.sentCount} messages sent!`, "success");
-
+  try {
+    const res = await Parse.Cloud.run("sendWhatsAppToActivatedUsers", { message });
+    Swal.fire("Done", `${res.sentCount} messages sent!`, "success");
   } catch (err) {
     console.error(err);
-    Swal.fire("Error", "Failed to send messages.", "error");
+    Swal.fire("Error", "Something went wrong!", "error");
   }
 }
       Parse.User.currentAsync().then(user => {
