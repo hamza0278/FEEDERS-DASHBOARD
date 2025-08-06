@@ -466,6 +466,14 @@ async function sendMessage() {
       Swal.fire('Error', error.message || 'Failed to send messages.', 'error');
     }
   }
+      Parse.User.currentAsync().then(user => {
+    if (!user || user.get("role") !== "admin") {
+      document.getElementById("msg-btn").style.display = "none";
+    }
+  }).catch(err => {
+    console.error("User check failed:", err);
+    document.getElementById("msg-btn").style.display = "none";
+  });
     fetchFeeders();
   </script>
 </body>
