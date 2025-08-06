@@ -89,9 +89,8 @@
   <header>
     <h2 class="header-title m-0">FEEDER MONITORING DASHBOARD</h2>
     <div class="header-right">
-      <button id="msg-btn" class="btn btn-info text-white" onclick="sendMessage()">Msg</button>
       <button id="add-btn" class="add-btn" onclick="showAddDeleteOptions()">Add/Delete</button>
-      <button id="generate-btn" class="generate-btn" onclick="location.href='keys.html'">Keys</button>
+      <button id="generate-btn" class="generate-btn" onclick="location.href='keys.html'">Generate Keys</button>
       <div class="search-wrapper">
         <input type="text" class="search-input" id="search-input" placeholder="Search feeder...">
         <button class="search-btn" onclick="performSearch()">Search</button>
@@ -101,6 +100,7 @@
       <button class="logout-btn" onclick="confirmLogout()">Logout</button>
     </div>
   </header>
+
   <div class="container py-4">
     <div class="row" id="feeder-container"></div>
   </div>
@@ -429,27 +429,6 @@ async function fetchFeeders() {
       }
     }
 
-      console.log("Full Results:", result.results); // Debug info
-    } catch (error) {
-      Swal.fire("Failed", error.message || "Something went wrong!", "error");
-    }
-  }
-      const role = user.get("role");
-      console.log("Logged in user:", user.get("username"));
-      console.log("User role:", role);
-
-      if (role !== "admin") {
-        document.getElementById("msg-btn").style.display = "none";
-      } else {
-        document.getElementById("msg-btn").style.display = "inline-block";
-      }
-    })
-    .catch(error => {
-      console.error("Error checking user role:", error);
-      document.getElementById("msg-btn").style.display = "none";
-    });
-    }
-      }
     fetchFeeders();
   </script>
 </body>
