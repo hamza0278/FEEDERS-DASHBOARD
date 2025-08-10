@@ -207,10 +207,17 @@
       try {
         const data = await Parse.Cloud.run("loginUser", { username: emailInput, password });
         await Parse.User.become(data.sessionToken);
-
+      if (data.role === 'admin') {
+        // Use sessionStorage for admins (clears on tab/browser close)
+        sessionStorage.setItem('role', data.role);
+        sessionStorage.setItem('username', emailInput);
+        sessionStorage.setItem('sessionToken', data.sessionToken);
+      } else {
+        // Use localStorage for normal users (persists across sessions)
         localStorage.setItem('role', data.role || 'public');
         localStorage.setItem('username', emailInput);
         localStorage.setItem('sessionToken', data.sessionToken);
+}
 
         if (data.role === 'admin') {
           Swal.fire({ icon: 'success', title: 'Welcome Admin', text: 'Redirecting...', timer: 1000, showConfirmButton: false });
