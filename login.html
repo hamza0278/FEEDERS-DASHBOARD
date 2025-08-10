@@ -258,6 +258,26 @@
         icon: 'info'
       });
     });
+document.addEventListener('DOMContentLoaded', () => {
+  // Detect if running as installed PWA
+  const isPWAInstalled = window.matchMedia('(display-mode: standalone)').matches 
+                      || window.navigator.standalone === true; // iOS Safari
+  
+  if (!isPWAInstalled) {
+    // Listen for install prompt on Chrome/Android
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault(); // Stop Chrome's mini-infobar
+      window.location.href = "install.html"; // Redirect to install guide
+    });
+
+    // For iOS Safari, there is no beforeinstallprompt event
+    // So just redirect immediately if not installed
+    if (/iphone|ipad|ipod/i.test(window.navigator.userAgent)) {
+      window.location.href = "install.html";
+    }
+  }
+});
+
 
     document.getElementById('refundLink').addEventListener('click', () => {
       Swal.fire({
