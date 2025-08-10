@@ -114,6 +114,16 @@
   </footer>
 
   <script>
+    let role = sessionStorage.getItem('role') || localStorage.getItem('role');
+let username = sessionStorage.getItem('username') || localStorage.getItem('username');
+let token = sessionStorage.getItem('sessionToken') || localStorage.getItem('sessionToken');
+
+if (!role || !username || !token) {
+  window.location.href = 'login.html';
+} else {
+  // logged in, continue
+}
+
     const feederContainer = document.getElementById("feeder-container");
 
     function showAddDeleteOptions() {
