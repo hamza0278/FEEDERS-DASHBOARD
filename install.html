@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Install Our App</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: auto;
+      padding: 20px;
+      line-height: 1.6;
+    }
+    h1 {
+      text-align: center;
+    }
+    .instructions {
+      margin-bottom: 20px;
+      padding: 15px;
+      background: #f9f9f9;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+    }
+    button {
+      background: #0078d7;
+      color: #fff;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+      display: block;
+      margin: auto;
+    }
+    button:disabled {
+      background: #999;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+  <h1>Install Our App</h1>
+
+  <div class="instructions">
+    <h3>📱 Android (Chrome)</h3>
+    <p>Tap the button below to install:</p>
+    <button id="installBtn" disabled>Install App</button>
+  </div>
+
+  <div class="instructions">
+    <h3>🍎 iOS (Safari)</h3>
+    <p>1. Tap the <strong>Share</strong> icon in Safari.</p>
+    <p>2. Scroll down and tap <strong>Add to Home Screen</strong>.</p>
+    <p>3. Tap <strong>Add</strong> in the top right corner.</p>
+  </div>
+
+  <script>
+    let deferredPrompt;
+    const installBtn = document.getElementById('installBtn');
+
+    // Chrome/Android will fire beforeinstallprompt when ready
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      installBtn.disabled = false;
+    });
+
+    installBtn.addEventListener('click', () => {
+      if (!deferredPrompt) return;
+
+      Swal.fire({
+        title: 'Install App?',
+        text: 'Would you like to install this app on your device?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Install',
+        cancelButtonText: 'Cancel',
+        reverseButtons: true
+      }).then((result) => {
+        if (result.isConfirmed) {
+          deferredPrompt.prompt();
+          deferredPrompt.userChoice.then((choice) => {
+            if (choice.outcome === 'accepted') {
+              Swal.fire('Installed!', 'The app has been installed.', 'success');
+            } else {
+              Swal.fire('Cancelled', 'Installation was cancelled.', 'info');
+            }
+            deferredPrompt = null;
+            installBtn.disabled = true;
+          });
+        }
+      });
+    });
+  </script>
+</body>
+</html>
