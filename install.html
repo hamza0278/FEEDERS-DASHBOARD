@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <title>Install Our App</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="manifest" href="/FEEDERS-DASHBOARD/manifest.json">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
     body {
@@ -60,7 +61,6 @@
     let deferredPrompt;
     const installBtn = document.getElementById('installBtn');
 
-    // Chrome/Android will fire beforeinstallprompt when ready
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       deferredPrompt = e;
