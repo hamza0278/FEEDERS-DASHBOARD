@@ -432,6 +432,44 @@ async function fetchFeeders() {
         alert("❌ Error: " + err.message);
       }
     }
+function confirmLogout() {
+  Swal.fire({
+    title: "Are you sure?",
+    text: "You will be logged out.",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#dc3545",
+    cancelButtonColor: "#6c757d",
+    confirmButtonText: "Logout",
+    cancelButtonText: "Cancel"
+  }).then((result) => {
+    if (result.isConfirmed) {
+      localStorage.clear();  // or remove specific keys if preferred
+      window.location.href = "login.html";  // redirect to login page
+    }
+  });
+}
+
+// On page load, fetch feeder data from Parse and populate
+document.addEventListener("DOMContentLoaded", () => {
+  const username = localStorage.getItem("username");
+  if (!username) {
+    // Not logged in; redirect to login
+    window.location.href = "login.html";
+    return;
+  }
+
+  Parse.Cloud.run("getFeedersByUser", { username }).then((feeders) => {
+    if (Array.isArray(feeders) && feeders.length) {
+      feeders.forEach(feeder => createFeederBox(feeder));
+    } else {
+      // No feeders found, create a default one
+      createFeederBox({ name: "Default Feeder", status: "on", load: "0A" });
+    }
+  }).catch(error => {
+    Swal.fire("Error", "Failed to load feeder data.", "error");
+  });
+});
 
     fetchFeeders();
   </script>
