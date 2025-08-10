@@ -432,7 +432,9 @@ async function fetchFeeders() {
         alert("❌ Error: " + err.message);
       }
     }
-function confirmLogout() {
+
+    fetchFeeders();
+    function confirmLogout() {
   Swal.fire({
     title: "Are you sure?",
     text: "You will be logged out.",
@@ -470,8 +472,6 @@ document.addEventListener("DOMContentLoaded", () => {
     Swal.fire("Error", "Failed to load feeder data.", "error");
   });
 });
-
-    fetchFeeders();
   </script>
 </body>
 </html>
