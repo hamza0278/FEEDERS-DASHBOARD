@@ -135,37 +135,8 @@
       </p>
     </form>
 
-    <div class="policy-links">
-      <a id="termsLink">Terms & Conditions</a>
-      <a id="privacyLink">Privacy Policy</a>
-      <a id="refundLink">Refund Policy</a>
-    </div>
-  </div>
-
   <script>
-    // Show popup on page load with system meta details
-    window.addEventListener('load', () => {
-     Swal.fire({
-  icon: 'info',
-  title: '👋 Welcome',
-  html: `
-    <p><strong>Feeders Monitoring Dashboard:</strong></p>
-    <p><strong>Version:</strong> 1.0.0<br>
-    <strong>Last Updated:</strong> July 28, 2025</p>
-    <p><strong>Purpose:</strong><br>
-    - Monitor all feeders status (on/off)<br>
-    - Show reason, shutdown time, restoration time</p>
-    <p><strong>Activation Notice:</strong><br>
-    All new users must enter an activation key after signup.</p>
-    <p><strong>Contact:</strong><br>
-    Email Admin — feederdashboard@gmail.com<br>
-    IT Help Desk — +92-311-4085433</p>
-  `,
-  confirmButtonText: 'Continue',
-  width: 600
-});
-
-    });
+      });
 
     function isValidEmail(value) {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -228,37 +199,6 @@
       }
     });
 
-    document.getElementById('termsLink').addEventListener('click', () => {
-      Swal.fire({
-        title: 'Terms & Conditions',
-        html: `
-          <div style="text-align:left;">
-            <strong>Effective Date:</strong> July 25, 2025<br><br>
-            By accessing and using the Feeders Dashboard system, you agree to the following:<br><br>
-            1. <strong>Usage:</strong> The system is for authorized users only.<br>
-            2. <strong>Account Responsibility:</strong> Keep your login credentials secure.<br>
-            3. <strong>Data Accuracy:</strong> Update feeder info truthfully.<br>
-            4. <strong>Termination:</strong> Admin may suspend accounts for violations.<br>
-            5. <strong>Changes:</strong> Terms may be updated anytime.
-          </div>`,
-        icon: 'info'
-      });
-    });
-
-    document.getElementById('privacyLink').addEventListener('click', () => {
-      Swal.fire({
-        title: 'Privacy Policy',
-        html: `
-          <div style="text-align:left;">
-            <strong>Effective Date:</strong> July 25, 2025<br><br>
-            - We collect only essential data.<br>
-            - Your data is encrypted and not shared.<br>
-            - You may request deletion of your data.<br>
-            - Contact admin for support or privacy concerns.
-          </div>`,
-        icon: 'info'
-      });
-    });
 document.addEventListener('DOMContentLoaded', () => {
   // Detect if running as installed PWA
   const isPWAInstalled = window.matchMedia('(display-mode: standalone)').matches 
@@ -278,24 +218,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 });
-
-
-    document.getElementById('refundLink').addEventListener('click', () => {
-      Swal.fire({
-        title: 'Refund Policy',
-        html: `
-          <div style="text-align:left;">
-            <strong>Effective Date:</strong> July 25, 2025<br><br>
-            - Activation key purchases are final.<br>
-            - Refunds are only offered in special cases:<br>
-            &nbsp;&nbsp;a) Charged more than once<br>
-            &nbsp;&nbsp;b) Didn’t receive key and unresolved after 7 days<br>
-            &nbsp;&nbsp;c) System failure not fixed in reasonable time<br><br>
-            - No refunds for lost credentials or misunderstanding features.
-          </div>
-        `,
-        icon: 'info'
-      });
     });
   </script>
 </body>
