@@ -1,9 +1,169 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <script>
-    window.location.replace("login.html");
-  </script>
+  <meta charset="UTF-8">
+  <title>Feeder Monitoring Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f7fa;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px;
+    }
+    h1 {
+      color: #0056b3;
+    }
+    .description {
+      max-width: 700px;
+      margin: 15px 0 25px 0;
+      font-size: 16px;
+      line-height: 1.6;
+      text-align: center;
+      color: #444;
+    }
+    .links {
+      margin: 20px 0;
+    }
+    .links a {
+      margin: 0 10px;
+      text-decoration: none;
+      color: #0056b3;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .actions {
+      margin-top: 20px;
+    }
+    .actions button {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin: 0 10px;
+      background-color: #0056b3;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .actions button:disabled {
+      background-color: #9bbce3;
+      cursor: not-allowed;
+    }
+    .checkbox {
+      margin-top: 15px;
+      font-size: 14px;
+    }
+  </style>
 </head>
-<body></body>
+<body>
+
+  <h1>Feeder Monitoring Dashboard</h1>
+
+  <div class="description">
+    Welcome to the Feeder Monitoring Dashboard — a reliable, user-friendly platform 
+    providing real-time updates on feeder status and performance. Whether you're at 
+    home, in the office, or on the go, you can access the latest operational information 
+    anytime, anywhere.  
+    <br><br>
+    ✅ Instant updates without delays<br>
+    ✅ Simple and intuitive interface<br>
+    ✅ Reliable and accurate data<br>
+    ✅ Works on mobile, tablet, and desktop
+  </div>
+
+  <div class="links">
+    <a id="termsLink">Terms & Conditions</a> |
+    <a id="privacyLink">Privacy Policy</a> |
+    <a id="refundLink">Refund Policy</a>
+  </div>
+
+  <div class="checkbox">
+    <label>
+      <input type="checkbox" id="acceptCheckbox">
+      I have read and agree to the above policies
+    </label>
+  </div>
+
+  <div class="actions">
+    <button id="loginBtn" disabled>Login</button>
+    <button id="signupBtn" disabled>Signup</button>
+  </div>
+
+  <script>
+    // Terms
+    document.getElementById('termsLink').addEventListener('click', () => {
+      Swal.fire({
+        title: 'Terms & Conditions',
+        html: `
+          <div style="text-align:left;">
+            <strong>Effective Date:</strong> July 25, 2025<br><br>
+            By accessing and using the Feeders Dashboard system, you agree to the following:<br><br>
+            1. <strong>Usage:</strong> The system is for authorized users only.<br>
+            2. <strong>Account Responsibility:</strong> Keep your login credentials secure.<br>
+            3. <strong>Data Accuracy:</strong> Update feeder info truthfully.<br>
+            4. <strong>Termination:</strong> Admin may suspend accounts for violations.<br>
+            5. <strong>Changes:</strong> Terms may be updated anytime.
+          </div>`,
+        icon: 'info'
+      });
+    });
+
+    // Privacy
+    document.getElementById('privacyLink').addEventListener('click', () => {
+      Swal.fire({
+        title: 'Privacy Policy',
+        html: `
+          <div style="text-align:left;">
+            <strong>Effective Date:</strong> July 25, 2025<br><br>
+            - We collect only essential data.<br>
+            - Your data is encrypted and not shared.<br>
+            - You may request deletion of your data.<br>
+            - Contact admin for support or privacy concerns.
+          </div>`,
+        icon: 'info'
+      });
+    });
+
+    // Refund
+    document.getElementById('refundLink').addEventListener('click', () => {
+      Swal.fire({
+        title: 'Refund Policy',
+        html: `
+          <div style="text-align:left;">
+            <strong>Effective Date:</strong> July 25, 2025<br><br>
+            - Activation key purchases are final.<br>
+            - Refunds are only offered in special cases:<br>
+            &nbsp;&nbsp;a) Charged more than once<br>
+            &nbsp;&nbsp;b) Didn’t receive key and unresolved after 7 days<br>
+            &nbsp;&nbsp;c) System failure not fixed in reasonable time<br><br>
+            - No refunds for lost credentials or misunderstanding features.
+          </div>
+        `,
+        icon: 'info'
+      });
+    });
+
+    // Enable buttons when checkbox is checked
+    const checkbox = document.getElementById('acceptCheckbox');
+    const loginBtn = document.getElementById('loginBtn');
+    const signupBtn = document.getElementById('signupBtn');
+
+    checkbox.addEventListener('change', () => {
+      loginBtn.disabled = !checkbox.checked;
+      signupBtn.disabled = !checkbox.checked;
+    });
+
+    // Redirect buttons
+    loginBtn.addEventListener('click', () => {
+      window.location.href = 'login.html';
+    });
+    signupBtn.addEventListener('click', () => {
+      window.location.href = 'signup.html';
+    });
+  </script>
+
+</body>
 </html>
