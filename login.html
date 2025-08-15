@@ -1,224 +1,169 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>LOGIN</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="manifest" href="/FEEDERS-DASHBOARD/manifest.json" />
+  <meta charset="UTF-8">
+  <title>Feeder Monitoring Dashboard</title>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script src="https://npmcdn.com/parse/dist/parse.min.js"></script>
-  <script>
-    Parse.initialize("2UbcjCCCAXXdMC34Xsq3se5xHv42l9zpncnBO5zk", "Ryed1qJgdnSd6xxrVqFt95aLpxEDz9DDic1aaVGq");
-    Parse.serverURL = "https://parseapi.back4app.com";
-  </script>
   <style>
     body {
-      font-family: 'Inter', sans-serif;
-      background: #f0f4f8;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-    }
-
-    .login-box {
-      background: #fff;
-      padding: 2rem;
-      border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-      width: 100%;
-      max-width: 320px;
-      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+      background: #f5f7fa;
+      color: #333;
       display: flex;
       flex-direction: column;
       align-items: center;
+      padding: 40px;
     }
-
-    .login-box h2 {
+    h1 {
+      color: #0056b3;
+    }
+    .description {
+      max-width: 700px;
+      margin: 15px 0 25px 0;
+      font-size: 16px;
+      line-height: 1.6;
       text-align: center;
-      margin-bottom: 1.5rem;
-      color: #333;
+      color: #444;
     }
-
-    input {
-      width: 100%;
-      padding: 10px;
-      margin-bottom: 1rem;
-      border-radius: 6px;
-      font-size: 14px;
-      border: 1px solid #ccc;
-      box-sizing: border-box;
+    .links {
+      margin: 20px 0;
     }
-
-    button {
-      width: 100%;
-      padding: 10px;
-      border-radius: 6px;
-      font-size: 15px;
+    .links a {
+      margin: 0 10px;
+      text-decoration: none;
+      color: #0056b3;
       font-weight: bold;
+      cursor: pointer;
+    }
+    .actions {
+      margin-top: 20px;
+    }
+    .actions button {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin: 0 10px;
       background-color: #0056b3;
       color: white;
       border: none;
+      border-radius: 5px;
       cursor: pointer;
-      margin-top: 10px;
     }
-
-    button:hover {
-      background-color: #004494;
+    .actions button:disabled {
+      background-color: #9bbce3;
+      cursor: not-allowed;
     }
-
-    .forgot-link {
-      text-align: right;
-      width: 100%;
-      margin-top: -0.5rem;
-    }
-
-    .forgot-link a {
-      color: #dc3545;
-      font-size: 0.9rem;
-      text-decoration: none;
-    }
-
-    .signup-link, .contact-info {
-      text-align: center;
-      font-size: 0.9rem;
-      margin-top: 10px;
-      width: 100%;
-    }
-
-    .signup-link a {
-      color: #28a745;
-      font-weight: bold;
-      text-decoration: none;
-    }
-
-    .contact-info {
-      font-weight: bold;
-    }
-
-    .policy-links {
-      text-align: center;
-      margin-top: 20px;
-      font-size: 0.85rem;
-      width: 100%;
-    }
-
-    .policy-links a {
-      color: #555;
-      text-decoration: underline;
-      margin: 0 6px;
-      cursor: pointer;
+    .checkbox {
+      margin-top: 15px;
+      font-size: 14px;
     }
   </style>
 </head>
 <body>
-  <div class="login-box">
-    <h2>Login / Signup</h2>
-    <form id="loginForm" style="width: 100%;">
-      <input type="text" id="email" placeholder="Username or Email" required />
-      <input type="password" id="password" placeholder="Password" required />
 
-      <div class="forgot-link">
-        <a href="recover.html">Forgot Password?</a>
-      </div>
+  <h1>Feeder Monitoring Dashboard</h1>
 
-      <button type="submit">Login</button>
+  <div class="description">
+    Welcome to the Feeder Monitoring Dashboard — a reliable, user-friendly platform 
+    providing real-time updates on feeder status and performance. Whether you're at 
+    home, in the office, or on the go, you can access the latest operational information 
+    anytime, anywhere.  
+    <br><br>
+    ✅ Instant updates without delays<br>
+    ✅ Simple and intuitive interface<br>
+    ✅ Reliable and accurate data<br>
+    ✅ Works on mobile, tablet, and desktop
+  </div>
 
-      <div class="signup-link">
-        Don't have an account? <a href="signup.html">Sign Up</a>
-      </div>
+  <div class="links">
+    <a id="termsLink">Terms & Conditions</a> |
+    <a id="privacyLink">Privacy Policy</a> |
+    <a id="refundLink">Refund Policy</a>
+  </div>
 
-      <p class="contact-info">
-        <strong>To complete the signup, you need an activation key.</strong>
-      </p>
-    </form>
+  <div class="checkbox">
+    <label>
+      <input type="checkbox" id="acceptCheckbox">
+      I have read and agree to the above policies
+    </label>
+  </div>
+
+  <div class="actions">
+    <button id="loginBtn" disabled>Login</button>
+    <button id="signupBtn" disabled>Signup</button>
+  </div>
 
   <script>
-      });
-
-    function isValidEmail(value) {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      return emailRegex.test(value);
-    }
-
-    function isValidUsername(value) {
-      const usernameRegex = /^[a-zA-Z0-9_]+$/;
-      return usernameRegex.test(value);
-    }
-
-    document.getElementById('loginForm').addEventListener('submit', async function (e) {
-      e.preventDefault();
-
+    // Terms
+    document.getElementById('termsLink').addEventListener('click', () => {
       Swal.fire({
-        title: 'Logging in...',
-        text: 'Please wait',
-        allowOutsideClick: false,
-        allowEscapeKey: false,
-        didOpen: () => Swal.showLoading()
+        title: 'Terms & Conditions',
+        html: `
+          <div style="text-align:left;">
+            <strong>Effective Date:</strong> July 25, 2025<br><br>
+            By accessing and using the Feeders Dashboard system, you agree to the following:<br><br>
+            1. <strong>Usage:</strong> The system is for authorized users only.<br>
+            2. <strong>Account Responsibility:</strong> Keep your login credentials secure.<br>
+            3. <strong>Data Accuracy:</strong> Update feeder info truthfully.<br>
+            4. <strong>Termination:</strong> Admin may suspend accounts for violations.<br>
+            5. <strong>Changes:</strong> Terms may be updated anytime.
+          </div>`,
+        icon: 'info'
       });
-
-      await Parse.User.logOut();
-      localStorage.clear();
-
-      const emailInput = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value.trim();
-
-      if (!emailInput || !password) {
-        Swal.fire("Missing Fields", "Please enter both username/email and password", "warning");
-        return;
-      }
-
-      if (!isValidEmail(emailInput) && !isValidUsername(emailInput)) {
-        Swal.fire("Invalid Input", "Please enter a valid username or email address", "error");
-        return;
-      }
-
-      try {
-        const data = await Parse.Cloud.run("loginUser", { username: emailInput, password });
-        await Parse.User.become(data.sessionToken);
-
-        localStorage.setItem('role', data.role || 'public');
-        localStorage.setItem('username', emailInput);
-        localStorage.setItem('sessionToken', data.sessionToken);
-
-        if (data.role === 'admin') {
-          Swal.fire({ icon: 'success', title: 'Welcome Admin', text: 'Redirecting...', timer: 1000, showConfirmButton: false });
-          setTimeout(() => window.location.href = 'dashboard.html', 1000);
-        } else if (data.activated === true) {
-          Swal.fire({ icon: 'success', title: 'Welcome', text: 'Redirecting...', timer: 1000, showConfirmButton: false });
-          setTimeout(() => window.location.href = 'dashboard.html', 1000);
-        } else {
-          Swal.fire({ icon: 'warning', title: 'Activation Required', text: 'Redirecting to activation page...', timer: 1200, showConfirmButton: false });
-          setTimeout(() => window.location.href = 'activation.html', 1200);
-        }
-
-      } catch (err) {
-        Swal.fire("Login Failed", err.message || "Invalid credentials", "error");
-      }
     });
 
-document.addEventListener('DOMContentLoaded', () => {
-  // Detect if running as installed PWA
-  const isPWAInstalled = window.matchMedia('(display-mode: standalone)').matches 
-                      || window.navigator.standalone === true; // iOS Safari
-  
-  if (!isPWAInstalled) {
-    // Listen for install prompt on Chrome/Android
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault(); // Stop Chrome's mini-infobar
-      window.location.href = "install.html"; // Redirect to install guide
+    // Privacy
+    document.getElementById('privacyLink').addEventListener('click', () => {
+      Swal.fire({
+        title: 'Privacy Policy',
+        html: `
+          <div style="text-align:left;">
+            <strong>Effective Date:</strong> July 25, 2025<br><br>
+            - We collect only essential data.<br>
+            - Your data is encrypted and not shared.<br>
+            - You may request deletion of your data.<br>
+            - Contact admin for support or privacy concerns.
+          </div>`,
+        icon: 'info'
+      });
     });
 
-    // For iOS Safari, there is no beforeinstallprompt event
-    // So just redirect immediately if not installed
-    if (/iphone|ipad|ipod/i.test(window.navigator.userAgent)) {
-      window.location.href = "install.html";
-    }
-  }
-});
+    // Refund
+    document.getElementById('refundLink').addEventListener('click', () => {
+      Swal.fire({
+        title: 'Refund Policy',
+        html: `
+          <div style="text-align:left;">
+            <strong>Effective Date:</strong> July 25, 2025<br><br>
+            - Activation key purchases are final.<br>
+            - Refunds are only offered in special cases:<br>
+            &nbsp;&nbsp;a) Charged more than once<br>
+            &nbsp;&nbsp;b) Didn’t receive key and unresolved after 7 days<br>
+            &nbsp;&nbsp;c) System failure not fixed in reasonable time<br><br>
+            - No refunds for lost credentials or misunderstanding features.
+          </div>
+        `,
+        icon: 'info'
+      });
+    });
+
+    // Enable buttons when checkbox is checked
+    const checkbox = document.getElementById('acceptCheckbox');
+    const loginBtn = document.getElementById('loginBtn');
+    const signupBtn = document.getElementById('signupBtn');
+
+    checkbox.addEventListener('change', () => {
+      loginBtn.disabled = !checkbox.checked;
+      signupBtn.disabled = !checkbox.checked;
+    });
+
+    // Redirect buttons
+    loginBtn.addEventListener('click', () => {
+      window.location.href = 'login.html';
+    });
+    signupBtn.addEventListener('click', () => {
+      window.location.href = 'signup.html';
     });
   </script>
+
 </body>
 </html>
