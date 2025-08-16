@@ -5,10 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Feeder Monitoring Dashboard</title>
 
-  <!-- Early redirect to prevent flash -->
+  <!-- Early check -->
   <script>
     if (localStorage.getItem("policiesAccepted") === "true") {
       window.location.replace("login.html");
+    } else {
+      // Show body only if user hasn't accepted yet
+      document.addEventListener("DOMContentLoaded", () => {
+        document.body.style.display = "flex";
+      });
     }
   </script>
 
@@ -18,7 +23,7 @@
       font-family: Arial, sans-serif;
       background: #f5f7fa;
       color: #333;
-      display: flex;
+      display: none; /* hidden by default, shown only if needed */
       flex-direction: column;
       align-items: center;
       padding: 20px;
