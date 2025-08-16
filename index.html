@@ -78,7 +78,6 @@
       text-align: center;
     }
 
-    /* Responsive tweaks */
     @media (max-width: 480px) {
       .description {
         font-size: 14px;
@@ -126,6 +125,11 @@
   </div>
 
   <script>
+    // Check if policies already accepted
+    if (localStorage.getItem("policiesAccepted") === "true") {
+      window.location.href = "login.html";
+    }
+
     // Terms
     document.getElementById('termsLink').addEventListener('click', () => {
       Swal.fire({
@@ -189,11 +193,13 @@
       signupBtn.disabled = !checkbox.checked;
     });
 
-    // Redirect buttons
+    // Save flag and redirect
     loginBtn.addEventListener('click', () => {
+      localStorage.setItem("policiesAccepted", "true");
       window.location.href = 'login.html';
     });
     signupBtn.addEventListener('click', () => {
+      localStorage.setItem("policiesAccepted", "true");
       window.location.href = 'signup.html';
     });
   </script>
