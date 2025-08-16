@@ -2,28 +2,23 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Feeder Monitoring Dashboard</title>
 
-  <!-- Early check -->
+  <!-- Run redirect immediately before anything else -->
   <script>
     if (localStorage.getItem("policiesAccepted") === "true") {
       window.location.replace("login.html");
-    } else {
-      // Show body only if user hasn't accepted yet
-      document.addEventListener("DOMContentLoaded", () => {
-        document.body.style.display = "flex";
-      });
     }
   </script>
 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
       background: #f5f7fa;
       color: #333;
-      display: none; /* hidden by default, shown only if needed */
+      display: none; /* hide until we know no redirect */
       flex-direction: column;
       align-items: center;
       padding: 20px;
@@ -138,6 +133,9 @@
   </div>
 
   <script>
+    // Show the body only if not redirected
+    document.body.style.display = "flex";
+
     // Terms
     document.getElementById('termsLink').addEventListener('click', () => {
       Swal.fire({
@@ -197,17 +195,20 @@
     const signupBtn = document.getElementById('signupBtn');
 
     checkbox.addEventListener('change', () => {
-      loginBtn.disabled = !checkbox.checked;
-      signupBtn.disabled = !checkbox.checked;
+      const enabled = checkbox.checked;
+      loginBtn.disabled = !enabled;
+      signupBtn.disabled = !enabled;
+
+      if (enabled) {
+        localStorage.setItem("policiesAccepted", "true");
+      }
     });
 
-    // Save flag and redirect
+    // Redirect buttons
     loginBtn.addEventListener('click', () => {
-      localStorage.setItem("policiesAccepted", "true");
       window.location.href = 'login.html';
     });
     signupBtn.addEventListener('click', () => {
-      localStorage.setItem("policiesAccepted", "true");
       window.location.href = 'signup.html';
     });
   </script>
