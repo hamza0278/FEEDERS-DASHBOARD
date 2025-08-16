@@ -11,6 +11,83 @@
   <script>
     Parse.initialize("2UbcjCCCAXXdMC34Xsq3se5xHv42l9zpncnBO5zk", "Ryed1qJgdnSd6xxrVqFt95aLpxEDz9DDic1aaVGq");
     Parse.serverURL = "https://parseapi.back4app.com";
+
+    function isValidEmail(value) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return emailRegex.test(value);
+    }
+
+    function isValidUsername(value) {
+      const usernameRegex = /^[a-zA-Z0-9_]+$/;
+      return usernameRegex.test(value);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+
+      // PWA install check
+      const isPWAInstalled = window.matchMedia('(display-mode: standalone)').matches 
+                          || window.navigator.standalone === true; // iOS
+      if (!isPWAInstalled) {
+        window.addEventListener('beforeinstallprompt', (e) => {
+          e.preventDefault();
+          window.location.href = "install.html";
+        });
+        if (/iphone|ipad|ipod/i.test(window.navigator.userAgent)) {
+          window.location.href = "install.html";
+        }
+      }
+
+      document.getElementById('loginForm').addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        Swal.fire({
+          title: 'Logging in...',
+          text: 'Please wait',
+          allowOutsideClick: false,
+          allowEscapeKey: false,
+          didOpen: () => Swal.showLoading()
+        });
+
+        await Parse.User.logOut();
+        localStorage.clear();
+
+        const emailInput = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value.trim();
+
+        if (!emailInput || !password) {
+          Swal.fire("Missing Fields", "Please enter both username/email and password", "warning");
+          return;
+        }
+
+        if (!isValidEmail(emailInput) && !isValidUsername(emailInput)) {
+          Swal.fire("Invalid Input", "Please enter a valid username or email address", "error");
+          return;
+        }
+
+        try {
+          const data = await Parse.Cloud.run("loginUser", { username: emailInput, password });
+          await Parse.User.become(data.sessionToken);
+
+          localStorage.setItem('role', data.role || 'public');
+          localStorage.setItem('username', emailInput);
+          localStorage.setItem('sessionToken', data.sessionToken);
+
+          if (data.role === 'admin') {
+            Swal.fire({ icon: 'success', title: 'Welcome Admin', text: 'Redirecting...', timer: 1000, showConfirmButton: false });
+            setTimeout(() => window.location.href = 'dashboard.html', 1000);
+          } else if (data.activated === true) {
+            Swal.fire({ icon: 'success', title: 'Welcome', text: 'Redirecting...', timer: 1000, showConfirmButton: false });
+            setTimeout(() => window.location.href = 'dashboard.html', 1000);
+          } else {
+            Swal.fire({ icon: 'warning', title: 'Activation Required', text: 'Redirecting to activation page...', timer: 1200, showConfirmButton: false });
+            setTimeout(() => window.location.href = 'activation.html', 1200);
+          }
+
+        } catch (err) {
+          Swal.fire("Login Failed", err.message || "Invalid credentials", "error");
+        }
+      });
+    });
   </script>
   <style>
     body {
@@ -134,91 +211,6 @@
         <strong>To complete the signup, you need an activation key.</strong>
       </p>
     </form>
-
-  <script>
-      });
-
-    function isValidEmail(value) {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      return emailRegex.test(value);
-    }
-
-    function isValidUsername(value) {
-      const usernameRegex = /^[a-zA-Z0-9_]+$/;
-      return usernameRegex.test(value);
-    }
-
-    document.getElementById('loginForm').addEventListener('submit', async function (e) {
-      e.preventDefault();
-
-      Swal.fire({
-        title: 'Logging in...',
-        text: 'Please wait',
-        allowOutsideClick: false,
-        allowEscapeKey: false,
-        didOpen: () => Swal.showLoading()
-      });
-
-      await Parse.User.logOut();
-      localStorage.clear();
-
-      const emailInput = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value.trim();
-
-      if (!emailInput || !password) {
-        Swal.fire("Missing Fields", "Please enter both username/email and password", "warning");
-        return;
-      }
-
-      if (!isValidEmail(emailInput) && !isValidUsername(emailInput)) {
-        Swal.fire("Invalid Input", "Please enter a valid username or email address", "error");
-        return;
-      }
-
-      try {
-        const data = await Parse.Cloud.run("loginUser", { username: emailInput, password });
-        await Parse.User.become(data.sessionToken);
-
-        localStorage.setItem('role', data.role || 'public');
-        localStorage.setItem('username', emailInput);
-        localStorage.setItem('sessionToken', data.sessionToken);
-
-        if (data.role === 'admin') {
-          Swal.fire({ icon: 'success', title: 'Welcome Admin', text: 'Redirecting...', timer: 1000, showConfirmButton: false });
-          setTimeout(() => window.location.href = 'dashboard.html', 1000);
-        } else if (data.activated === true) {
-          Swal.fire({ icon: 'success', title: 'Welcome', text: 'Redirecting...', timer: 1000, showConfirmButton: false });
-          setTimeout(() => window.location.href = 'dashboard.html', 1000);
-        } else {
-          Swal.fire({ icon: 'warning', title: 'Activation Required', text: 'Redirecting to activation page...', timer: 1200, showConfirmButton: false });
-          setTimeout(() => window.location.href = 'activation.html', 1200);
-        }
-
-      } catch (err) {
-        Swal.fire("Login Failed", err.message || "Invalid credentials", "error");
-      }
-    });
-
-document.addEventListener('DOMContentLoaded', () => {
-  // Detect if running as installed PWA
-  const isPWAInstalled = window.matchMedia('(display-mode: standalone)').matches 
-                      || window.navigator.standalone === true; // iOS Safari
-  
-  if (!isPWAInstalled) {
-    // Listen for install prompt on Chrome/Android
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault(); // Stop Chrome's mini-infobar
-      window.location.href = "install.html"; // Redirect to install guide
-    });
-
-    // For iOS Safari, there is no beforeinstallprompt event
-    // So just redirect immediately if not installed
-    if (/iphone|ipad|ipod/i.test(window.navigator.userAgent)) {
-      window.location.href = "install.html";
-    }
-  }
-});
-    });
-  </script>
+  </div>
 </body>
 </html>
