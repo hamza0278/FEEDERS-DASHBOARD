@@ -4,6 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Feeder Monitoring Dashboard</title>
+
+  <!-- Early redirect to prevent flash -->
+  <script>
+    if (localStorage.getItem("policiesAccepted") === "true") {
+      window.location.replace("login.html");
+    }
+  </script>
+
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
     body {
@@ -125,11 +133,6 @@
   </div>
 
   <script>
-    // Check if policies already accepted
-    if (localStorage.getItem("policiesAccepted") === "true") {
-      window.location.href = "login.html";
-    }
-
     // Terms
     document.getElementById('termsLink').addEventListener('click', () => {
       Swal.fire({
