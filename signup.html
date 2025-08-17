@@ -301,7 +301,37 @@
         icon: 'info'
       });
     });
+    
+    async function signupUser() {
+    const username = document.getElementById("username").value;
+    const password = document.getElementById("password").value;
+    const mobile = document.getElementById("mobile").value;
 
+    const user = new Parse.User();
+    user.set("username", username);
+    user.set("password", password);
+    user.set("mobile", mobile);
+
+    try {
+      await user.signUp();
+      alert("✅ Signup successful!");
+
+      // Call cloud function to send WhatsApp
+      await Parse.Cloud.run("sendWhatsApp", {
+        phone: mobile,                      // user phone in +91... format
+        template: "user_welcome",           // your approved template name
+        language: "en_US",                  // template language
+        parameters: [
+          { type: "text", text: username }  // fills {{1}} with username
+        ]
+      });
+
+      console.log("WhatsApp welcome message sent!");
+
+    } catch (error) {
+      alert("❌ Error: " + error.message);
+    }
+  }
     document.getElementById('refundLink').addEventListener('click', () => {
       Swal.fire({
         title: 'Refund Policy',
@@ -336,3 +366,4 @@
   </script>
 </body>
 </html>
+
