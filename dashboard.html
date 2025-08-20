@@ -434,49 +434,51 @@ async function fetchFeeders() {
       }
     }
 // Example function to fetch user info from database
-function getUserInfo() {
-    return {
-        username: 'JohnDoe',
-        phone: '+923001234567',
-        role: 'admin' // 'admin' or 'staff'
-    };
-}
+    // Replace this with your actual database call
+    function getUserInfo() {
+        return {
+            username: 'JohnDoe',           // fetched username
+            phone: '+923001234567',        // fetched WhatsApp number
+            role: 'admin',                 // role: 'admin' or 'user'
+            activated: true                // account activation status
+        };
+    }
 
-const user = getUserInfo();
-const alertButton = document.getElementById('alertButton');
+    const user = getUserInfo();
+    const alertButton = document.getElementById('alertButton');
 
-// Only show the alert button if the user is admin
-if (user.role === 'admin') {
-    alertButton.style.display = 'inline-block';
+    // Only show the alert button if the user is admin and activated
+    if (user.role === 'admin' && user.activated) {
+        alertButton.style.display = 'inline-block';
 
-    // Function to show SweetAlert2 popup
-    function user_alert() {
-        Swal.fire({
-            title: 'Send WhatsApp Alert',
-            html: `
-                <input type="text" id="feeder" class="swal2-input" placeholder="Feeder Name">
-                <input type="text" id="reason" class="swal2-input" placeholder="Reason">
-                <input type="text" id="time1" class="swal2-input" placeholder="Time">
-                <input type="text" id="time2" class="swal2-input" placeholder="Ask-for-Time">
-            `,
-            confirmButtonText: 'Send',
-            focusConfirm: false,
-            preConfirm: () => {
-                const feeder = Swal.getPopup().querySelector('#feeder').value;
-                const reason = Swal.getPopup().querySelector('#reason').value;
-                const time1 = Swal.getPopup().querySelector('#time1').value;
-                const time2 = Swal.getPopup().querySelector('#time2').value;
+        // Function to show SweetAlert2 popup
+        function user_alert() {
+            Swal.fire({
+                title: 'Send WhatsApp Alert',
+                html: `
+                    <input type="text" id="feeder" class="swal2-input" placeholder="Feeder Name">
+                    <input type="text" id="reason" class="swal2-input" placeholder="Reason">
+                    <input type="text" id="time1" class="swal2-input" placeholder="Time">
+                    <input type="text" id="time2" class="swal2-input" placeholder="Ask-for-Time">
+                `,
+                confirmButtonText: 'Send',
+                focusConfirm: false,
+                preConfirm: () => {
+                    const feeder = Swal.getPopup().querySelector('#feeder').value;
+                    const reason = Swal.getPopup().querySelector('#reason').value;
+                    const time1 = Swal.getPopup().querySelector('#time1').value;
+                    const time2 = Swal.getPopup().querySelector('#time2').value;
 
-                if (!feeder || !reason || !time1 || !time2) {
-                    Swal.showValidationMessage(`Please fill all fields`);
+                    if (!feeder || !reason || !time1 || !time2) {
+                        Swal.showValidationMessage(`Please fill all fields`);
+                    }
+                    return { feeder, reason, time1, time2 };
                 }
-                return { feeder, reason, time1, time2 };
-            }
-        }).then((result) => {
-            if (result.isConfirmed) {
-                const { feeder, reason, time1, time2 } = result.value;
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const { feeder, reason, time1, time2 } = result.value;
 
-                const message = `
+                    const message = `
 Header: ${user.username}
 Body:
 ${feeder} → feeder name
@@ -485,20 +487,16 @@ ${time1} → time
 ${time2} → ask-for-time
 `;
 
-                console.log('Send WhatsApp to', user.phone);
-                console.log('Message:', message);
+                    console.log('Send WhatsApp to', user.phone);
+                    console.log('Message:', message);
 
-                Swal.fire('Alert Sent!', '', 'success');
-            }
-        });
-    }
+                    Swal.fire('Alert Sent!', '', 'success');
+                }
+            });
+        }
 
-    // Connect button
-    alertButton.addEventListener('click', user_alert);
-} else {
-    // Hide button for non-admins
-    alertButton.style.display = 'none';
-}
+        // Connect button
+      
 
 
     fetchFeeders();
