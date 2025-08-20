@@ -434,8 +434,7 @@ async function fetchFeeders() {
         alert("❌ Error: " + err.message);
       }
     }
-    fetchFeeders();
-    document.addEventListener('DOMContentLoaded', () => {
+     document.addEventListener('DOMContentLoaded', () => {
     const user = getUserInfo();
     const alertButton = document.getElementById('alertButton');
 
@@ -488,7 +487,7 @@ ${time2} → ask-for-time
         alertButton.style.display = 'none'; // hide for everyone else
     }
 });
-
+    fetchFeeders();
   </script>
 </body>
 </html>
