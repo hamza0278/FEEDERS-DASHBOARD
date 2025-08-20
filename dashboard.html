@@ -434,22 +434,19 @@ async function fetchFeeders() {
       }
     }
 // Example function to fetch user info from database
-// Replace this with your actual database call
 function getUserInfo() {
     return {
-        username: 'JohnDoe',    // fetched username
-        phone: '+923001234567', // fetched WhatsApp number
-        role: 'staff'           // 'admin' or 'staff'
+        username: 'JohnDoe',
+        phone: '+923001234567',
+        role: 'admin' // 'admin' or 'staff'
     };
 }
 
 const user = getUserInfo();
 const alertButton = document.getElementById('alertButton');
 
-// Show button only if user is admin
-if (user.role !== 'admin') {
-    alertButton.style.display = 'none';
-} else {
+// Only show the alert button if the user is admin
+if (user.role === 'admin') {
     alertButton.style.display = 'inline-block';
 
     // Function to show SweetAlert2 popup
@@ -498,7 +495,11 @@ ${time2} → ask-for-time
 
     // Connect button
     alertButton.addEventListener('click', user_alert);
+} else {
+    // Hide button for non-admins
+    alertButton.style.display = 'none';
 }
+
 
     fetchFeeders();
   </script>
