@@ -93,8 +93,9 @@
   <header>
     <h2 class="header-title m-0">FEEDER MONITORING DASHBOARD</h2>
     <div class="header-right">
+      <button id="alertButton" class="btn btn-primary">Alert</button>
       <button id="add-btn" class="add-btn" onclick="showAddDeleteOptions()">Add/Delete</button>
-      <button id="generate-btn" class="generate-btn" onclick="location.href='keys.html'">Generate Keys</button>
+      <button id="generate-btn" class="generate-btn" onclick="location.href='keys.html'">Keys</button>
       <div class="search-wrapper">
         <input type="text" class="search-input" id="search-input" placeholder="Search feeder...">
         <button class="search-btn" onclick="performSearch()">Search</button>
@@ -434,6 +435,60 @@ async function fetchFeeders() {
       }
     }
     fetchFeeders();
+    document.addEventListener('DOMContentLoaded', () => {
+    const user = getUserInfo();
+    const alertButton = document.getElementById('alertButton');
+
+    if (user.role === 'admin' && user.activated) { // only activated admins
+        alertButton.style.display = 'inline-block';
+
+        alertButton.addEventListener('click', () => {
+            Swal.fire({
+                title: 'Send WhatsApp Alert',
+                html: `
+                    <input type="text" id="feeder" class="swal2-input" placeholder="Feeder Name">
+                    <input type="text" id="reason" class="swal2-input" placeholder="Reason">
+                    <input type="text" id="time1" class="swal2-input" placeholder="Time">
+                    <input type="text" id="time2" class="swal2-input" placeholder="Ask-for-Time">
+                `,
+                confirmButtonText: 'Send',
+                focusConfirm: false,
+                preConfirm: () => {
+                    const feeder = Swal.getPopup().querySelector('#feeder').value;
+                    const reason = Swal.getPopup().querySelector('#reason').value;
+                    const time1 = Swal.getPopup().querySelector('#time1').value;
+                    const time2 = Swal.getPopup().querySelector('#time2').value;
+
+                    if (!feeder || !reason || !time1 || !time2) {
+                        Swal.showValidationMessage('Please fill all fields');
+                    }
+                    return { feeder, reason, time1, time2 };
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const { feeder, reason, time1, time2 } = result.value;
+
+                    const message = `
+Header: ${user.username}
+Body:
+${feeder} → feeder name
+${reason} → reason
+${time1} → time
+${time2} → ask-for-time
+`;
+
+                    console.log('Send WhatsApp to', user.phone);
+                    console.log('Message:', message);
+
+                    Swal.fire('Alert Sent!', '', 'success');
+                }
+            });
+        });
+    } else {
+        alertButton.style.display = 'none'; // hide for everyone else
+    }
+});
+
   </script>
 </body>
 </html>
