@@ -12,6 +12,10 @@
     emailjs.init("FCXI2unZNjR1bUUdk");
   </script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+  <!-- intl-tel-input CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/css/intlTelInput.css"/>
+
   <style>
     body {
       font-family: 'Inter', sans-serif;
@@ -108,7 +112,7 @@
         <input type="email" id="email" placeholder="Enter Email" required />
       </div>
       <div class="field-group">
-        <input type="tel" id="mobile" placeholder="Enter Mobile Number (e.g. 3001234567)" required pattern="[0-9+]{10,15}" />
+        <input type="tel" id="mobile" placeholder="3001234567" required />
       </div>
       <div class="field-group">
         <input type="password" id="password" placeholder="Choose Password" required />
@@ -132,9 +136,21 @@
     </div>
   </div>
 
+  <!-- intl-tel-input JS -->
+  <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/intlTelInput.min.js"></script>
+
   <script>
     Parse.initialize("2UbcjCCCAXXdMC34Xsq3se5xHv42l9zpncnBO5zk", "Ryed1qJgdnSd6xxrVqFt95aLpxEDz9DDic1aaVGq");
     Parse.serverURL = "https://parseapi.back4app.com/";
+
+    // initialize intl-tel-input
+    const input = document.querySelector("#mobile");
+    const iti = window.intlTelInput(input, {
+      initialCountry: "pk", // default Pakistan
+      separateDialCode: true,
+      excludeCountries: ["il"], // remove Israel
+      utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/utils.js"
+    });
 
     window.addEventListener("load", async () => {
       try {
@@ -165,25 +181,16 @@
       return /^[a-zA-Z0-9_]+$/.test(username);
     }
 
-    // Automatically prepend +92 if not present
-    document.getElementById("mobile").addEventListener("blur", function () {
-      let val = this.value.trim();
-      if (!val.startsWith("+92")) {
-        if (val.startsWith("0")) {
-          val = val.substring(1);
-        }
-        this.value = "+92" + val;
-      }
-    });
-
     document.getElementById('signup-form').addEventListener('submit', async function(e) {
       e.preventDefault();
 
       const username = document.getElementById('username').value.trim();
       const email = document.getElementById('email').value.trim();
-      const mobile = document.getElementById('mobile').value.trim();
       const password = document.getElementById('password').value.trim();
       const confirmPassword = document.getElementById('confirm-password').value.trim();
+
+      // Get number with country code
+      let mobile = iti.getNumber().replace("+", ""); 
 
       if (!username || !email || !mobile || !password || !confirmPassword) {
         return Swal.fire('Missing Fields', 'Please fill all fields.', 'warning');
@@ -245,6 +252,7 @@
       }
     });
 
+    // ---- Policy Popups ----
     document.getElementById("termsLink").addEventListener("click", () => {
       Swal.fire({
         title: "Terms & Conditions",
@@ -301,37 +309,7 @@
         icon: 'info'
       });
     });
-    
-    async function signupUser() {
-    const username = document.getElementById("username").value;
-    const password = document.getElementById("password").value;
-    const mobile = document.getElementById("mobile").value;
 
-    const user = new Parse.User();
-    user.set("username", username);
-    user.set("password", password);
-    user.set("mobile", mobile);
-
-    try {
-      await user.signUp();
-      alert("✅ Signup successful!");
-
-      // Call cloud function to send WhatsApp
-      await Parse.Cloud.run("sendWhatsApp", {
-        phone: mobile,                      // user phone in +91... format
-        template: "user_welcome",           // your approved template name
-        language: "en_US",                  // template language
-        parameters: [
-          { type: "text", text: username }  // fills {{1}} with username
-        ]
-      });
-
-      console.log("WhatsApp welcome message sent!");
-
-    } catch (error) {
-      alert("❌ Error: " + error.message);
-    }
-  }
     document.getElementById('refundLink').addEventListener('click', () => {
       Swal.fire({
         title: 'Refund Policy',
@@ -366,4 +344,3 @@
   </script>
 </body>
 </html>
-
