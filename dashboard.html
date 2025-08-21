@@ -115,6 +115,14 @@
   </footer>
 
   <script>
+     // Example: user role fetched from login/session
+  const userRole = "employee"; // or "admin"
+
+  const alertButton = document.getElementById("alertButton");
+
+  if (userRole !== "admin") {
+    alertButton.style.display = "none"; // hide button for non-admins
+  }
    
    const feederContainer = document.getElementById("feeder-container");
 
