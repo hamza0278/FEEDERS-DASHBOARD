@@ -12,8 +12,6 @@
     emailjs.init("FCXI2unZNjR1bUUdk");
   </script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-
-  <!-- intl-tel-input CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/css/intlTelInput.css"/>
 
   <style>
@@ -136,156 +134,106 @@
     </div>
   </div>
 
-  <!-- intl-tel-input JS -->
   <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/intlTelInput.min.js"></script>
 
   <script>
-    Parse.initialize("2UbcjCCCAXXdMC34Xsq3se5xHv42l9zpncnBO5zk", "Ryed1qJgdnSd6xxrVqFt95aLpxEDz9DDic1aaVGq");
+    Parse.initialize("2UbcjCCCAXXdMC34Xsq3se5xHv42l9zpncnBO5zk");
     Parse.serverURL = "https://parseapi.back4app.com/";
 
-    // initialize intl-tel-input
     const input = document.querySelector("#mobile");
     const iti = window.intlTelInput(input, {
-      initialCountry: "pk", // default Pakistan
+      initialCountry: "pk",
       separateDialCode: true,
-      excludeCountries: ["il"], // remove Israel
+      excludeCountries: ["il"],
       utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/utils.js"
     });
 
     window.addEventListener("load", async () => {
-      try {
-        await Parse.User.logOut();
-      } catch (err) {
-        console.warn("Error clearing session:", err);
-      }
+      try { await Parse.User.logOut(); } catch (err) { console.warn(err); }
     });
 
     function toggleVisibility(id, iconElement) {
       const input = document.getElementById(id);
       if (input.type === "password") {
         input.type = "text";
-        iconElement.classList.remove("fa-eye");
-        iconElement.classList.add("fa-eye-slash");
+        iconElement.classList.replace("fa-eye", "fa-eye-slash");
       } else {
         input.type = "password";
-        iconElement.classList.remove("fa-eye-slash");
-        iconElement.classList.add("fa-eye");
+        iconElement.classList.replace("fa-eye-slash", "fa-eye");
       }
     }
 
-    function isValidEmail(email) {
-      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-    }
-
-    function isValidUsername(username) {
-      return /^[a-zA-Z0-9_]+$/.test(username);
-    }
+    function isValidEmail(email) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); }
+    function isValidUsername(username) { return /^[a-zA-Z0-9_]+$/.test(username); }
 
     document.getElementById('signup-form').addEventListener('submit', async function(e) {
       e.preventDefault();
 
-      const username = document.getElementById('username').value.trim();
-      const email = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value.trim();
+      const newUsername = document.getElementById('username').value.trim();
+      const newEmail = document.getElementById('email').value.trim();
+      const newPassword = document.getElementById('password').value.trim();
       const confirmPassword = document.getElementById('confirm-password').value.trim();
+      const newMobile = iti.getNumber().replace("+", ""); 
 
-      // Get number with country code
-      let mobile = iti.getNumber().replace("+", ""); 
-
-      if (!username || !email || !mobile || !password || !confirmPassword) {
+      if (!newUsername || !newEmail || !newMobile || !newPassword || !confirmPassword)
         return Swal.fire('Missing Fields', 'Please fill all fields.', 'warning');
-      }
 
-      if (!isValidUsername(username)) {
+      if (!isValidUsername(newUsername))
         return Swal.fire('Invalid Username', 'Username must be alphanumeric (a-z, A-Z, 0-9, or _)', 'error');
-      }
 
-      if (!isValidEmail(email)) {
+      if (!isValidEmail(newEmail))
         return Swal.fire('Invalid Email', 'Please enter a valid email address.', 'error');
-      }
 
-      if (password !== confirmPassword) {
+      if (newPassword !== confirmPassword)
         return Swal.fire('Password Mismatch', 'Passwords do not match.', 'error');
-      }
 
-      Swal.fire({
-        title: 'Creating account...',
-        text: 'Please wait',
-        allowOutsideClick: false,
-        allowEscapeKey: false,
-        didOpen: () => Swal.showLoading()
-      });
+      Swal.fire({ title: 'Creating account...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
       try {
-        const user = new Parse.User();
-        user.set("username", username);
-        user.set("email", email);
-        user.set("password", password);
-        user.set("mobile", mobile);
+        const newUser = new Parse.User();
+        newUser.set("username", newUsername);
+        newUser.set("password", newPassword);
+        newUser.set("email", newEmail);
+        newUser.set("mobile", newMobile);
+        newUser.set("activated", true);
 
-        await user.signUp();
+        await newUser.signUp();
 
-        const activationLink = `https://hamza0278.github.io/FEEDERS-DASHBOARD/activation.html?user=${username}`;
+        // Send welcome WhatsApp
+        await Parse.Cloud.run("sendWelcomeWhatsApp", { username: newUsername, mobile: newMobile });
 
-        await emailjs.send("service_jq6klbx", "template_6tdt39m", {
-          to_email: email,
-          username: username,
-          activation_link: activationLink
-        });
+        Swal.fire({ icon: 'success', title: 'Signup Successful', text: 'Welcome WhatsApp sent!', confirmButtonText: 'Go to Login' })
+          .then(() => { window.location.href = 'login.html'; });
 
-        Swal.fire({
-          icon: 'success',
-          title: 'Signup Successful',
-          text: 'An activation email has been sent.',
-          confirmButtonText: 'Go to Login'
-        }).then(() => {
-          window.location.href = 'login.html';
-        });
-
-      } catch (error) {
-        console.error("Signup error:", error);
-        Swal.fire({
-          icon: 'error',
-          title: 'Signup Failed',
-          text: `(${error.code}) ${error.message}`
-        });
+      } catch (err) {
+        console.error("Signup or WhatsApp sending failed:", err);
+        Swal.fire({ icon: 'error', title: 'Signup Failed', text: `(${err.code}) ${err.message}` });
       }
     });
 
-    // ---- Policy Popups ----
+    // Policies
     document.getElementById("termsLink").addEventListener("click", () => {
       Swal.fire({
         title: "Terms & Conditions",
         html: `
-          <div style="text-align: left;">
+          <div style="text-align:left;">
             <strong>Effective Date:</strong> July 25, 2025<br><br>
             By signing up for and using the Feeder Monitoring System, you agree to the following terms:<br><br>
             <strong>1. Account Registration</strong>
-            <ul>
-              <li>You must provide accurate and complete registration information.</li>
-              <li>You may not use false or misleading information to create an account.</li>
-            </ul>
+            <ul><li>You must provide accurate and complete registration information.</li>
+            <li>You may not use false or misleading information to create an account.</li></ul>
             <strong>2. Account Security</strong>
-            <ul>
-              <li>You are responsible for maintaining the confidentiality of your login credentials.</li>
-              <li>Notify the system administrator immediately if you suspect unauthorized access.</li>
-            </ul>
+            <ul><li>You are responsible for maintaining the confidentiality of your login credentials.</li>
+            <li>Notify the system administrator immediately if you suspect unauthorized access.</li></ul>
             <strong>3. Authorized Usage</strong>
-            <ul>
-              <li>This system is strictly for authorized users and feeder monitoring purposes only.</li>
-              <li>Unauthorized access, sharing, or tampering with data is prohibited.</li>
-            </ul>
+            <ul><li>This system is strictly for authorized users and feeder monitoring purposes only.</li>
+            <li>Unauthorized access, sharing, or tampering with data is prohibited.</li></ul>
             <strong>4. System Monitoring</strong>
-            <ul>
-              <li>All user activity may be logged for audit and security purposes.</li>
-              <li>Misuse may result in suspension, investigation, or termination of your access.</li>
-            </ul>
+            <ul><li>All user activity may be logged for audit and security purposes.</li>
+            <li>Misuse may result in suspension, investigation, or termination of your access.</li></ul>
             <strong>5. Agreement</strong>
-            <ul>
-              <li>By creating an account, you agree to abide by all system policies and terms.</li>
-            </ul>
-          </div>
-        `,
+            <ul><li>By creating an account, you agree to abide by all system policies and terms.</li></ul>
+          </div>`,
         icon: "info",
         confirmButtonText: "Close"
       });
@@ -336,8 +284,7 @@
               </li>
               <li><strong>Request Process:</strong> Contact us with proof of purchase and a brief explanation. Each case is reviewed within 5–7 business days.</li>
             </ol>
-          </div>
-        `,
+          </div>`,
         icon: 'info'
       });
     });
