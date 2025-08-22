@@ -434,7 +434,7 @@ async function fetchFeeders() {
         alert("❌ Error: " + err.message);
       }
     }
-      const userRole = localStorage.getItem("role"); // "admin" or "employee"
+     const userRole = sessionStorage.getItem("role"); // "admin" or "employee"
 
   if (userRole === "admin") {
     const btn = document.getElementById("alertButton");
