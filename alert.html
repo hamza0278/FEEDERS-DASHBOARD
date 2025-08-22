@@ -86,6 +86,21 @@
     function backToDashboard() {
       window.location.href = "dashboard.html"; // adjust path if needed
     }
+
+    // Auto-format time as HH:MM
+    function formatTimeInput(event) {
+      let input = event.target;
+      let value = input.value.replace(/\D/g, ""); // remove non-digits
+      if (value.length > 2) {
+        value = value.slice(0, 2) + ":" + value.slice(2, 4);
+      }
+      input.value = value;
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      document.getElementById("time").addEventListener("input", formatTimeInput);
+      document.getElementById("restorationTime").addEventListener("input", formatTimeInput);
+    });
   </script>
 </head>
 <body>
@@ -98,16 +113,39 @@
       <div class="col-md-6">
         <div class="card">
           <label for="feederName" class="form-label">Feeder Name</label>
-          <input type="text" id="feederName" class="form-control" placeholder="Enter feeder name">
+          <select id="feederName" class="form-select">
+            <option value="" disabled selected>Select feeder</option>
+            <option value="HASSAN PARK (110801)">HASSAN PARK (110801)</option>
+            <option value="BANGLA ROAD (110802)">BANGLA ROAD (110802)</option>
+            <option value="SKP BEDAD (110803)">SKP BEDAD (110803)</option>
+            <option value="MUBARAK ABAD (110804)">MUBARAK ABAD (110804)</option>
+            <option value="CHAND BAGH (110805)">CHAND BAGH (110805)</option>
+            <option value="GUJRANWALA ROAD (110806)">GUJRANWALA ROAD (110806)</option>
+            <option value="NANGAL SAHDAN (110807)">NANGAL SAHDAN (110807)</option>
+            <option value="ASHRAF PLOY (110808)">ASHRAF PLOY (110808)</option>
+            <option value="A.RAHEEM FOODS (110809)">A.RAHEEM FOODS (110809)</option>
+            <option value="PLATINIUM PAPER MILL (110810)">PLATINIUM PAPER MILL (110810)</option>
+            <option value="MURIDKE (110811)">MURIDKE (110811)</option>
+            <option value="HAFIZ FLOUR MILL (110812)">HAFIZ FLOUR MILL (110812)</option>
+            <option value="KOT YAQOOB (110813)">KOT YAQOOB (110813)</option>
+          </select>
 
           <label for="reason" class="form-label">Reason</label>
-          <input type="text" id="reason" class="form-control" placeholder="Enter reason">
+          <select id="reason" class="form-select">
+            <option value="" disabled selected>Select reason</option>
+            <option value="P.T.W">P.T.W</option>
+            <option value="Dead Short">Dead Short</option>
+            <option value="Load Shedding">Load Shedding</option>
+            <option value="Shutdown">Shutdown</option>
+            <option value="Maintenance">Maintenance</option>
+            <option value="Main Fail">Main Fail</option>
+          </select>
 
           <label for="time" class="form-label">Outage Time</label>
-          <input type="text" id="time" class="form-control" placeholder="Enter outage time">
+          <input type="text" id="time" class="form-control" placeholder="HH:MM">
 
           <label for="restorationTime" class="form-label">Expected Restoration Time</label>
-          <input type="text" id="restorationTime" class="form-control" placeholder="Enter restoration time">
+          <input type="text" id="restorationTime" class="form-control" placeholder="HH:MM">
 
           <button class="send-btn w-100 mt-3" onclick="sendAlert()">Send</button>
           <button class="back-btn w-100" onclick="backToDashboard()">Back to Dashboard</button>
