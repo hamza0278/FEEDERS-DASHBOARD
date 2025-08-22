@@ -434,11 +434,14 @@ async function fetchFeeders() {
         alert("❌ Error: " + err.message);
       }
     }
-     // Example: assuming you store the role in localStorage after login
-  const userRole = localStorage.getItem("role"); // "admin" or "employee"
+      const userRole = localStorage.getItem("role"); // "admin" or "employee"
 
   if (userRole === "admin") {
-    document.getElementById("alertButton").style.display = "inline-block";
+    const btn = document.getElementById("alertButton");
+    btn.style.display = "inline-block";
+    btn.onclick = function () {
+      window.location.href = "alert.html";
+    };
   }
     fetchFeeders();
   </script>
