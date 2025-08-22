@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Send WhatsApp Alert</title>
+  <script src="https://npmcdn.com/parse/dist/parse.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f6fa;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .card {
+      background: #fff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      width: 400px;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      text-align: center;
+      color: #333;
+    }
+
+    label {
+      font-weight: bold;
+      display: block;
+      margin: 10px 0 5px;
+      color: #444;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 20px;
+      padding: 12px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+  <script>
+    // Initialize Parse
+    Parse.initialize("2UbcjCCCAXXdMC34Xsq3se5xHv42l9zpncnBO5zk", "Ryed1qJgdnSd6xxrVqFt95aLpxEDz9DDic1aaVGq"); 
+    Parse.serverURL = "https://parseapi.back4app.com/";
+    
+    async function sendAlert() {
+      const feederName = document.getElementById("feederName").value;
+      const reason = document.getElementById("reason").value;
+      const time = document.getElementById("time").value;
+      const restorationTime = document.getElementById("restorationTime").value;
+
+      try {
+        const result = await Parse.Cloud.run("sendWhatsAppAlert", {
+          feederName,
+          reason,
+          time,
+          restorationTime
+        });
+
+        if (result.success) {
+          alert("WhatsApp alerts sent successfully!");
+        } else {
+          alert("Failed: " + result.message);
+        }
+      } catch (err) {
+        console.error("Error:", err);
+        alert("Error sending alert");
+      }
+    }
+  </script>
+</head>
+<body>
+  <div class="card">
+    <h2>Send WhatsApp Alert</h2>
+    
+    <label for="feederName">Feeder Name:</label>
+    <input type="text" id="feederName" placeholder="Enter feeder name">
+    
+    <label for="reason">Reason:</label>
+    <input type="text" id="reason" placeholder="Enter reason">
+    
+    <label for="time">Time:</label>
+    <input type="text" id="time" placeholder="Enter outage time">
+    
+    <label for="restorationTime">Expected Restoration Time:</label>
+    <input type="text" id="restorationTime" placeholder="Enter restoration time">
+    
+    <button onclick="sendAlert()">Send Alert</button>
+  </div>
+</body>
+</html>
