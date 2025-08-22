@@ -10,6 +10,11 @@
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
   <script>
     emailjs.init("FCXI2unZNjR1bUUdk");
+    Parse.initialize(
+      "2UbcjCCCAXXdMC34Xsq3se5xHv42l9zpncnBO5zk", // Application ID
+      "Ryed1qJgdnSd6xxrVqFt95aLpxEDz9DDic1aaVGq"  // JavaScript Key
+    );
+    Parse.serverURL = "https://parseapi.back4app.com/";
   </script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/css/intlTelInput.css"/>
@@ -50,9 +55,7 @@
       font-size: 14px;
       box-sizing: border-box;
     }
-    input {
-      border: 1px solid #ccc;
-    }
+    input { border: 1px solid #ccc; }
     .toggle-password {
       position: absolute;
       right: 12px;
@@ -71,19 +74,13 @@
       cursor: pointer;
       margin-top: 5px;
     }
-    button:hover {
-      background-color: #218838;
-    }
+    button:hover { background-color: #218838; }
     .login-link {
       margin-top: 10px;
       text-align: center;
       font-size: 0.9rem;
     }
-    .login-link a {
-      color: #0056b3;
-      font-weight: bold;
-      text-decoration: none;
-    }
+    .login-link a { color: #0056b3; font-weight: bold; text-decoration: none; }
     .policy-links {
       margin-top: 15px;
       text-align: center;
@@ -137,9 +134,6 @@
   <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/intlTelInput.min.js"></script>
 
   <script>
-    Parse.initialize("2UbcjCCCAXXdMC34Xsq3se5xHv42l9zpncnBO5zk");
-    Parse.serverURL = "https://parseapi.back4app.com/";
-
     const input = document.querySelector("#mobile");
     const iti = window.intlTelInput(input, {
       initialCountry: "pk",
@@ -173,7 +167,7 @@
       const newEmail = document.getElementById('email').value.trim();
       const newPassword = document.getElementById('password').value.trim();
       const confirmPassword = document.getElementById('confirm-password').value.trim();
-      const newMobile = iti.getNumber().replace("+", ""); 
+      const newMobile = iti.getNumber().replace("+", "");
 
       if (!newUsername || !newEmail || !newMobile || !newPassword || !confirmPassword)
         return Swal.fire('Missing Fields', 'Please fill all fields.', 'warning');
@@ -199,7 +193,7 @@
 
         await newUser.signUp();
 
-        // Send welcome WhatsApp
+        // Send welcome WhatsApp template
         await Parse.Cloud.run("sendWelcomeWhatsApp", { username: newUsername, mobile: newMobile });
 
         Swal.fire({ icon: 'success', title: 'Signup Successful', text: 'Welcome WhatsApp sent!', confirmButtonText: 'Go to Login' })
@@ -213,80 +207,37 @@
 
     // Policies
     document.getElementById("termsLink").addEventListener("click", () => {
-      Swal.fire({
-        title: "Terms & Conditions",
-        html: `
-          <div style="text-align:left;">
-            <strong>Effective Date:</strong> July 25, 2025<br><br>
-            By signing up for and using the Feeder Monitoring System, you agree to the following terms:<br><br>
-            <strong>1. Account Registration</strong>
-            <ul><li>You must provide accurate and complete registration information.</li>
-            <li>You may not use false or misleading information to create an account.</li></ul>
-            <strong>2. Account Security</strong>
-            <ul><li>You are responsible for maintaining the confidentiality of your login credentials.</li>
-            <li>Notify the system administrator immediately if you suspect unauthorized access.</li></ul>
-            <strong>3. Authorized Usage</strong>
-            <ul><li>This system is strictly for authorized users and feeder monitoring purposes only.</li>
-            <li>Unauthorized access, sharing, or tampering with data is prohibited.</li></ul>
-            <strong>4. System Monitoring</strong>
-            <ul><li>All user activity may be logged for audit and security purposes.</li>
-            <li>Misuse may result in suspension, investigation, or termination of your access.</li></ul>
-            <strong>5. Agreement</strong>
-            <ul><li>By creating an account, you agree to abide by all system policies and terms.</li></ul>
-          </div>`,
-        icon: "info",
-        confirmButtonText: "Close"
-      });
+      Swal.fire({ title: "Terms & Conditions", html: `
+        <div style="text-align:left;">
+          <strong>Effective Date:</strong> July 25, 2025<br><br>
+          By signing up for and using the Feeder Monitoring System, you agree to the following terms:<br><br>
+          <strong>1. Account Registration</strong>
+          <ul><li>Provide accurate info.</li><li>No false info.</li></ul>
+          <strong>2. Account Security</strong>
+          <ul><li>Keep credentials safe.</li><li>Notify admin for breaches.</li></ul>
+          <strong>3. Authorized Usage</strong>
+          <ul><li>Only authorized users.</li><li>No tampering or sharing.</li></ul>
+          <strong>4. System Monitoring</strong>
+          <ul><li>User activity may be logged.</li><li>Misuse can lead to suspension.</li></ul>
+          <strong>5. Agreement</strong>
+          <ul><li>Agree to all policies.</li></ul>
+        </div>`, icon: "info", confirmButtonText: "Close" });
     });
 
     document.getElementById('privacyLink').addEventListener('click', () => {
-      Swal.fire({
-        title: 'Privacy Policy',
-        html: `
-          <div style="text-align:left;">
-            <strong>Effective Date:</strong> July 25, 2025<br><br>
-            Your privacy is important to us. This policy outlines how we handle your data:<br><br>
-            <ol style="padding-left: 1.2em;">
-              <li><strong>Data Collection:</strong> We collect only the necessary data to operate the system (e.g., username, feeder inputs).</li>
-              <li><strong>Data Security:</strong> All data is stored securely and encrypted where applicable.</li>
-              <li><strong>Privacy Commitment:</strong> We do not share, sell, or transfer your personal information.</li>
-              <li><strong>Data Deletion:</strong> You can request deletion of your data by contacting the admin.</li>
-              <li><strong>Support:</strong> For any concerns, contact support or your site administrator.</li>
-            </ol>
-          </div>`,
-        icon: 'info'
-      });
+      Swal.fire({ title: 'Privacy Policy', html: `
+        <div style="text-align:left;">
+          <strong>Effective Date:</strong> July 25, 2025<br><br>
+          Data collection, security, deletion, and support policies explained.
+        </div>`, icon: 'info' });
     });
 
     document.getElementById('refundLink').addEventListener('click', () => {
-      Swal.fire({
-        title: 'Refund Policy',
-        html: `
-          <div style="text-align:left;">
-            <strong>Effective Date:</strong> July 25, 2025<br><br>
-            This refund policy applies to activation key purchases:<br><br>
-            <ol style="padding-left: 1.2em;">
-              <li><strong>Final Sale:</strong> All activation key purchases are final and non-refundable.</li>
-              <li><strong>Refunds Are Only Considered If:</strong>
-                <ol type="a" style="padding-left: 1.5em;">
-                  <li>You were charged more than once</li>
-                  <li>You didn’t receive the key and support couldn’t resolve it within 7 days</li>
-                  <li>The system failed and couldn’t be fixed in a reasonable time</li>
-                </ol>
-              </li>
-              <li><strong>Refunds Are Not Provided For:</strong>
-                <ol type="a" style="padding-left: 1.5em;">
-                  <li>You changed your mind</li>
-                  <li>You misunderstood the system or its features</li>
-                  <li>Lost login credentials</li>
-                  <li>Unauthorized or shared use after key delivery</li>
-                </ol>
-              </li>
-              <li><strong>Request Process:</strong> Contact us with proof of purchase and a brief explanation. Each case is reviewed within 5–7 business days.</li>
-            </ol>
-          </div>`,
-        icon: 'info'
-      });
+      Swal.fire({ title: 'Refund Policy', html: `
+        <div style="text-align:left;">
+          <strong>Effective Date:</strong> July 25, 2025<br><br>
+          All activation key purchases are final. Refund exceptions outlined.
+        </div>`, icon: 'info' });
     });
   </script>
 </body>
