@@ -115,15 +115,7 @@
   </footer>
 
   <script>
-     // Example: user role fetched from login/session
-  const userRole = "employee"; // or "admin"
-
-  const alertButton = document.getElementById("alertButton");
-
-  if (userRole !== "admin") {
-    alertButton.style.display = "none"; // hide button for non-admins
-  }
-   
+     
    const feederContainer = document.getElementById("feeder-container");
 
     function showAddDeleteOptions() {
@@ -442,7 +434,12 @@ async function fetchFeeders() {
         alert("❌ Error: " + err.message);
       }
     }
-     
+     // Example: assuming you store the role in localStorage after login
+  const userRole = localStorage.getItem("role"); // "admin" or "employee"
+
+  if (userRole === "admin") {
+    document.getElementById("alertButton").style.display = "inline-block";
+  }
     fetchFeeders();
   </script>
 </body>
