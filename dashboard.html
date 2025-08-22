@@ -434,10 +434,10 @@ async function fetchFeeders() {
         alert("❌ Error: " + err.message);
       }
     }
-     const userRole = sessionStorage.getItem("role"); // "admin" or "employee"
+    const btn = document.getElementById("alertButton");
+  const userRole = sessionStorage.getItem("role"); // "admin" or "users"
 
   if (userRole === "admin") {
-    const btn = document.getElementById("alertButton");
     btn.style.display = "inline-block";
     btn.onclick = function () {
       window.location.href = "alert.html";
